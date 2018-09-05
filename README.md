@@ -3,7 +3,7 @@ Get updated task lists during development based on comments in your code.
 
 PREREQUISITES:
 
-python
+python<br>
 argopt python module
 
 SETUP:
@@ -24,26 +24,24 @@ Works great in team development environments as well! No need to track your outs
 If multiple people are working on a file simply note the name of the person in the comment to assign the task to them and let them use flowcat to match the tasks that belong to them.
 
 As an example:
+<pre>
 <code>
 #@marvin Fix the sanitation of variables
 SOME CODE
 #@Arthur Create a new menu item for the babel fish on our site.
 #@marvin Create happy() function to define things that make you happy.
-</code>
+</code></pre>
 Now when we run taskcat we can specify the regex in the argument as <code>-m "#@marvin"</code> to get all of Mavin's tasks and <code>-m "#@Arthur"</code> to get a list of Arthur's tasks.
 
 OPTIONS:
 
 Usage:
   todolist [-h] (-f folder) [-o outfile] [-l] [-m match]
-
+<pre>
 Options:
   -h --help     Show this screen.
   -l  Show line numbers
   -f /path/to/folder or file
   -o /path/to/outputfile  File will be overwritten if it exists
   -m (OPTIONAL) regex to match a todo item for ex -m "#@note" matches anything after #@note. Defaults to "#@todo\ "
-  
-  
-  
-  
+</pre>
