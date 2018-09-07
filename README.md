@@ -11,7 +11,7 @@ SETUP:
 To install flowcat run <code>git clone https://github.com/Acetolyne/flowcat.git</code><br>
 If you do not have argopt installed you can install it with <code>pip install argopt</code><br>
 You can now run flowcat from the directory you downloaded it to by running <code>./flowcat -f FOLDER/FILE OTEHR OPTIONS</code><br>
-To ba able to run it from anywhere create a symbolic link in your /usr/bin or /usr/share/bin directory that points to the location of the flowcat executable.
+To be able to run it from anywhere create a symbolic link in your /usr/bin or /usr/share/bin directory that points to the location of the flowcat executable.
 
 
 ABOUT:
