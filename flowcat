@@ -1,0 +1,136 @@
+#! /usr/bin/python
+
+"""FlowCat
+
+Usage:
+  flowcat [-h] (-f folder/file) [-o outfile] [-l] [-m match]
+
+Options:
+  -h --help     Show this screen.
+  -l  Show line numbers
+  -f /path/to/folder or file
+  -o /path/to/outputfile
+  -m regex to match a todo item for ex -m "#@note" matches anything after #@note. Defaults to 
+     "#@todo\ "
+
+  Regex arguments should be surrounded by quotes.
+  Using ^ will mean the line has to begin with the regex statement and will not show lines that have code before the regex meaning inline comments will not be picked up
+  All typical regex statements should be used, typically you will simply use the string you are searching for.
+
+  Note that if the output file exists it will be overwritten not appended maybe in the next version.
+
+
+"""
+
+from docopt import docopt
+import os
+import re
+
+arguments = docopt(__doc__, version='flowcat 1.0.0')
+for k, v in arguments.iteritems():
+    if(k == "-f"):
+        fold = v
+    if(k == "-o"):
+        out = v
+        if out != None:
+            f = open(out, "w+")
+            f.close()
+    if(k == "-l"):
+        l = v
+    if(k == "-m"):
+        if(v == None):
+            match = "#@todo\ "
+        else:
+            match = v
+
+
+def write(output):
+    if out != None:
+        f = open(out, "a")
+        f.write(output + "\n")
+
+
+def getSingle(filename, match):
+    f = open(filename, 'r')
+    for line in f:
+        if match[0] == '^':
+            if(m.match(line)):
+                print(filename)
+                write(filename)
+                return True
+        else:
+            if(m.search(line)):
+                print(filename)
+                write(filename)
+                return True
+
+
+def parseFile(m, filename, match):
+    ln = 0
+    if match[0] == '^':
+        curmatch = match[1:]
+    else:
+        curmatch = match
+    if getSingle(filename, match) == True:
+        f = open(filename, 'r')
+        for line in f:
+            ln += 1
+            if match[0] == '^':
+                if(m.match(line)):
+                    # only show the part of the line that is after the regular
+                    # expression match
+                    fin = re.split(match, line)
+                    if l == True:
+                        pre = "\t" + str(ln) + ") "
+                    else:
+                        pre = "\t"
+                    print(pre + fin[1].rstrip())
+                    write(pre + fin[1].rstrip())
+            else:
+                if(m.search(line)):
+                    # only show the part of the line that is after the regular
+                    # expression match
+                    fin = re.split(match, line)
+                    if l == True:
+                        pre = "\t" + str(ln) + ") "
+                    else:
+                        pre = "\t"
+                    print(pre + fin[1].rstrip())
+                    write(pre + fin[1].rstrip())
+
+
+def parseFolder(m, dirpath, dirnames, filenames, match):
+    if match[0] == '^':
+        curmatch = match[1:]
+    else:
+        curmatch = match
+    dirname = ""
+    for filename in filenames:
+        parseFile(m, filename, match)
+    for dirname in dirnames:
+        curpath = fold + "/" + dirname
+        for (dirpath, dirnames, filenames) in os.walk(curpath):
+            for filename in filenames:
+                filename = dirpath + "/" + filename
+                parseFile(m, filename, match)
+
+#@todo compress parsing of file and let parse folder use the new function (code compression)
+#@todo create a local repository
+#@todo create page on acetolyne.net for this tool
+#@todo version 2 should be able to match on multiple regular expressions at a time.
+#@todo make changelog file
+#@todo create some automated tests with docker especially for testing regex
+#@todo update readme with an example of the output
+
+m = re.compile(match)
+print("Matching on '" + match + "'")
+if os.path.isdir(fold) == True:
+    for (dirpath, dirnames, filenames) in os.walk(fold):
+        parseFolder(m, dirpath, dirnames, filenames, match)
+        break
+elif os.path.isfile(fold) == True:
+    filename = fold
+    parseFile(m, filename, match)
+else:
+    print("Folder or file not found check your -f argument")
+    exit
