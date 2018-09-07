@@ -1,14 +1,18 @@
 # flowcat
-Get updated task lists during development based on comments in your code.
+<b>Get updated task lists during development based on comments in your code.</b>
 
 PREREQUISITES:
 
-python<br>
+python >= 2.7<br>
 argopt python module
 
 SETUP:
 
-If you do not have argopt installed you can install it with <code>pip install argopt</code>
+To install flowcat run <code>git clone https://github.com/Acetolyne/flowcat.git</code><br>
+If you do not have argopt installed you can install it with <code>pip install argopt</code><br>
+You can now run flowcat from the directory you downloaded it to by running <code>./flowcat -f FOLDER/FILE OTEHR OPTIONS</code><br>
+To ba able to run it from anywhere create a symbolic link in your /usr/bin or /usr/share/bin directory that points to the location of the flowcat executable.
+
 
 ABOUT:
 
@@ -31,7 +35,7 @@ SOME CODE
 #@Arthur Create a new menu item for the babel fish on our site.
 #@marvin Create happy() function to define things that make you happy.
 </code></pre>
-Now when we run taskcat we can specify the regex in the argument as <code>-m "#@marvin"</code> to get all of Mavin's tasks and <code>-m "#@Arthur"</code> to get a list of Arthur's tasks.
+Now when we run taskcat we can specify the regex in the argument as <code>-m "#@marvin"</code> to get all of Mavin's tasks and <code>-m "#@Arthur"</code> to get a list of Arthur's tasks. All tasks should be a comment in your code in PHP your line should start with <code>\\</code> in python and other laguages it will need to start with a <code>#</code>
 
 OPTIONS:
 
@@ -43,5 +47,5 @@ Options:
   -l  Show line numbers
   -f /path/to/folder or file
   -o /path/to/outputfile  File will be overwritten if it exists
-  -m (OPTIONAL) regex to match a todo item for ex -m "#@note" matches anything after #@note. Defaults to "#@todo\ "
+  -m regex to match a todo item for example -m "#@note" matches anything after #@note. Defaults to "#@todo\ "
 </pre>

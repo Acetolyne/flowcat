@@ -114,11 +114,8 @@ def parseFolder(m, dirpath, dirnames, filenames, match):
                 filename = dirpath + "/" + filename
                 parseFile(m, filename, match)
 
-#@todo compress parsing of file and let parse folder use the new function (code compression)
-#@todo create a local repository
 #@todo create page on acetolyne.net for this tool
 #@todo version 2 should be able to match on multiple regular expressions at a time.
-#@todo make changelog file
 #@todo create some automated tests with docker especially for testing regex
 #@todo update readme with an example of the output
 
