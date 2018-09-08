@@ -52,6 +52,9 @@ def write(output):
 
 def getSingle(filename, match):
     f = open(filename, 'r')
+    if fold != filename:
+        fileprt=re.split(fold, filename)
+        filename = fileprt[1]
     for line in f:
         if match[0] == '^':
             if(m.match(line)):
@@ -106,7 +109,8 @@ def parseFolder(m, dirpath, dirnames, filenames, match):
         curmatch = match
     dirname = ""
     for filename in filenames:
-        parseFile(m, filename, match)
+        curfile=fold+"/"+filename
+        parseFile(m, curfile, match)
     for dirname in dirnames:
         curpath = fold + "/" + dirname
         for (dirpath, dirnames, filenames) in os.walk(curpath):
@@ -120,7 +124,7 @@ def parseFolder(m, dirpath, dirnames, filenames, match):
 #@todo update readme with an example of the output
 
 m = re.compile(match)
-print("Matching on '" + match + "'")
+print("Matching on '" + match + "'\n")
 if os.path.isdir(fold) == True:
     for (dirpath, dirnames, filenames) in os.walk(fold):
         parseFolder(m, dirpath, dirnames, filenames, match)
