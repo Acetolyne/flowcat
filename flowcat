@@ -1,15 +1,16 @@
-#! /usr/bin/python
+#! /usr/bin/python3
 
 """FlowCat
 
 Usage:
-  flowcat [-h] (-f folder/file) [-o outfile] [-l] [-m match]
+  flowcat [-h] (-f folder/file) [-o outfile] [-l] [-g] [-m match]  
 
 Options:
   -h --help     Show this screen.
   -l  Show line numbers
   -f /path/to/folder or file
   -o /path/to/outputfile
+  -g  create GitHub issue from todo items
   -m regex to match a todo item for ex -m "#@note" matches anything after #@note. Defaults to 
      "#@todo\ "
 
@@ -26,8 +27,8 @@ from docopt import docopt
 import os
 import re
 
-arguments = docopt(__doc__, version='flowcat 1.0.0')
-for k, v in arguments.iteritems():
+arguments = docopt(__doc__, version='flowcat 1.1.0')
+for k, v in list(arguments.items()):
     if(k == "-f"):
         fold = v
     if(k == "-o"):
@@ -42,7 +43,14 @@ for k, v in arguments.iteritems():
             match = "#@todo\ "
         else:
             match = v
+    if(k == "-g"):
+        g = v
 
+def github():
+    #@todo authenticate with github
+    print("*****INFO: -g Option not yet implemented coming in 1.1.1*****\n")
+    #@todo get all issues
+    #@todo if the issue does not exist then create it
 
 def write(output):
     if out != None:
@@ -70,10 +78,10 @@ def getSingle(filename, match):
 
 def parseFile(m, filename, match):
     ln = 0
-    if match[0] == '^':
-        curmatch = match[1:]
-    else:
-        curmatch = match
+    #if match[0] == '^':
+    #    curmatch = match[1:]
+    #else:
+    #    curmatch = match
     if getSingle(filename, match) == True:
         f = open(filename, 'r')
         for line in f:
@@ -87,7 +95,8 @@ def parseFile(m, filename, match):
                         pre = "\t" + str(ln) + ") "
                     else:
                         pre = "\t"
-                    print(pre + fin[1].rstrip())
+                    print((pre + fin[1].rstrip()))
+                    #@todo if -g is true then write to line and append reference to new github issue
                     write(pre + fin[1].rstrip())
             else:
                 if(m.search(line)):
@@ -98,33 +107,35 @@ def parseFile(m, filename, match):
                         pre = "\t" + str(ln) + ") "
                     else:
                         pre = "\t"
-                    print(pre + fin[1].rstrip())
+                    print((pre + fin[1].rstrip()))
                     write(pre + fin[1].rstrip())
 
 
 def parseFolder(m, dirpath, dirnames, filenames, match):
-    if match[0] == '^':
-        curmatch = match[1:]
-    else:
-        curmatch = match
+    #if match[0] == '^':
+    #    curmatch = match[1:]
+    #else:
+    #    curmatch = match
     dirname = ""
     for filename in filenames:
-        curfile=fold+"/"+filename
+        curfile = fold+"/"+filename
         parseFile(m, curfile, match)
     for dirname in dirnames:
-        curpath = fold + "/" + dirname
-        for (dirpath, dirnames, filenames) in os.walk(curpath):
-            for filename in filenames:
-                filename = dirpath + "/" + filename
-                parseFile(m, filename, match)
+        if not dirname.startswith("."):
+            curpath = fold + "/" + dirname
+            for (dirpath, dirnames, filenames) in os.walk(curpath):
+                for filename in filenames:
+                    filename = dirpath + "/" + filename
+                    parseFile(m, filename, match)
 
 #@todo create page on acetolyne.net for this tool
 #@todo version 2 should be able to match on multiple regular expressions at a time.
 #@todo create some automated tests with docker especially for testing regex
 #@todo update readme with an example of the output
-
+if g:
+    github()
 m = re.compile(match)
-print("Matching on '" + match + "'\n")
+print(("Matching on '" + match + "'\n"))
 if os.path.isdir(fold) == True:
     for (dirpath, dirnames, filenames) in os.walk(fold):
         parseFolder(m, dirpath, dirnames, filenames, match)
