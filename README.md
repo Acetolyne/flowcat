@@ -45,7 +45,7 @@ If there is a need please put in a feature request on GitHub.
 ### OPTIONS
 
 Usage:
-  todolist [-h] (-f folder) [-o outfile] [-l] [-m match]
+  flowcat [-h] (-f folder) [-o outfile] [-l] [-m match]
 
 Options:
   -h --help     Show this screen.
