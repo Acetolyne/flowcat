@@ -82,33 +82,34 @@ def parseFile(m, filename, match):
     #    curmatch = match[1:]
     #else:
     #    curmatch = match
-    if getSingle(filename, match) == True:
-        f = open(filename, 'r')
-        for line in f:
-            ln += 1
-            if match[0] == '^':
-                if(m.match(line)):
-                    # only show the part of the line that is after the regular
-                    # expression match
-                    fin = re.split(match, line)
-                    if l == True:
-                        pre = "\t" + str(ln) + ") "
-                    else:
-                        pre = "\t"
-                    print((pre + fin[1].rstrip()))
-                    #@todo if -g is true then write to line and append reference to new github issue
-                    write(pre + fin[1].rstrip())
-            else:
-                if(m.search(line)):
-                    # only show the part of the line that is after the regular
-                    # expression match
-                    fin = re.split(match, line)
-                    if l == True:
-                        pre = "\t" + str(ln) + ") "
-                    else:
-                        pre = "\t"
-                    print((pre + fin[1].rstrip()))
-                    write(pre + fin[1].rstrip())
+    if "__pycache__" not in filename:
+        if getSingle(filename, match) == True:
+            f = open(filename, 'r')
+            for line in f:
+                ln += 1
+                if match[0] == '^':
+                    if(m.match(line)):
+                        # only show the part of the line that is after the regular
+                        # expression match
+                        fin = re.split(match, line)
+                        if l == True:
+                            pre = "\t" + str(ln) + ") "
+                        else:
+                            pre = "\t"
+                        print((pre + fin[1].rstrip()))
+                        #@todo if -g is true then write to line and append reference to new github issue
+                        write(pre + fin[1].rstrip())
+                else:
+                    if(m.search(line)):
+                        # only show the part of the line that is after the regular
+                        # expression match
+                        fin = re.split(match, line)
+                        if l == True:
+                            pre = "\t" + str(ln) + ") "
+                        else:
+                            pre = "\t"
+                        print((pre + fin[1].rstrip()))
+                        write(pre + fin[1].rstrip())
 
 
 def parseFolder(m, dirpath, dirnames, filenames, match):
@@ -118,15 +119,18 @@ def parseFolder(m, dirpath, dirnames, filenames, match):
     #    curmatch = match
     dirname = ""
     for filename in filenames:
-        curfile = fold+"/"+filename
-        parseFile(m, curfile, match)
+        if not filename.startswith("__"):
+            curfile = fold+"/"+filename
+            parseFile(m, curfile, match)
     for dirname in dirnames:
         if not dirname.startswith("."):
-            curpath = fold + "/" + dirname
-            for (dirpath, dirnames, filenames) in os.walk(curpath):
-                for filename in filenames:
-                    filename = dirpath + "/" + filename
-                    parseFile(m, filename, match)
+            if "__pycache__" not in dirname:
+                curpath = fold + "/" + dirname
+                for (dirpath, dirnames, filenames) in os.walk(curpath):
+                    if not dirname.startswith("__"):
+                        for filename in filenames:
+                            filename = dirpath + "/" + filename
+                            parseFile(m, filename, match)
 
 #@todo create page on acetolyne.net for this tool
 #@todo version 2 should be able to match on multiple regular expressions at a time.
