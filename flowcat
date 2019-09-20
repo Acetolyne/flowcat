@@ -63,17 +63,20 @@ def getSingle(filename, match):
     if fold != filename:
         fileprt=re.split(fold, filename)
         filename = fileprt[1]
-    for line in f:
-        if match[0] == '^':
-            if(m.match(line)):
-                print(filename)
-                write(filename)
-                return True
-        else:
-            if(m.search(line)):
-                print(filename)
-                write(filename)
-                return True
+    try:
+        for line in f:
+            if match[0] == '^':
+                if(m.match(line)):
+                    print(filename)
+                    write(filename)
+                    return True
+            else:
+                if(m.search(line)):
+                    print(filename)
+                    write(filename)
+                    return True
+    except UnicodeDecodeError:
+        pass
 
 
 def parseFile(m, filename, match):
