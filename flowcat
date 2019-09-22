@@ -46,6 +46,9 @@ for k, v in list(arguments.items()):
     if(k == "-g"):
         g = v
 
+if fold.startswith("."):
+    fold = os.getcwd()+'/'+fold
+
 def github():
     #@todo authenticate with github
     print("*****INFO: -g Option not yet implemented coming in 1.1.1*****\n")
