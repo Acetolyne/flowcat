@@ -1,11 +1,10 @@
-# flowcat 1.1.0
+# flowcat 2.0.0
 
 ## Get updated task lists during development based on comments in your code
 
 ### PREREQUISITES
 
-python >= 3.0
-argopt python module
+None
 
 ### SETUP
 

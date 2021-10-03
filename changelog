@@ -1,6 +1,7 @@
-VERSION 1.1.0
+VERSION 2.0.0
 
-Moved to Python3
-Fixed README.md syntax
-Fixed bug where specifying a folder recursed into hidden directories.
-
+Moved to GoLang
+Program is now a single binary
+Temporarily remove unfinished github issue feature
+Changed default match to \\@todo insteaed of #@todo
+Added better handling for unparsable files.
