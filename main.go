@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -65,13 +66,6 @@ func main() {
 	helpFlag := flag.Bool("h", false, "Shows the help menu.")
 	flag.Parse()
 
-	//@todo remove below after testing
-	fmt.Println("Folder: ", *folderFlag)
-	fmt.Println("Output: ", *outputFlag)
-	fmt.Println("Match: ", *matchFlag)
-	fmt.Println("Lines: ", *lineFlag)
-	fmt.Println("Help: ", *helpFlag)
-
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
 	if *helpFlag {
 		fmt.Println("Usage of Flowcat:")
@@ -87,7 +81,7 @@ func main() {
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 		if *outputFlag != "" {
 			//f, err := os.Create(*outputFlag)
-			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
+			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
 			//defer f.Close()
 			if err != nil && F != nil {
 				fmt.Println("ERROR: could not write output to", *outputFlag)
