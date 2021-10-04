@@ -6,7 +6,26 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
+
+func testExclude(path string) (string, bool) {
+	var f []string
+	f = append(f, "^\\.")
+	f = append(f, "todo")
+	for _, i := range f {
+		//fmt.Println("From slice", i)
+		v, _ := regexp.Compile(i)
+		//fmt.Println("After changed", v)
+		regCheck := v.MatchString(strings.TrimSpace(path))
+		//fmt.Println(v, regCheck)
+		if regCheck {
+			return path, true
+		}
+
+	}
+	return path, false
+}
 
 func main() {
 	fmt.Println("FlowCat")
@@ -37,28 +56,20 @@ func main() {
 		fmt.Println("    Optional output file to dump results to, note output will still be shown on terminal.")
 	}
 
-	getParsableFiles := func(path string, info os.FileInfo, _ error) (err error) {
-		var f []string
-		f = append(f, "^\\..*")
-		f = append(f, "todo")
+	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 		if info.Mode().IsRegular() {
-			//@todo later filter differently below is temporary
-			for _, i := range f {
-				//fmt.Println("From slice", i)
-				v, _ := regexp.Compile(i)
-				//fmt.Println("After changed", v)
-				regCheck := v.MatchString(info.Name())
-				fmt.Println(regCheck)
-
+			file, exc := testExclude(path)
+			if !exc {
+				fmt.Println(file)
 			}
-			fmt.Println(info.Name())
+
 		}
 		return nil
 	}
 
 	//Start crawling the base directory
 	//@todo change below to use filepath.WalkDir instead
-	err := filepath.Walk(*folderFlag, getParsableFiles)
+	err := filepath.Walk(*folderFlag, parseFiles)
 	if err != nil {
 		fmt.Println(err)
 	}
