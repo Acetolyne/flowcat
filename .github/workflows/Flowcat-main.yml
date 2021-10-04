@@ -38,4 +38,4 @@
         - name: Run a multi-line script
           run: |
             cd $GITHUB_WORKSPACE
-            echo `ls`
+            env GOOS=linux GOARCH=amd64 go build -o bin/flowcat-linux-amd64/flowcat
