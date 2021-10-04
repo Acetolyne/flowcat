@@ -2,9 +2,7 @@
 
 ## Get updated task lists during development based on comments in your code
 
-[![Flowcat main test]
-(https://github.com/Acetolyne/flowcat/actions/workflows/main.yml/badge.svg)]
-(https://github.com/Acetolyne/flowcat/actions/workflows/main.yml)
+[![Flowcat-main](https://github.com/Acetolyne/flowcat/actions/workflows/Flowcat-main.yml/badge.svg)](https://github.com/Acetolyne/flowcat/actions/workflows/Flowcat-main.yml)
 
 ### PREREQUISITES
 
