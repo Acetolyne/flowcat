@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+var ListedFiles []string
+
 func testExclude(path string) (string, bool) {
 	var f []string
 	f = append(f, "^\\.")
@@ -39,6 +41,17 @@ func testLine(line string, flag string) bool {
 		return true
 	}
 	return false
+}
+
+func listFile(file string) bool {
+	for _, v := range ListedFiles {
+		if v == file {
+			return false
+		}
+	}
+	ListedFiles = append(ListedFiles, file)
+	fmt.Println(file)
+	return true
 }
 
 func main() {
@@ -81,7 +94,8 @@ func main() {
 					for fscanner.Scan() {
 						incline := testLine(fscanner.Text(), *matchFlag)
 						if incline {
-							fmt.Println(fscanner.Text())
+							listFile(path)
+							fmt.Println("\t", fscanner.Text())
 						}
 					}
 				}
