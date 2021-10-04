@@ -11,7 +11,8 @@ import (
 	"strings"
 )
 
-//@todo make src folder that contains binaries for each OS and arch
+//@todo add more architectures under bin folder
+//@todo update master branch build badge
 var ListedFiles []string
 
 func testExclude(path string, outfile string) (string, bool) {
