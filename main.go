@@ -19,6 +19,9 @@ func testExclude(path string, outfile string) (string, bool) {
 	var f []string
 	//@todo make below come from a settings file passed in my argument -e
 	//@todo make global and per folder settings file .flowcat
+	//@todo add regex info to readme file
+	//@todo add builds to autorun in VSCode
+	//@todo make matching workflows for each build on Github to show status for each arch?
 	//ignore paths starting with period by default
 	f = append(f, "^\\.")
 	//ignore paths starting with underscore by default
