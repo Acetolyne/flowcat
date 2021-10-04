@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -25,6 +26,19 @@ func testExclude(path string) (string, bool) {
 
 	}
 	return path, false
+}
+
+func testLine(line string, flag string) bool {
+	//fmt.Println("From slice", i)
+	flag = "^" + flag
+	v, _ := regexp.Compile(flag)
+	//fmt.Println("After changed", v)
+	regCheck := v.MatchString(strings.TrimSpace(line))
+	//fmt.Println(v, regCheck)
+	if regCheck {
+		return true
+	}
+	return false
 }
 
 func main() {
@@ -59,10 +73,19 @@ func main() {
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 		if info.Mode().IsRegular() {
 			file, exc := testExclude(path)
+			//If the file does not match our exclusion regex then use it.
 			if !exc {
-				fmt.Println(file)
+				curfile, err := os.Open(file)
+				if err == nil {
+					fscanner := bufio.NewScanner(curfile)
+					for fscanner.Scan() {
+						incline := testLine(fscanner.Text(), *matchFlag)
+						if incline {
+							fmt.Println(fscanner.Text())
+						}
+					}
+				}
 			}
-
 		}
 		return nil
 	}
