@@ -11,18 +11,24 @@ import (
 	"strings"
 )
 
+//@todo make src folder that contains binaries for each OS and arch
 var ListedFiles []string
 
-func testExclude(path string) (string, bool) {
+func testExclude(path string, outfile string) (string, bool) {
 	var f []string
+	//@todo make below come from a settings file passed in my argument -e
+	//@todo make global and per folder settings file .flowcat
+	//ignore paths starting with period by default
 	f = append(f, "^\\.")
-	f = append(f, "todo")
+	//ignore paths starting with underscore by default
+	f = append(f, "^_")
+	//If we are outputting to a file ignore the output file by default
+	if outfile != "" {
+		f = append(f, outfile)
+	}
 	for _, i := range f {
-		//fmt.Println("From slice", i)
 		v, _ := regexp.Compile(i)
-		//fmt.Println("After changed", v)
 		regCheck := v.MatchString(strings.TrimSpace(path))
-		//fmt.Println(v, regCheck)
 		if regCheck {
 			return path, true
 		}
@@ -32,12 +38,9 @@ func testExclude(path string) (string, bool) {
 }
 
 func testLine(line string, flag string) bool {
-	//fmt.Println("From slice", i)
 	flag = "^" + flag
 	v, _ := regexp.Compile(flag)
-	//fmt.Println("After changed", v)
 	regCheck := v.MatchString(strings.TrimSpace(line))
-	//fmt.Println(v, regCheck)
 	if regCheck {
 		return true
 	}
@@ -68,27 +71,32 @@ func main() {
 
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
 	if *helpFlag {
-		fmt.Println("Usage of Flowcat:")
+		fmt.Println("Flowcat version 2.0.0")
+		fmt.Println("")
+		fmt.Println("Options for Flowcat:")
 		fmt.Println("-f string")
-		fmt.Println("    The project top level directory, where flowcat should start recursing from. (default '.' Current Directory)")
-		fmt.Println("-l    If line numbers should be shown with todo items in output.")
+		fmt.Println("   The project top level directory, where flowcat should start recursing from. (default '.' Current Directory)")
+		fmt.Println("-l")
+		fmt.Println("	If line numbers should be shown with todo items in output.")
 		fmt.Println("-m string")
-		fmt.Println("    The string to match to do items on. (default '//@todo')")
+		fmt.Println("   The string to match to do items on. (default '//@todo')")
 		fmt.Println("-o string")
-		fmt.Println("    Optional output file to dump results to, note output will still be shown on terminal.")
+		fmt.Println("   Optional output file to dump results to, note output will still be shown on terminal.")
+		fmt.Println("-h")
+		fmt.Println("   This help menu.")
+		os.Exit(0)
 	}
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 		if *outputFlag != "" {
-			//f, err := os.Create(*outputFlag)
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
-			//defer f.Close()
+			defer F.Close()
 			if err != nil && F != nil {
 				fmt.Println("ERROR: could not write output to", *outputFlag)
 			}
 		}
 		if info.Mode().IsRegular() {
-			file, exc := testExclude(path)
+			file, exc := testExclude(path, *outputFlag)
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
 				curfile, err := os.Open(file)
