@@ -91,11 +91,18 @@ func main() {
 				curfile, err := os.Open(file)
 				if err == nil {
 					fscanner := bufio.NewScanner(curfile)
+					var linenum = 0
+					var ln string
 					for fscanner.Scan() {
+						if *lineFlag {
+							linenum++
+							ln = fmt.Sprint(linenum)
+							ln = ln + ")"
+						}
 						incline := testLine(fscanner.Text(), *matchFlag)
 						if incline {
 							listFile(path)
-							fmt.Println("\t", fscanner.Text())
+							fmt.Println("\t", ln, strings.TrimSpace(fscanner.Text()))
 						}
 					}
 				}
