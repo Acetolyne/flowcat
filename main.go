@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -9,7 +10,18 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
+
+//@todo yaml package above fails due to certificate with go get gopkg.in/yaml.v2
+type Config struct {
+	Settings struct {
+		Linenums bool   `yaml:"linenum"`
+		Match    string `yaml:"match"`
+	} `yaml:"settings"`
+	Ignored []string `yaml:"ignore"`
+}
 
 //@todo add more architectures under bin folder
 //@todo update master branch build badge
@@ -65,6 +77,24 @@ func listFile(file string, f *os.File) bool {
 	return true
 }
 
+func initSettings() error {
+	f, err := os.Open(".flowcat")
+	defer f.Close()
+	if err == nil {
+		return errors.New("no setting file")
+	} else {
+		var cfg Config
+		fmt.Println(cfg.Settings.Linenums)
+		decoder := yaml.NewDecoder(f)
+		err = decoder.Decode(&cfg)
+		if err != nil {
+			return errors.New(err.Error())
+		}
+		return errors.New("setting file found")
+	}
+	//@todo if not exists then create one and add settings from user input
+}
+
 func main() {
 	var F *os.File
 
@@ -80,6 +110,8 @@ func main() {
 		fmt.Println("Flowcat version 2.0.0")
 		fmt.Println("")
 		fmt.Println("Options for Flowcat:")
+		fmt.Println("init")
+		fmt.Println("using flowcat init allows you to create a settings file used when flowcat is run in the current directory, settings can be changed later in the .flowcat file")
 		fmt.Println("-f string")
 		fmt.Println("   The project top level directory, where flowcat should start recursing from. (default '.' Current Directory)")
 		fmt.Println("-l")
@@ -91,6 +123,16 @@ func main() {
 		fmt.Println("-h")
 		fmt.Println("   This help menu.")
 		os.Exit(0)
+	}
+	//if we are using the init argument then run init function
+	if len(os.Args) > 1 && os.Args[1] == "init" {
+		err := initSettings()
+		if err != nil {
+			fmt.Println(err)
+		}
+		//always exit without running if we were using init argument
+		os.Exit(0)
+
 	}
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
