@@ -13,6 +13,8 @@ import (
 
 //@todo add more architectures under bin folder
 //@todo update master branch build badge
+//@todo add section in readme about building from source
+//@todo add section in readme about regex for -m option
 var ListedFiles []string
 
 func testExclude(path string, outfile string) (string, bool) {

@@ -68,7 +68,7 @@ If you need to you can specify those directories in the -f argument to get the t
 If there is a need please put in a feature request on GitHub.
 
 ### OPTIONS
-
+```
 Usage:
   flowcat [-h] (-f folder) [-o outfile] [-l] [-m match]
 
@@ -82,3 +82,4 @@ Options for Flowcat:
     Optional output file to dump results to, note output will still be shown on terminal.
 -h
     This help menu
+```
