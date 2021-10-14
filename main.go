@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -14,13 +15,15 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//@todo yaml package above fails due to certificate with go get gopkg.in/yaml.v2
 type Config struct {
-	Settings struct {
-		Linenums bool   `yaml:"linenum"`
-		Match    string `yaml:"match"`
-	} `yaml:"settings"`
-	Ignored []string `yaml:"ignore"`
+	Linenums     bool
+	Match        string
+	IgnoredItems map[string][]string
+}
+
+type Ignored struct {
+	Name       string
+	Properties []string
 }
 
 //@todo add more architectures under bin folder
@@ -28,23 +31,20 @@ type Config struct {
 //@todo add section in readme about building from source
 //@todo add section in readme about regex for -m option
 var ListedFiles []string
+var cfg Config
 
-func testExclude(path string, outfile string) (string, bool) {
-	var f []string
+func testExclude(path string, outfile string, cfg Config) (string, bool) {
 	//@todo make below come from a settings file passed in my argument -e
 	//@todo make global and per folder settings file .flowcat
 	//@todo add regex info to readme file
 	//@todo add builds to autorun in VSCode
 	//@todo make matching workflows for each build on Github to show status for each arch?
-	//ignore paths starting with period by default
-	f = append(f, "^\\.")
-	//ignore paths starting with underscore by default
-	f = append(f, "^_")
+	m := cfg.IgnoredItems["ignore"]
 	//If we are outputting to a file ignore the output file by default
 	if outfile != "" {
-		f = append(f, outfile)
+		m = append(m, outfile)
 	}
-	for _, i := range f {
+	for _, i := range m {
 		v, _ := regexp.Compile(i)
 		regCheck := v.MatchString(strings.TrimSpace(path))
 		if regCheck {
@@ -77,14 +77,13 @@ func listFile(file string, f *os.File) bool {
 	return true
 }
 
+//@todo finish init create file with standard settings if not found after input from user
 func initSettings() error {
 	f, err := os.Open(".flowcat")
 	defer f.Close()
-	if err == nil {
+	if err != nil {
 		return errors.New("no setting file")
 	} else {
-		var cfg Config
-		fmt.Println(cfg.Settings.Linenums)
 		decoder := yaml.NewDecoder(f)
 		err = decoder.Decode(&cfg)
 		if err != nil {
@@ -97,10 +96,12 @@ func initSettings() error {
 
 func main() {
 	var F *os.File
+	var showlines bool = false
+	var matchexp string
 
 	folderFlag := flag.String("f", ".", "The project top level directory, where flowcat should start recursing from.")
 	outputFlag := flag.String("o", "", "Optional output file to dump results to, note output will still be shown on terminal.")
-	matchFlag := flag.String("m", "//@todo", "The string to match to do items on.")
+	matchFlag := flag.String("m", "", "The string to match to do items on.")
 	lineFlag := flag.Bool("l", false, "If line numbers should be shown with todo items in output.")
 	helpFlag := flag.Bool("h", false, "Shows the help menu.")
 	flag.Parse()
@@ -135,6 +136,24 @@ func main() {
 
 	}
 
+	//Get settings if there is a settings file in the current directory
+	settings, err := ioutil.ReadFile(".flowcat")
+	if err != nil {
+		fmt.Println("settings file not found")
+	}
+	err = yaml.Unmarshal(settings, &cfg)
+	err = yaml.Unmarshal(settings, &cfg.IgnoredItems)
+	//@todo check what happens if settings file is missing a setting
+	showlines = cfg.Linenums
+	fmt.Println(showlines) //@todo why is this returning false always
+	if *lineFlag != false {
+		showlines = *lineFlag
+	}
+	matchexp = cfg.Match
+	if *matchFlag != "" {
+		matchexp = *matchFlag
+	}
+
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 		if *outputFlag != "" {
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
@@ -144,21 +163,22 @@ func main() {
 			}
 		}
 		if info.Mode().IsRegular() {
-			file, exc := testExclude(path, *outputFlag)
+			file, exc := testExclude(path, *outputFlag, cfg)
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
+				fmt.Println("Accepted", file)
 				curfile, err := os.Open(file)
 				if err == nil {
 					fscanner := bufio.NewScanner(curfile)
 					var linenum = 0
 					var ln string
 					for fscanner.Scan() {
-						if *lineFlag {
+						if showlines {
 							linenum++
 							ln = fmt.Sprint(linenum)
 							ln = ln + ")"
 						}
-						incline := testLine(fscanner.Text(), *matchFlag)
+						incline := testLine(fscanner.Text(), matchexp)
 						if incline {
 							listFile(path, F)
 							l := "\t" + ln + strings.TrimSpace(fscanner.Text())
@@ -176,7 +196,7 @@ func main() {
 
 	//Start crawling the base directory
 	//@todo change below to use filepath.WalkDir instead
-	err := filepath.Walk(*folderFlag, parseFiles)
+	err = filepath.Walk(*folderFlag, parseFiles)
 	if err != nil {
 		fmt.Println(err)
 	}
