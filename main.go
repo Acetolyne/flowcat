@@ -10,15 +10,16 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	Linenums     bool
-	Match        string
-	IgnoredItems map[string][]string
+	Linenums     string              `yaml:"linenum"`
+	Match        string              `yaml:"match"`
+	IgnoredItems map[string][]string `yaml:"ignore"`
 }
 
 type Ignored struct {
@@ -133,7 +134,6 @@ func main() {
 		}
 		//always exit without running if we were using init argument
 		os.Exit(0)
-
 	}
 
 	//Get settings if there is a settings file in the current directory
@@ -143,8 +143,9 @@ func main() {
 	}
 	err = yaml.Unmarshal(settings, &cfg)
 	err = yaml.Unmarshal(settings, &cfg.IgnoredItems)
+	fmt.Println(&cfg)
 	//@todo check what happens if settings file is missing a setting
-	showlines = cfg.Linenums
+	showlines, _ = strconv.ParseBool(cfg.Linenums)
 	fmt.Println(showlines) //@todo why is this returning false always
 	if *lineFlag != false {
 		showlines = *lineFlag
