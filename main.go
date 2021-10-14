@@ -143,16 +143,23 @@ func main() {
 	}
 	err = yaml.Unmarshal(settings, &cfg)
 	err = yaml.Unmarshal(settings, &cfg.IgnoredItems)
-	fmt.Println(&cfg)
 	//@todo check what happens if settings file is missing a setting
-	showlines, _ = strconv.ParseBool(cfg.Linenums)
-	fmt.Println(showlines) //@todo why is this returning false always
+	showlines, err = strconv.ParseBool(cfg.Linenums)
+	//@todo should this block? else what should the default be
+	if err != nil {
+		fmt.Println("linenum should be true or false")
+	}
 	if *lineFlag != false {
 		showlines = *lineFlag
 	}
 	matchexp = cfg.Match
+	fmt.Println(matchexp)
 	if *matchFlag != "" {
 		matchexp = *matchFlag
+	}
+	//Fallback incase settings is missing the match and one is not specified per an argument
+	if matchexp == "" {
+		matchexp = "//@todo"
 	}
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
