@@ -31,12 +31,12 @@ type Ignored struct {
 //@todo update master branch build badge
 //@todo add section in readme about building from source
 //@todo add section in readme about regex for -m option
+//@todo add unit testing
+//@todo add CI/CD pipeline for testing binaries on different OS's
 var ListedFiles []string
 var cfg Config
 
 func testExclude(path string, outfile string, cfg Config) (string, bool) {
-	//@todo make below come from a settings file passed in my argument -e
-	//@todo make global and per folder settings file .flowcat
 	//@todo add regex info to readme file
 	//@todo add builds to autorun in VSCode
 	//@todo make matching workflows for each build on Github to show status for each arch?
@@ -80,19 +80,33 @@ func listFile(file string, f *os.File) bool {
 
 //@todo finish init create file with standard settings if not found after input from user
 func initSettings() error {
+	var user_lines string
+	var user_match string
 	f, err := os.Open(".flowcat")
-	defer f.Close()
+	f.Close()
 	if err != nil {
-		return errors.New("no setting file")
-	} else {
-		decoder := yaml.NewDecoder(f)
-		err = decoder.Decode(&cfg)
+		var SetFile *os.File
+		fmt.Println("Display line numbers by default(true/false):")
+		fmt.Scanln(&user_lines)
+		fmt.Println("Regex to match on by default for this project(ex: //@todo):")
+		fmt.Scanln(&user_match)
+		//write the settings to the file
+		SetFile, err = os.OpenFile(".flowcat", os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
 		if err != nil {
-			return errors.New(err.Error())
+			return errors.New("ERROR: could not create settings file")
 		}
-		return errors.New("setting file found")
+		SetFile.WriteString("# Settings\n")
+		SetFile.WriteString("linenum: \"" + user_lines + "\"\n")
+		SetFile.WriteString("match: \"" + user_match + "\"\n\n")
+		SetFile.WriteString("# File patterns to ignore\n")
+		SetFile.WriteString("ignore:\n")
+		SetFile.WriteString("  - \"\\\\.flowcat\"\n")
+		SetFile.WriteString("  - \"^\\\\.\"\n")
+		SetFile.Close()
+		return nil
+	} else {
+		return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
 	}
-	//@todo if not exists then create one and add settings from user input
 }
 
 func main() {
@@ -143,11 +157,10 @@ func main() {
 	}
 	err = yaml.Unmarshal(settings, &cfg)
 	err = yaml.Unmarshal(settings, &cfg.IgnoredItems)
-	//@todo check what happens if settings file is missing a setting
 	showlines, err = strconv.ParseBool(cfg.Linenums)
 	//@todo should this block? else what should the default be
 	if err != nil {
-		fmt.Println("linenum should be true or false")
+		fmt.Println("linenum should be true or false", err)
 	}
 	if *lineFlag != false {
 		showlines = *lineFlag
@@ -172,9 +185,9 @@ func main() {
 		}
 		if info.Mode().IsRegular() {
 			file, exc := testExclude(path, *outputFlag, cfg)
+
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
-				fmt.Println("Accepted", file)
 				curfile, err := os.Open(file)
 				if err == nil {
 					fscanner := bufio.NewScanner(curfile)
