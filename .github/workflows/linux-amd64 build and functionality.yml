@@ -37,21 +37,22 @@
       # Runs a set of commands using the runners shell
         - name: build-script
           run: |
-            cd $GITHUB_WORKSPACE
+            cd ${{ github.workspace }}
             go get gopkg.in/yaml.v2
             env GOOS=linux GOARCH=amd64 go build -o bin/flowcat-linux-amd64/flowcat
+            cp bin/flowcat-linux-amd64/flowcat /usr/bin/flowcat
     #Job2
-    functionality-test:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-        - name: test-binary
-          run: |
-            cd ${{ github.workspace }}
-            ls -la
-            cd bin/flowcat-linux-amd64/
-            cp flowcat /usr/bin/flowcat
-            cd ${{ github.workspace }}/tests/assets/
-            cp .flowcat1 .flowcat
-            flowcat
+    # functionality-test:
+    #   needs: build
+    #   runs-on: ubuntu-latest
+    #   steps:
+    #     - name: test-binary
+    #       run: |
+    #         cd ${{ github.workspace }}
+    #         ls -la
+    #         cd bin/flowcat-linux-amd64/
+    #         cp flowcat /usr/bin/flowcat
+    #         cd ${{ github.workspace }}/tests/assets/
+    #         cp .flowcat1 .flowcat
+    #         flowcat
             
