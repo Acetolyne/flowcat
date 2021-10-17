@@ -47,11 +47,11 @@
       steps:
         - name: test-binary
           run: |
-            cd $GITHUB_WORKSPACE/
-            echo `ls`
+            cd ${{ github.workspace }}
+            ls -la
             cd bin/flowcat-linux-amd64/
             cp flowcat /usr/bin/flowcat
-            cd $GITHUB_WORKSPACE/tests/assets/
+            cd ${{ github.workspace }}/tests/assets/
             cp .flowcat1 .flowcat
             flowcat
             
