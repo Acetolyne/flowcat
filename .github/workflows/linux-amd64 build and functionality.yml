@@ -48,7 +48,7 @@
         - name: test-binary
           run: |
             cd $GITHUB_WORKSPACE/
-            ls
+            echo `ls`
             cd bin/flowcat-linux-amd64/
             cp flowcat /usr/bin/flowcat
             cd $GITHUB_WORKSPACE/tests/assets/
