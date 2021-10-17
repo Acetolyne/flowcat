@@ -42,6 +42,7 @@
             env GOOS=linux GOARCH=amd64 go build -o bin/flowcat-linux-amd64/flowcat
     #Job2
     functionality-test:
+      needs: build
       runs-on: ubuntu-latest
       steps:
         - name: test-binary
