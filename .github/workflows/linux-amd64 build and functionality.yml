@@ -40,7 +40,7 @@
             cd ${{ github.workspace }}
             go get gopkg.in/yaml.v2
             env GOOS=linux GOARCH=amd64 go build -o bin/flowcat-linux-amd64/flowcat
-            cp bin/flowcat-linux-amd64/flowcat /usr/bin/flowcat
+            cd bin/flowcat-linux-amd64/
     #Job2
     # functionality-test:
     #   needs: build
