@@ -27,19 +27,16 @@ type Ignored struct {
 	Properties []string
 }
 
-//@todo add more architectures under bin folder
-//@todo update master branch build badge
-//@todo add section in readme about building from source
-//@todo add section in readme about regex for -m option
+//@todo push binaries from github workflow
+//@todo update master branch build badges
 //@todo add unit testing
-//@todo add CI/CD pipeline for testing binaries on different OS's
+//@todo add github workflows for testing binaries on different OS's
 var ListedFiles []string
 var cfg Config
 
 func testExclude(path string, outfile string, cfg Config) (string, bool) {
-	//@todo add regex info to readme file
 	//@todo add builds to autorun in VSCode
-	//@todo make matching workflows for each build on Github to show status for each arch?
+	//@todo make matching workflows for each build on Github to show status for each arch
 	m := cfg.IgnoredItems["ignore"]
 	//If we are outputting to a file ignore the output file by default
 	if outfile != "" {
