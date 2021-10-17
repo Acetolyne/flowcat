@@ -47,7 +47,9 @@
       steps:
         - name: test-binary
           run: |
-            cd $GITHUB_WORKSPACE/bin/flowcat-linux-amd64/
+            cd $GITHUB_WORKSPACE/
+            ls
+            cd bin/flowcat-linux-amd64/
             cp flowcat /usr/bin/flowcat
             cd $GITHUB_WORKSPACE/tests/assets/
             cp .flowcat1 .flowcat
