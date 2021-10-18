@@ -172,6 +172,8 @@ func main() {
 		matchexp = "//@todo"
 	}
 
+	reg, _ := regexp.Compile(matchexp)
+
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 		if *outputFlag != "" {
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
@@ -199,8 +201,8 @@ func main() {
 						incline := testLine(fscanner.Text(), matchexp)
 						if incline {
 							listFile(path, F)
-							l := "\t" + ln + strings.TrimSpace(fscanner.Text())
-							fmt.Println("\t", ln, strings.TrimSpace(fscanner.Text()))
+							l := "\t" + ln + reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1]
+							fmt.Println("\t", ln, reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1])
 							if *outputFlag != "" {
 								F.WriteString(l + "\n")
 							}
