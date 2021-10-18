@@ -42,7 +42,7 @@
             env GOOS=linux GOARCH=amd64 go build -o bin/flowcat-linux-amd64/flowcat
             cp bin/flowcat-linux-amd64/flowcat tests/flowcat
             cd tests
-            exit 1
+            if [ "$(./flowcat -f assets/.flowcat1)" != "assets/.flowcat1 \"" ]; then exit 1; fi
             
     #Job2
     # functionality-test:

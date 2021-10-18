@@ -163,7 +163,6 @@ func main() {
 		showlines = *lineFlag
 	}
 	matchexp = cfg.Match
-	fmt.Println(matchexp)
 	if *matchFlag != "" {
 		matchexp = *matchFlag
 	}
