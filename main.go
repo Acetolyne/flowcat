@@ -54,7 +54,7 @@ func testExclude(path string, outfile string, cfg Config) (string, bool) {
 }
 
 func testLine(line string, flag string) bool {
-	flag = "^" + flag
+	//flag = "^" + flag
 	v, _ := regexp.Compile(flag)
 	regCheck := v.MatchString(strings.TrimSpace(line))
 	if regCheck {
@@ -149,16 +149,16 @@ func main() {
 
 	//Get settings if there is a settings file in the current directory
 	settings, err := ioutil.ReadFile(".flowcat")
-	if err != nil {
-		fmt.Println("settings file not found")
+	if err == nil {
+		showlines, err = strconv.ParseBool(cfg.Linenums)
+		//@todo should this block? else what should the default be
+		if err != nil {
+			fmt.Println("linenum should be true or false", err)
+		}
 	}
 	err = yaml.Unmarshal(settings, &cfg)
 	err = yaml.Unmarshal(settings, &cfg.IgnoredItems)
-	showlines, err = strconv.ParseBool(cfg.Linenums)
-	//@todo should this block? else what should the default be
-	if err != nil {
-		fmt.Println("linenum should be true or false", err)
-	}
+
 	if *lineFlag != false {
 		showlines = *lineFlag
 	}
