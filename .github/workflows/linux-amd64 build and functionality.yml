@@ -46,6 +46,14 @@
             if [[ `echo $?` -ne 0 ]]; then exit 1; fi
             ./flowcat -l -f assets/__testfile__ | grep "1)  test file" > /dev/null
             if [[ `echo $?` -ne 0 ]]; then exit 1; fi
+            ./flowcat -f assets/__testfile__ -o output
+            if [ ! -f output ]; then exit 1; fi
+            cat output | grep "after" > /dev/null
+            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
+            ./flowcat -m "#@todo" -f assets/__testfile__ -o output
+            cat output | grep "test 2" > /dev/null
+            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
+
             
     #Job2
     # functionality-test:
