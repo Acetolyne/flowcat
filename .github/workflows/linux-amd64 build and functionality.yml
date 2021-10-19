@@ -1,13 +1,13 @@
 # This is a basic workflow to help you get started with Actions
 
-  name: Flowcat-main
+  name: linux-amd64 build/functionality
   # Controls when the workflow will run
   on:
     # Triggers the workflow on push or pull request events but only for the master branch
     push:
-      branches: [ master ]
+      branches: [ 2.x.x ]
     pull_request:
-      branches: [ master ]
+      branches: [ 2.x.x ]
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
   # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -37,17 +37,36 @@
       # Runs a set of commands using the runners shell
         - name: build-script
           run: |
-            cd $GITHUB_WORKSPACE
+            cd ${{ github.workspace }}
+            go get gopkg.in/yaml.v2
             env GOOS=linux GOARCH=amd64 go build -o bin/flowcat-linux-amd64/flowcat
+            cp bin/flowcat-linux-amd64/flowcat tests/flowcat
+            cd tests
+            ./flowcat -f assets/__testfile__ | grep "test file.*" > /dev/null
+            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
+            ./flowcat -l -f assets/__testfile__ | grep "1)  test file" > /dev/null
+            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
+            ./flowcat -f assets/__testfile__ -o output
+            if [ ! -f output ]; then exit 1; fi
+            cat output | grep "after" > /dev/null
+            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
+            ./flowcat -m "#@todo" -f assets/__testfile__ -o output
+            cat output | grep "test 2" > /dev/null
+            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
+
+            
     #Job2
-    functionality-test:
-      runs-on: ubuntu-latest
-      steps:
-        - name: test-binary
-          run: |
-            cd $GITHUB_WORKSPACE/bin/flowcat-linux-amd64/
-            cp flowcat /usr/bin/flowcat
-            cd $GITHUB_WORKSPACE/tests/assets/
-            cp .flowcat1 .flowcat
-            flowcat
+    # functionality-test:
+    #   needs: build
+    #   runs-on: ubuntu-latest
+    #   steps:
+    #     - name: test-binary
+    #       run: |
+    #         cd ${{ github.workspace }}
+    #         ls -la
+    #         cd bin/flowcat-linux-amd64/
+    #         cp flowcat /usr/bin/flowcat
+    #         cd ${{ github.workspace }}/tests/assets/
+    #         cp .flowcat1 .flowcat
+    #         flowcat
             

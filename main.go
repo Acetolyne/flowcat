@@ -54,7 +54,7 @@ func testExclude(path string, outfile string, cfg Config) (string, bool) {
 }
 
 func testLine(line string, flag string) bool {
-	flag = "^" + flag
+	//flag = "^" + flag
 	v, _ := regexp.Compile(flag)
 	regCheck := v.MatchString(strings.TrimSpace(line))
 	if regCheck {
@@ -149,21 +149,20 @@ func main() {
 
 	//Get settings if there is a settings file in the current directory
 	settings, err := ioutil.ReadFile(".flowcat")
-	if err != nil {
-		fmt.Println("settings file not found")
+	if err == nil {
+		showlines, err = strconv.ParseBool(cfg.Linenums)
+		//@todo should this block? else what should the default be
+		if err != nil {
+			fmt.Println("linenum should be true or false", err)
+		}
 	}
 	err = yaml.Unmarshal(settings, &cfg)
 	err = yaml.Unmarshal(settings, &cfg.IgnoredItems)
-	showlines, err = strconv.ParseBool(cfg.Linenums)
-	//@todo should this block? else what should the default be
-	if err != nil {
-		fmt.Println("linenum should be true or false", err)
-	}
+
 	if *lineFlag != false {
 		showlines = *lineFlag
 	}
 	matchexp = cfg.Match
-	fmt.Println(matchexp)
 	if *matchFlag != "" {
 		matchexp = *matchFlag
 	}
@@ -171,6 +170,8 @@ func main() {
 	if matchexp == "" {
 		matchexp = "//@todo"
 	}
+
+	reg, _ := regexp.Compile(matchexp)
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 		if *outputFlag != "" {
@@ -199,8 +200,8 @@ func main() {
 						incline := testLine(fscanner.Text(), matchexp)
 						if incline {
 							listFile(path, F)
-							l := "\t" + ln + strings.TrimSpace(fscanner.Text())
-							fmt.Println("\t", ln, strings.TrimSpace(fscanner.Text()))
+							l := "\t" + ln + reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1]
+							fmt.Println("\t", ln, reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1])
 							if *outputFlag != "" {
 								F.WriteString(l + "\n")
 							}
