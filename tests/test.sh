@@ -27,10 +27,14 @@ arch=$1
 #     ;;
 # esac
 
+sudo -i
 #Start functionality tests for all binaries
+####TEMP STUFF
+ls
+cp bin/flowcat-linux-amd64/flowcat tests/bin/flowcat
 
 #Setup directory structure for tests
-sudo -i
+
 mkdir tests/tmp
 mkdir tests/tmp2
 mkdir tests/bin

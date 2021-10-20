@@ -43,5 +43,5 @@
             uname -a
             ls -la bin/flowcat-linux-amd64/
             cd tests
-            ./test.sh linux-amd64
+            sudo ./test.sh linux-amd64
             if [[ `echo $?` -ne 0 ]]; then exit 1; fi
