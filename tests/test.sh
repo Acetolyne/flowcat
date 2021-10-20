@@ -40,9 +40,8 @@ cp bin/flowcat-linux-amd64/flowcat tests/bin/flowcat
 mkdir tests/tmp
 mkdir tests/tmp2
 #mkdir tests/bin
-mv flowcat tests/bin/flowcat
-newpath = "$GITHUB_WORKSPACE/tests/bin"
-echo "{newpath}" >> $GITHUB_PATH
+#mv flowcat tests/bin/flowcat
+echo "$GITHUB_WORKSPACE/tests/bin" >> $GITHUB_PATH
 cd tests/tmp
 cp ../assets/__testfile__ .
 cd ../tmp2
