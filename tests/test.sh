@@ -101,10 +101,10 @@ if [[ $(echo $?) -ne 0 ]]; then
   exit 1
 fi
 #CanUsePathSettings
-# cp ../assets/.flowcat ../tmp2/.flowcat
-# res=$(flowcat -f ../tmp2/)
-# echo $res | grep -q '__testfile__ 1) test file 3) after'
-# if [[ $(echo $?) -ne 0 ]]; then
-#   echo "CanUsePathSettings Failed"
-#   exit 1
-# fi
+cp ../assets/.flowcat ../tmp2/.flowcat
+res=$(flowcat -f ../tmp2/)
+echo $res | grep -q '__testfile__ 1) test file 3) after'
+if [[ $(echo $?) -ne 0 ]]; then
+  echo "CanUsePathSettings Failed"
+  exit 1
+fi
