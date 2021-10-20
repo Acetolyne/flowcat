@@ -39,34 +39,6 @@
           run: |
             cd ${{ github.workspace }}
             go get gopkg.in/yaml.v2
-            env GOOS=linux GOARCH=amd64 go build -o bin/flowcat-linux-amd64/flowcat
-            cp bin/flowcat-linux-amd64/flowcat tests/flowcat
             cd tests
-            ./flowcat -f assets/__testfile__ | grep "test file.*" > /dev/null
-            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
-            ./flowcat -l -f assets/__testfile__ | grep "1)  test file" > /dev/null
-            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
-            ./flowcat -f assets/__testfile__ -o output
-            if [ ! -f output ]; then exit 1; fi
-            cat output | grep "after" > /dev/null
-            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
-            ./flowcat -m "#@todo" -f assets/__testfile__ -o output
-            cat output | grep "test 2" > /dev/null
-            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
-
-            
-    #Job2
-    # functionality-test:
-    #   needs: build
-    #   runs-on: ubuntu-latest
-    #   steps:
-    #     - name: test-binary
-    #       run: |
-    #         cd ${{ github.workspace }}
-    #         ls -la
-    #         cd bin/flowcat-linux-amd64/
-    #         cp flowcat /usr/bin/flowcat
-    #         cd ${{ github.workspace }}/tests/assets/
-    #         cp .flowcat1 .flowcat
-    #         flowcat
-            
+            ret=$(./test.sh linux-amd64)
+            exit $ret
