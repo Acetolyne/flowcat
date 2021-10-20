@@ -2,7 +2,6 @@
 
 #Arch is passed in as linux-amd64, linux-i386, etc
 arch=$1
-
 #Test that building the main.go file matches the binary that is in bin, confirms the binary is the latest build
 case $arch in
 
@@ -10,6 +9,7 @@ case $arch in
     dirsep="/"
     cd ..
     env GOOS=linux GOARCH=amd64 go build -o flowcat
+    ls -la
     diff flowcat bin/flowcat-$arch/flowcat
     if [[ `echo $?` -ne 0 ]]; then echo "Binary file $1 is not the latest" && exit 1; fi
     ;;
