@@ -40,5 +40,5 @@
             cd ${{ github.workspace }}
             go get gopkg.in/yaml.v2
             cd tests
-            ret=$(./test.sh linux-amd64)
-            exit $ret
+            ./test.sh linux-amd64
+            if [[ $(echo $?) -ne 0 ]]; then exit 1; fi

@@ -33,7 +33,7 @@ esac
 mkdir tests/tmp
 mkdir tests/tmp2
 mkdir tests/bin
-cp flowcat tests/bin/flowcat
+mv flowcat tests/bin/flowcat
 echo "::add-path::$GITHUB_WORKSPACE/tests/bin"
 cd tests/tmp
 cp ../assets/__testfile__ .
