@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -22,22 +23,17 @@ type Config struct {
 	IgnoredItems map[string][]string `yaml:"ignore"`
 }
 
-type Ignored struct {
-	Name       string
-	Properties []string
-}
-
-//@todo push binaries from github workflow
 //@todo update master branch build badges
 //@todo add unit testing
 //@todo add github workflows for testing binaries on different OS's
 var ListedFiles []string
-var cfg Config
+var Cfg Config
 
-func testExclude(path string, outfile string, cfg Config) (string, bool) {
+func checkExclude(path string, outfile string) (string, bool) {
 	//@todo add builds to autorun in VSCode
 	//@todo make matching workflows for each build on Github to show status for each arch
-	m := cfg.IgnoredItems["ignore"]
+	//@todo implement http://tools.ietf.org/html/draft-ietf-websec-mime-sniff to check for files we cant parse like binary data
+	m := Cfg.IgnoredItems["ignore"]
 	//If we are outputting to a file ignore the output file by default
 	if outfile != "" {
 		m = append(m, outfile)
@@ -53,7 +49,7 @@ func testExclude(path string, outfile string, cfg Config) (string, bool) {
 	return path, false
 }
 
-func testLine(line string, flag string) bool {
+func checkLine(line string, flag string) bool {
 	//flag = "^" + flag
 	v, _ := regexp.Compile(flag)
 	regCheck := v.MatchString(strings.TrimSpace(line))
@@ -111,7 +107,7 @@ func main() {
 	var showlines bool = false
 	var matchexp string
 
-	folderFlag := flag.String("f", ".", "The project top level directory, where flowcat should start recursing from.")
+	folderFlag := flag.String("f", "./", "The project top level directory, where flowcat should start recursing from.")
 	outputFlag := flag.String("o", "", "Optional output file to dump results to, note output will still be shown on terminal.")
 	matchFlag := flag.String("m", "", "The string to match to do items on.")
 	lineFlag := flag.Bool("l", false, "If line numbers should be shown with todo items in output.")
@@ -147,22 +143,27 @@ func main() {
 		os.Exit(0)
 	}
 
+	//If the -f argument contains a specific file then return the directory its in
+	dir, _ := path.Split(*folderFlag)
 	//Get settings if there is a settings file in the current directory
-	settings, err := ioutil.ReadFile(".flowcat")
+	settings, err := ioutil.ReadFile(dir + "/.flowcat")
+	//If there is a settings file then get the values
 	if err == nil {
-		showlines, err = strconv.ParseBool(cfg.Linenums)
+		err = yaml.Unmarshal(settings, &Cfg)
+		//Ignore errors
+		err = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
+		//Ignore errors
+		showlines, err = strconv.ParseBool(Cfg.Linenums)
 		//@todo should this block? else what should the default be
 		if err != nil {
 			fmt.Println("linenum should be true or false", err)
 		}
 	}
-	err = yaml.Unmarshal(settings, &cfg)
-	err = yaml.Unmarshal(settings, &cfg.IgnoredItems)
 
 	if *lineFlag != false {
 		showlines = *lineFlag
 	}
-	matchexp = cfg.Match
+	matchexp = Cfg.Match
 	if *matchFlag != "" {
 		matchexp = *matchFlag
 	}
@@ -170,7 +171,6 @@ func main() {
 	if matchexp == "" {
 		matchexp = "//@todo"
 	}
-
 	reg, _ := regexp.Compile(matchexp)
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
@@ -182,7 +182,7 @@ func main() {
 			}
 		}
 		if info.Mode().IsRegular() {
-			file, exc := testExclude(path, *outputFlag, cfg)
+			file, exc := checkExclude(path, *outputFlag)
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
@@ -197,7 +197,7 @@ func main() {
 							ln = fmt.Sprint(linenum)
 							ln = ln + ")"
 						}
-						incline := testLine(fscanner.Text(), matchexp)
+						incline := checkLine(fscanner.Text(), matchexp)
 						if incline {
 							listFile(path, F)
 							l := "\t" + ln + reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1]
