@@ -32,6 +32,7 @@ sudo -i
 ####TEMP STUFF
 cd ..
 ls
+echo $GITHUB_PATH
 mkdir tests/bin
 cp bin/flowcat-linux-amd64/flowcat tests/bin/flowcat
 
