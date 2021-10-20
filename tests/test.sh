@@ -34,7 +34,8 @@ mkdir tests/tmp
 mkdir tests/tmp2
 mkdir tests/bin
 mv flowcat tests/bin/flowcat
-echo "::add-path::$GITHUB_WORKSPACE/tests/bin"
+newpath = "$GITHUB_WORKSPACE/tests/bin"
+echo "{newpath}" >> $GITHUB_PATH
 cd tests/tmp
 cp ../assets/__testfile__ .
 cd ../tmp2
