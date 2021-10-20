@@ -102,8 +102,9 @@ if [[ $(echo $?) -ne 0 ]]; then
 fi
 #CanUsePathSettings
 cp ../assets/.flowcat ../tmp2/.flowcat
-res=$(flowcat -f ../tmp2/)
-echo $res | grep -q '__testfile__ 1) test file 3) after'
+cd ..
+res=$(flowcat -f tmp2/)
+echo $res | grep -q 'tmp2/.test 1) test file 3) after tmp2/__testfile__ 1) test file 3) after tmp2/regular 1) regular test 3) with exclude'
 if [[ $(echo $?) -ne 0 ]]; then
   echo "CanUsePathSettings Failed"
   exit 1
