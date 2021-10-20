@@ -32,13 +32,14 @@ sudo -i
 ####TEMP STUFF
 cd ..
 ls
+mkdir tests/bin
 cp bin/flowcat-linux-amd64/flowcat tests/bin/flowcat
 
 #Setup directory structure for tests
 
 mkdir tests/tmp
 mkdir tests/tmp2
-mkdir tests/bin
+#mkdir tests/bin
 mv flowcat tests/bin/flowcat
 newpath = "$GITHUB_WORKSPACE/tests/bin"
 echo "{newpath}" >> $GITHUB_PATH
