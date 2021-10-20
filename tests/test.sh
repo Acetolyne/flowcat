@@ -30,6 +30,7 @@ arch=$1
 #Start functionality tests for all binaries
 
 #Setup directory structure for tests
+sudo -i
 mkdir tests/tmp
 mkdir tests/tmp2
 mkdir tests/bin
