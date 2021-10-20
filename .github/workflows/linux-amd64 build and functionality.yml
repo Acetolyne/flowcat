@@ -39,6 +39,8 @@
           run: |
             cd ${{ github.workspace }}
             go get gopkg.in/yaml.v2
+            git branch
+            git checkout 2.x.x
             cd tests
             ./test.sh linux-amd64
             if [[ `echo $?` -ne 0 ]]; then exit 1; fi
