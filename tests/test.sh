@@ -30,6 +30,7 @@ arch=$1
 sudo -i
 #Start functionality tests for all binaries
 ####TEMP STUFF
+cd ..
 ls
 cp bin/flowcat-linux-amd64/flowcat tests/bin/flowcat
 
