@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-  name: "linux-amd64 build and functionality"
+  name: "linux-386 build and functionality"
   # Controls when the workflow will run
   on:
     # Triggers the workflow on push or pull request events but only for the master branch
@@ -41,5 +41,5 @@
           run: |
             cd ${{ github.workspace }}
             cd tests
-            sh -e ./test.sh linux-amd64
+            sh -e ./test.sh linux-386
             if [ `echo $?` -ne 0 ]; then exit 1; fi
