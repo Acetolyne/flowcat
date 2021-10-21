@@ -2,7 +2,6 @@
 
 ## Get updated task lists during development based on comments in your code
 
-[![Flowcat-main](https://github.com/Acetolyne/flowcat/actions/workflows/Flowcat-main.yml/badge.svg)](https://github.com/Acetolyne/flowcat/actions/workflows/Flowcat-main.yml)
 <a href="https://goreportcard.com/report/github.com/Acetolyne/flowcat" target="_blank"><img src="https://goreportcard.com/badge/github.com/Acetolyne/flowcat?style=flat&logo=none" alt="go report" /></a>
 
 ### PREREQUISITES
