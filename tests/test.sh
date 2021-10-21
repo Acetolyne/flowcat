@@ -8,6 +8,8 @@ go mod init main
 go get gopkg.in/yaml.v2
 go install -v
 #Test that building the main.go file matches the binary that is in bin, confirms the binary is the latest build
+#//@todo push built binary only on PR (new workflow) to repo then remove diff checks below
+#//@todo add more archs for binaries
 case $arch in
 
   "linux-amd64")
@@ -30,12 +32,6 @@ case $arch in
 esac
 
 #Start functionality tests for all binaries
-####TEMP STUFF
-# cd ..
-# ls
-# echo $GITHUB_PATH
-# mkdir tests/bin
-# cp bin/flowcat-linux-amd64/flowcat tests/bin/flowcat
 
 #Setup directory structure for tests
 
@@ -77,7 +73,7 @@ if [ $(echo $?) -ne 0 ]; then
 fi
 echo "CanSpecifyMatch: PASSED"
 #CanCreateOutputFile
-sudo flowcat -o todo
+sudo flowcat -o todo > /dev/null
 res=$(cat todo)
 echo $res | grep -q '__testfile__ test file after'
 if [ $(echo $?) -ne 0 ]; then
