@@ -4,5 +4,5 @@ match: "//@todo"
 
 # File patterns to ignore
 ignore:
-  - "\\.flowcat*"
+  - "\\.flowcat"
   - "^\\."
