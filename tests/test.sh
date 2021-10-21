@@ -77,8 +77,7 @@ if [ $(echo $?) -ne 0 ]; then
 fi
 echo "CanSpecifyMatch: PASSED"
 #CanCreateOutputFile
-flowcat -o todo
-ls
+sudo flowcat -o todo
 res=$(cat todo)
 echo $res | grep -q '__testfile__ test file after'
 if [ $(echo $?) -ne 0 ]; then
