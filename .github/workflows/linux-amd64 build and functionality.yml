@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-  name: linux-amd64 build/functionality
+  name: "linux-amd64 build and functionality"
   # Controls when the workflow will run
   on:
     # Triggers the workflow on push or pull request events but only for the master branch
@@ -21,7 +21,9 @@
       steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         - uses: actions/checkout@v2
-        - uses: actions/setup-go@v2.1.4
+        - uses: actions/setup-go@v2
+          with:
+            go-version: '^1.17.1'
           #with:
             # The Go version to download (if necessary) and use. Supports semver spec and ranges.
             #go-version: # optional
@@ -38,10 +40,8 @@
         - name: build-script
           run: |
             cd ${{ github.workspace }}
-            go get gopkg.in/yaml.v2
-            git branch
-            uname -a
-            ls -la bin/flowcat-linux-amd64/
             cd tests
-            sudo ./test.sh linux-amd64
+            ls
+            which go
+            sh -e ./test.sh linux-amd64
             if [[ `echo $?` -ne 0 ]]; then exit 1; fi
