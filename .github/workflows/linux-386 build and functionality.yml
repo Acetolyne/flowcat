@@ -1,18 +1,18 @@
 # This is a basic workflow to help you get started with Actions
 
-  name: Flowcat-main
+  name: "linux-amd64 build and functionality"
   # Controls when the workflow will run
   on:
     # Triggers the workflow on push or pull request events but only for the master branch
     push:
-      branches: [ master ]
+      branches: [ "*" ]
     pull_request:
-      branches: [ master ]
+      branches: [ "*" ]
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
   # A workflow run is made up of one or more jobs that can run sequentially or in parallel
   jobs:
-  # This workflow contains a single job called "build"
+    #Job1
     build:
     # The type of runner that the job will run on
       runs-on: ubuntu-latest
@@ -21,7 +21,9 @@
       steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         - uses: actions/checkout@v2
-        - uses: actions/setup-go@v2.1.4
+        - uses: actions/setup-go@v2
+          with:
+            go-version: '^1.17.1'
           #with:
             # The Go version to download (if necessary) and use. Supports semver spec and ranges.
             #go-version: # optional
@@ -35,7 +37,9 @@
         #  run: echo Hello, world!
 
       # Runs a set of commands using the runners shell
-        - name: Run a multi-line script
+        - name: build-script
           run: |
-            cd $GITHUB_WORKSPACE
-            env GOOS=linux GOARCH=amd64 go build -o bin/flowcat-linux-amd64/flowcat
+            cd ${{ github.workspace }}
+            cd tests
+            sh -e ./test.sh linux-386
+            if [ `echo $?` -ne 0 ]; then exit 1; fi
