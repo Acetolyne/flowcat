@@ -44,4 +44,4 @@
             ls
             which go
             sh -e ./test.sh linux-amd64
-            if [[ `echo $?` -ne 0 ]]; then exit 1; fi
+            if [ `echo $?` -ne 0 ]; then exit 1; fi

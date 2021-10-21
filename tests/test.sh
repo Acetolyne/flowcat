@@ -12,9 +12,7 @@ case $arch in
     go mod init main
     go get gopkg.in/yaml.v2
     go install -v
-    ls -la
     env GOOS=linux GOARCH=amd64 GO111MODULE=auto go build -o flowcat
-    ls -la
     #diff flowcat bin/flowcat-$arch/flowcat
     #if [ `echo $?` -ne 0 ]; then echo "Binary file $1 is not the latest" && exit 1; fi
     ;;
@@ -43,30 +41,20 @@ esac
 
 #Setup directory structure for tests
 
-mkdir -p tests/tmp
-mkdir -p tests/tmp2
-mkdir -p tests/bin
-mv flowcat /bin/flowcat
-env PATH=$GITHUB_WORKSPACE/tests/bin
-echo $PATH
-echo "$GITHUB_WORKSPACE/tests/bin" >> /var/run/act/workflow/paths.txt
-echo $GITHUB_PATH
-echo "$PWD/tests/bin" >> $GITHUB_PATH
-
-echo $PATH
-echo $GITHUB_PATH
-cat /var/run/act/workflow/paths.txt
+sudo mkdir -p tests/tmp
+sudo mkdir -p tests/tmp2
+sudo mkdir -p tests/bin
+sudo mv flowcat /bin/flowcat
 #echo "$GITHUB_WORKSPACE/tests/bin" >> $GITHUB_PATH
 
 cd tests/tmp
-cp ../assets/__testfile__ .
+sudo cp ../assets/__testfile__ .
 cd ../tmp2
-cp ../assets/__testfile__ .
-cp ../assets/.test .
-cp ../assets/regular .
+sudo cp ../assets/__testfile__ .
+sudo cp ../assets/.test .
+sudo cp ../assets/regular .
 cd ../tmp
-
-which flowcat
+pwd
 #CanRun Test
 res=$(flowcat)
 echo $res | grep -q '__testfile__ test file after'
@@ -104,16 +92,16 @@ if [ $(echo $?) -ne 0 ]; then
   exit 1
 fi
 #CanUseSettingsFile
-pwd
+echo "stat1"
 ls -la ../assets/
-cp ../assets/.flowcat .
+sudo cp ../assets/.flowcat .
 res=$(flowcat)
 echo $res | grep -q '__testfile__ 1) test file 3) after'
 if [ $(echo $?) -ne 0 ]; then
   echo "CanUseSettingsFile Failed"
   exit 1
 fi
-cp ../assets/.flowcat1 ./.flowcat
+sudo cp ../assets/.flowcat1 ./.flowcat
 res=$(flowcat)
 echo $res | grep -q '__testfile__ test 2'
 if [ $(echo $?) -ne 0 ]; then
@@ -128,7 +116,7 @@ if [ $(echo $?) -ne 0 ]; then
   exit 1
 fi
 #CanUsePathSettings
-cp ../assets/.flowcat ../tmp2/.flowcat
+sudo cp ../assets/.flowcat ../tmp2/.flowcat
 cd ..
 res=$(flowcat -f tmp2/)
 echo $res | grep -q 'tmp2/.test 1) test file 3) after tmp2/__testfile__ 1) test file 3) after tmp2/regular 1) regular test 3) with exclude'
