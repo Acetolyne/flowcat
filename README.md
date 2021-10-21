@@ -2,7 +2,6 @@
 
 ## Get updated task lists during development based on comments in your code
 
-[![Flowcat-main](https://github.com/Acetolyne/flowcat/actions/workflows/Flowcat-main.yml/badge.svg)](https://github.com/Acetolyne/flowcat/actions/workflows/Flowcat-main.yml)
 <a href="https://goreportcard.com/report/github.com/Acetolyne/flowcat" target="_blank"><img src="https://goreportcard.com/badge/github.com/Acetolyne/flowcat?style=flat&logo=none" alt="go report" /></a>
 
 ### PREREQUISITES
@@ -59,7 +58,11 @@ Options for Flowcat:
 #### Installation
 Download the appropriate version for your system below then put the flowcat binary for your OS in one of your userpaths such as /usr/local/bin/, /bin/, /sbin/ or another path
 
-https://www.github.comAcetolyne/flowcat/bin/flowcat-linux-amd64/flowcat
+[![linux-amd64 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml) https://www.github.com/Acetolyne/flowcat/bin/flowcat-linux-amd64/flowcat
+
+[![linux-386 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml) https://www.github.com/Acetolyne/flowcat/bin/flowcat-linux-386/flowcat
+
+
 
 Flowcat is currently only tested on Linux systems, now that flowcat is written in GoLang I am looking at porting it to Windows systems as well. While not tested yet it should currently work with MacOS as well but feedback is required.
 
