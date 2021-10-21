@@ -77,7 +77,7 @@ if [ $(echo $?) -ne 0 ]; then
   exit 1
 fi
 #CanCreateOutputFile
-flowcat -o todo > /dev/null
+flowcat -o todo
 res=$(cat todo)
 echo $res | grep -q '__testfile__ test file after'
 if [ $(echo $?) -ne 0 ]; then
