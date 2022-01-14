@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"flag"
 	"fmt"
@@ -13,6 +12,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"text/scanner"
 
 	"gopkg.in/yaml.v2"
 )
@@ -22,6 +22,28 @@ type Config struct {
 	Match        string              `yaml:"match"`
 	IgnoredItems map[string][]string `yaml:"ignore"`
 }
+
+type Comments struct {
+	FileExt        []string
+	SingleLine     string
+	MultiLineStart string
+	MultiLineEnd   string
+}
+
+//comment types from https://geekflare.com/how-to-add-comments/
+var CommentTypes = map[int]Comments{
+	0: {
+		FileExt:        []string{".go", ".py", ".kt", ".kts", ".ktm"},
+		SingleLine:     "//",
+		MultiLineStart: "/*",
+		MultiLineEnd:   "*/",
+	},
+}
+
+//@todo create Comments struct to match comments on different file types
+//@todo convert from regex to lexers to parse comments
+//@todo convert Config struct to get additional user defined comment matching and extend the comments struct with it if not nil
+//@todo when we have multi line comments include each line until we hit the comment end
 
 //@todo update master branch build badges
 //@todo add unit testing
@@ -172,6 +194,7 @@ func main() {
 		matchexp = "//@todo"
 	}
 	reg, _ := regexp.Compile(matchexp)
+	fmt.Println(reg)
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 		if *outputFlag != "" {
@@ -187,26 +210,41 @@ func main() {
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
 				curfile, err := os.Open(file)
+				var s scanner.Scanner
+				s.Init(curfile)
+				s.Mode = scanner.ScanComments
+				tok := s.Scan()
+				fmt.Println(file)
 				if err == nil {
-					fscanner := bufio.NewScanner(curfile)
-					var linenum = 0
-					var ln string
-					for fscanner.Scan() {
-						if showlines {
-							linenum++
-							ln = fmt.Sprint(linenum)
-							ln = ln + ")"
-						}
-						incline := checkLine(fscanner.Text(), matchexp)
-						if incline {
-							listFile(path, F)
-							l := "\t" + ln + reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1]
-							fmt.Println("\t", ln, reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1])
-							if *outputFlag != "" {
-								F.WriteString(l + "\n")
+					for tok != scanner.EOF {
+						if tok == scanner.Comment {
+							if showlines {
+								fmt.Println(s.Position.Line)
 							}
+							fmt.Println(s.TokenText())
 						}
+						tok = s.Scan()
 					}
+
+					// fscanner := bufio.NewScanner(curfile)
+					// var linenum = 0
+					// var ln string
+					// for fscanner.Scan() {
+					// 	if showlines {
+					// 		linenum++
+					// 		ln = fmt.Sprint(linenum)
+					// 		ln = ln + ")"
+					// 	}
+					// 	incline := checkLine(fscanner.Text(), matchexp)
+					// 	if incline {
+					// 		listFile(path, F)
+					// 		l := "\t" + ln + reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1]
+					// 		fmt.Println("\t", ln, reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1])
+					// 		if *outputFlag != "" {
+					// 			F.WriteString(l + "\n")
+					// 		}
+					// 	}
+					// }
 				}
 			}
 		}
