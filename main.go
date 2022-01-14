@@ -219,9 +219,10 @@ func main() {
 					for tok != scanner.EOF {
 						if tok == scanner.Comment {
 							if showlines {
-								fmt.Println(s.Position.Line)
+								fmt.Println(strconv.Itoa(s.Position.Line) + ":" + s.TokenText())
+							} else {
+								fmt.Println(s.TokenText())
 							}
-							fmt.Println(s.TokenText())
 						}
 						tok = s.Scan()
 					}
