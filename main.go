@@ -33,9 +33,22 @@ type Comments struct {
 }
 
 //comment types from https://geekflare.com/how-to-add-comments/
+//@todo we only need custom file mappings that are not covered in the lexer
 var CommentTypes = map[int]Comments{
 	0: {
 		FileExt:        []string{".go", ".py", ".kt", ".kts", ".ktm"},
+		SingleLine:     "//",
+		MultiLineStart: "/*",
+		MultiLineEnd:   "*/",
+	},
+	1: {
+		FileExt:        []string{".js", ".ts", ".tsx", ".jsx", ".html", ".css", ".scss", ".sass", ".less", ".styl", ".stylus", ".json", ".yml", ".yaml", ".xml", ".toml", ".md", ".sh", ".bat", ".ini", ".conf", ".c", ".cpp", ".h", ".hpp", ".hxx", ".h++", ".cs", ".java", ".csproj", ".csproj.user", ".csproj.references", ".csproj.debug", ".csproj.release", ".csproj.unspecified", ".csproj.nuget", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget"},
+		SingleLine:     "//",
+		MultiLineStart: "/*",
+		MultiLineEnd:   "*/",
+	},
+	2: {
+		FileExt:        []string{""},
 		SingleLine:     "//",
 		MultiLineStart: "/*",
 		MultiLineEnd:   "*/",
@@ -155,9 +168,21 @@ func GetFileContentType(out *os.File) (string, error) {
 	return contentType, nil
 }
 
+func checklines(s *scanner.Scanner, ext string, Showlines bool) string {
+	//@todo if ext in Comments struct then get comment characters
+	//@todo if ext not in Comments struct then get default comment characters
+	if Showlines {
+		l := "\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText() + "\n"
+		return l
+	} else {
+		l := "\t" + s.TokenText() + "\n"
+		return l
+	}
+}
+
 func main() {
 	var F *os.File
-	var showlines bool = false
+	var Showlines bool = false
 	var matchexp string
 
 	folderFlag := flag.String("f", "./", "The project top level directory, where flowcat should start recursing from.")
@@ -206,7 +231,7 @@ func main() {
 		//Ignore errors
 		err = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
 		//Ignore errors
-		showlines, err = strconv.ParseBool(Cfg.Linenums)
+		Showlines, err = strconv.ParseBool(Cfg.Linenums)
 		//@todo should this block? else what should the default be
 		if err != nil {
 			fmt.Println("linenum should be true or false", err)
@@ -214,13 +239,14 @@ func main() {
 	}
 
 	if *lineFlag != false {
-		showlines = *lineFlag
+		Showlines = *lineFlag
 	}
 	matchexp = Cfg.Match
 	if *matchFlag != "" {
-		matchexp = *matchFlag
+		matchexp = *matchFlag //@todo create matchflag from Comments struct
 	}
 	//Fallback incase settings is missing the match and one is not specified per an argument
+	//@todo remove the fallback as we will get everything from the Comments Struct
 	if matchexp == "" {
 		matchexp = "//@todo"
 	}
@@ -236,7 +262,6 @@ func main() {
 			}
 		}
 		if info.Mode().IsRegular() {
-			fmt.Println(path)
 
 			file, exc := checkExclude(path, *outputFlag)
 
@@ -250,57 +275,51 @@ func main() {
 				if err != nil {
 					fmt.Println("ERROR: could not read file", file, err)
 				}
-				valid := []byte(contents)
-
-				//fmt.Println(utf8.Valid(valid))
-				if utf8.Valid(valid) {
+				contentbytes := []byte(contents)
+				if utf8.Valid(contentbytes) {
 					var s scanner.Scanner
 					s.Error = func(*scanner.Scanner, string) {} // ignore errors
 					s.Init(curfile)
 					s.Mode = scanner.ScanComments
-					tok := s.Scan()
-					//if s.ErrorCount == 0 {
-					//if err == nil {
-					for tok != scanner.EOF {
-						if tok == scanner.Comment {
-							if showlines {
-								fmt.Println("showing lines")
-								fmt.Println("\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText())
-							} else {
-								fmt.Println("\t" + s.TokenText())
-							}
 
+					//@todo make Showlines Exportable so we dont need to pass it thru in below function as it does not change after initially set
+					checklines := func(s scanner.Scanner, path string, Showlines bool) string {
+						//ext := filepath.Ext(path)
+						tok := s.Scan()
+						var line string
+						// if line {
+						// 	fmt.Println(path)
+						// 	fmt.Println(line)
+						// }
+						for tok != scanner.EOF {
+							if tok == scanner.Comment {
+								if Showlines {
+									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText() + "\n"
+								} else {
+									line += "\t" + s.TokenText() + "\n"
+									//@todo only return strings that start with the -m argument
+
+								}
+							}
+							tok = s.Scan()
 						}
-						tok = s.Scan()
+
+						return line
+					}
+					filelines := checklines(s, path, Showlines)
+					if filelines != "" {
+						fmt.Println(path)
+						fmt.Println(filelines)
 					}
 				}
-				// fscanner := bufio.NewScanner(curfile)
-				// var linenum = 0
-				// var ln string
-				// for fscanner.Scan() {
-				// 	if showlines {
-				// 		linenum++
-				// 		ln = fmt.Sprint(linenum)
-				// 		ln = ln + ")"
-				// 	}
-				// 	incline := checkLine(fscanner.Text(), matchexp)
-				// 	if incline {
-				// 		listFile(path, F)
-				// 		l := "\t" + ln + reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1]
-				// 		fmt.Println("\t", ln, reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1])
-				// 		if *outputFlag != "" {
-				// 			F.WriteString(l + "\n")
-				// 		}
-				// 	}
-				// }
-				//}
 			}
+			return nil
 		}
 		return nil
 	}
-
 	//Start crawling the base directory
 	//@todo change below to use filepath.WalkDir instead
+	//@todo fix tests for new functionality
 	err = filepath.Walk(*folderFlag, parseFiles)
 	if err != nil {
 		fmt.Println(err)
