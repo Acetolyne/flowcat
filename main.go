@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -13,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"text/scanner"
+	"unicode/utf8"
 
 	"gopkg.in/yaml.v2"
 )
@@ -62,12 +64,24 @@ func checkExclude(path string, outfile string) (string, bool) {
 	}
 	for _, i := range m {
 		v, _ := regexp.Compile(i)
+		f, err := os.Open(path)
+		contentType, err := GetFileContentType(f)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(contentType)
 		regCheck := v.MatchString(strings.TrimSpace(path))
 		if regCheck {
-			return path, true
+			if strings.Contains(contentType, "utf-8") {
+				return path, true
+			} else {
+				return path, false
+			}
+		} else {
+			return path, false
 		}
-
 	}
+
 	return path, false
 }
 
@@ -122,6 +136,23 @@ func initSettings() error {
 	} else {
 		return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
 	}
+}
+
+func GetFileContentType(out *os.File) (string, error) {
+
+	// Only the first 512 bytes are used to sniff the content type.
+	buffer := make([]byte, 512)
+
+	_, err := out.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	// Use the net/http package's handy DectectContentType function. Always returns a valid
+	// content-type by returning "application/octet-stream" if no others seemed to match.
+	contentType := http.DetectContentType(buffer)
+
+	return contentType, nil
 }
 
 func main() {
@@ -193,10 +224,10 @@ func main() {
 	if matchexp == "" {
 		matchexp = "//@todo"
 	}
-	reg, _ := regexp.Compile(matchexp)
-	fmt.Println(reg)
+	//reg, _ := regexp.Compile(matchexp)
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
+
 		if *outputFlag != "" {
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
 			defer F.Close()
@@ -205,48 +236,64 @@ func main() {
 			}
 		}
 		if info.Mode().IsRegular() {
+			fmt.Println(path)
+
 			file, exc := checkExclude(path, *outputFlag)
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
 				curfile, err := os.Open(file)
-				var s scanner.Scanner
-				s.Init(curfile)
-				s.Mode = scanner.ScanComments
-				tok := s.Scan()
-				fmt.Println(file)
-				if err == nil {
+				if err != nil {
+					fmt.Println("ERROR: could not open file", file, err)
+				}
+				contents, err := os.ReadFile(path)
+				if err != nil {
+					fmt.Println("ERROR: could not read file", file, err)
+				}
+				valid := []byte(contents)
+
+				//fmt.Println(utf8.Valid(valid))
+				if utf8.Valid(valid) {
+					var s scanner.Scanner
+					s.Error = func(*scanner.Scanner, string) {} // ignore errors
+					s.Init(curfile)
+					s.Mode = scanner.ScanComments
+					tok := s.Scan()
+					//if s.ErrorCount == 0 {
+					//if err == nil {
 					for tok != scanner.EOF {
 						if tok == scanner.Comment {
 							if showlines {
-								fmt.Println(strconv.Itoa(s.Position.Line) + ":" + s.TokenText())
+								fmt.Println("showing lines")
+								fmt.Println("\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText())
 							} else {
-								fmt.Println(s.TokenText())
+								fmt.Println("\t" + s.TokenText())
 							}
+
 						}
 						tok = s.Scan()
 					}
-
-					// fscanner := bufio.NewScanner(curfile)
-					// var linenum = 0
-					// var ln string
-					// for fscanner.Scan() {
-					// 	if showlines {
-					// 		linenum++
-					// 		ln = fmt.Sprint(linenum)
-					// 		ln = ln + ")"
-					// 	}
-					// 	incline := checkLine(fscanner.Text(), matchexp)
-					// 	if incline {
-					// 		listFile(path, F)
-					// 		l := "\t" + ln + reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1]
-					// 		fmt.Println("\t", ln, reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1])
-					// 		if *outputFlag != "" {
-					// 			F.WriteString(l + "\n")
-					// 		}
-					// 	}
-					// }
 				}
+				// fscanner := bufio.NewScanner(curfile)
+				// var linenum = 0
+				// var ln string
+				// for fscanner.Scan() {
+				// 	if showlines {
+				// 		linenum++
+				// 		ln = fmt.Sprint(linenum)
+				// 		ln = ln + ")"
+				// 	}
+				// 	incline := checkLine(fscanner.Text(), matchexp)
+				// 	if incline {
+				// 		listFile(path, F)
+				// 		l := "\t" + ln + reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1]
+				// 		fmt.Println("\t", ln, reg.Split(strings.TrimSpace(fscanner.Text()), 2)[1])
+				// 		if *outputFlag != "" {
+				// 			F.WriteString(l + "\n")
+				// 		}
+				// 	}
+				// }
+				//}
 			}
 		}
 		return nil
