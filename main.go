@@ -308,6 +308,11 @@ func main() {
 					}
 					filelines := checklines(s, path, Showlines)
 					if filelines != "" {
+						if *outputFlag != "" {
+							F.WriteString(path)
+							F.WriteString("\n")
+							F.WriteString(filelines)
+						}
 						fmt.Println(path)
 						fmt.Println(filelines)
 					}
