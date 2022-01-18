@@ -16,7 +16,7 @@ import (
 	"text/scanner"
 	"unicode/utf8"
 
-	"./lexer"
+	lexer "github.com/Acetolyne/sourcelex"
 
 	"gopkg.in/yaml.v2"
 )
@@ -148,7 +148,7 @@ func GetFileContentType(out *os.File) (string, error) {
 	return contentType, nil
 }
 
-func checklines(s *scanner.Scanner, ext string, Showlines bool) string {
+func checklines(s *lexer.Scanner, ext string, Showlines bool) string {
 	//@todo if ext in Comments struct then get comment characters
 	//@todo if ext not in Comments struct then get default comment characters
 	if Showlines {
@@ -260,9 +260,10 @@ func main() {
 				if utf8.Valid(contentbytes) {
 					fmt.Println("Valid UTF-8")
 					var s lexer.Scanner
+					s.Init(curfile)
 					s.Error = func(*lexer.Scanner, string) {} // ignore errors
 					s.Init(curfile)
-					s.Mode = lexer.ScanComments
+					s.Mode = scanner.ScanComments
 
 					//@todo make Showlines Exportable so we dont need to pass it thru in below function as it does not change after initially set
 					checklines := func(s lexer.Scanner, path string, Showlines bool) string {
@@ -270,8 +271,8 @@ func main() {
 						tok := s.Scan()
 						var line string
 						//fmt.Println(path)
-						for tok != lexer.EOF {
-							if tok == lexer.Comment {
+						for tok != scanner.EOF {
+							if tok == scanner.Comment {
 								if Showlines {
 									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText() + "\n"
 								} else {

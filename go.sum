@@ -1,3 +1,7 @@
+github.com/Acetolyne/sourcelex v0.0.0-20220118043419-a50cbbaf71ef h1:mFZcglRPaMFHWdCjAIOGekrFj+N2dMbCjMeEaQpMTO0=
+github.com/Acetolyne/sourcelex v0.0.0-20220118043419-a50cbbaf71ef/go.mod h1:o0ulic6nSJJAbPybs8dqI8teMg++hH7qJ3EIjON876s=
+github.com/Acetolyne/sourcelex v0.0.0-20220118052128-3d91478e6435 h1:vI7EC95c8O3LVIWeVLWmUk0H/frVBtZdWOwXDLBA7ZY=
+github.com/Acetolyne/sourcelex v0.0.0-20220118052128-3d91478e6435/go.mod h1:o0ulic6nSJJAbPybs8dqI8teMg++hH7qJ3EIjON876s=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=
