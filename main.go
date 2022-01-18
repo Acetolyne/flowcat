@@ -16,6 +16,8 @@ import (
 	"text/scanner"
 	"unicode/utf8"
 
+	"./lexer"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -98,28 +100,6 @@ func checkExclude(path string, outfile string) (string, bool) {
 	return path, false
 }
 
-func checkLine(line string, flag string) bool {
-	//flag = "^" + flag
-	v, _ := regexp.Compile(flag)
-	regCheck := v.MatchString(strings.TrimSpace(line))
-	if regCheck {
-		return true
-	}
-	return false
-}
-
-func listFile(file string, f *os.File) bool {
-	for _, v := range ListedFiles {
-		if v == file {
-			return false
-		}
-	}
-	ListedFiles = append(ListedFiles, file)
-	fmt.Println(file)
-	f.WriteString(file + "\n")
-	return true
-}
-
 //@todo finish init create file with standard settings if not found after input from user
 func initSettings() error {
 	var user_lines string
@@ -193,8 +173,9 @@ func main() {
 	flag.Parse()
 
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
+	//@todo update help menu and options
 	if *helpFlag {
-		fmt.Println("Flowcat version 2.0.0")
+		fmt.Println("Flowcat version 2.1.0")
 		fmt.Println("")
 		fmt.Println("Options for Flowcat:")
 		fmt.Println("init")
@@ -277,22 +258,20 @@ func main() {
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					var s scanner.Scanner
-					s.Error = func(*scanner.Scanner, string) {} // ignore errors
+					fmt.Println("Valid UTF-8")
+					var s lexer.Scanner
+					s.Error = func(*lexer.Scanner, string) {} // ignore errors
 					s.Init(curfile)
-					s.Mode = scanner.ScanComments
+					s.Mode = lexer.ScanComments
 
 					//@todo make Showlines Exportable so we dont need to pass it thru in below function as it does not change after initially set
-					checklines := func(s scanner.Scanner, path string, Showlines bool) string {
+					checklines := func(s lexer.Scanner, path string, Showlines bool) string {
 						//ext := filepath.Ext(path)
 						tok := s.Scan()
 						var line string
-						// if line {
-						// 	fmt.Println(path)
-						// 	fmt.Println(line)
-						// }
-						for tok != scanner.EOF {
-							if tok == scanner.Comment {
+						//fmt.Println(path)
+						for tok != lexer.EOF {
+							if tok == lexer.Comment {
 								if Showlines {
 									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText() + "\n"
 								} else {
