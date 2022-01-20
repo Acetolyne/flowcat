@@ -94,14 +94,14 @@ A useful workflow is to have flowcat regenerate your todo list when you save a f
     
         {
             "match": "/home/acetolyne/Project1/*",
-            "command": "flowcat -f /home/acetolyne/Project1/ -o /home/acetolyne/Project1/todo -l -m '//@todo'",
+            "command": "flowcat -f /home/acetolyne/Project1/ -o /home/acetolyne/Project1/todo -l -m '@todo'",
             "runIn": "terminal",
             "runningStatusMessage": "Updating task list",
             "finishStatusMessage": "Task list updated"
         },
         {
             "match": "/home/acetolyne/Project2/*",
-            "command": "flowcat -f /home/acetolyne/Project2/ -o /home/acetolyne/Project2/todo -l -m '//@todo'",
+            "command": "flowcat -f /home/acetolyne/Project2/ -o /home/acetolyne/Project2/todo -l -m '@todo'",
             "runIn": "terminal",
             "runningStatusMessage": "Updating task list",
             "finishStatusMessage": "Task list updated"

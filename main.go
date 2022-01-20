@@ -13,7 +13,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"text/scanner"
 	"unicode/utf8"
 
 	lexer "github.com/Acetolyne/sourcelex"
@@ -36,29 +35,28 @@ type Comments struct {
 
 //comment types from https://geekflare.com/how-to-add-comments/
 //@todo we only need custom file mappings that are not covered in the lexer
-var CommentTypes = map[int]Comments{
-	0: {
-		FileExt:        []string{".go", ".py", ".kt", ".kts", ".ktm"},
-		SingleLine:     "//",
-		MultiLineStart: "/*",
-		MultiLineEnd:   "*/",
-	},
-	1: {
-		FileExt:        []string{".js", ".ts", ".tsx", ".jsx", ".html", ".css", ".scss", ".sass", ".less", ".styl", ".stylus", ".json", ".yml", ".yaml", ".xml", ".toml", ".md", ".sh", ".bat", ".ini", ".conf", ".c", ".cpp", ".h", ".hpp", ".hxx", ".h++", ".cs", ".java", ".csproj", ".csproj.user", ".csproj.references", ".csproj.debug", ".csproj.release", ".csproj.unspecified", ".csproj.nuget", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget"},
-		SingleLine:     "//",
-		MultiLineStart: "/*",
-		MultiLineEnd:   "*/",
-	},
-	2: {
-		FileExt:        []string{""},
-		SingleLine:     "//",
-		MultiLineStart: "/*",
-		MultiLineEnd:   "*/",
-	},
-}
+// var CommentTypes = map[int]Comments{
+// 	0: {
+// 		FileExt:        []string{".go", ".py", ".kt", ".kts", ".ktm"},
+// 		SingleLine:     "//",
+// 		MultiLineStart: "/*",
+// 		MultiLineEnd:   "*/",
+// 	},
+// 	1: {
+// 		FileExt:        []string{".js", ".ts", ".tsx", ".jsx", ".html", ".css", ".scss", ".sass", ".less", ".styl", ".stylus", ".json", ".yml", ".yaml", ".xml", ".toml", ".md", ".sh", ".bat", ".ini", ".conf", ".c", ".cpp", ".h", ".hpp", ".hxx", ".h++", ".cs", ".java", ".csproj", ".csproj.user", ".csproj.references", ".csproj.debug", ".csproj.release", ".csproj.unspecified", ".csproj.nuget", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget"},
+// 		SingleLine:     "//",
+// 		MultiLineStart: "/*",
+// 		MultiLineEnd:   "*/",
+// 	},
+// 	2: {
+// 		FileExt:        []string{""},
+// 		SingleLine:     "//",
+// 		MultiLineStart: "/*",
+// 		MultiLineEnd:   "*/",
+// 	},
+// }
 
 //@todo create Comments struct to match comments on different file types
-//@todo convert from regex to lexers to parse comments
 //@todo convert Config struct to get additional user defined comment matching and extend the comments struct with it if not nil
 //@todo when we have multi line comments include each line until we hit the comment end
 
@@ -71,7 +69,6 @@ var Cfg Config
 func checkExclude(path string, outfile string) (string, bool) {
 	//@todo add builds to autorun in VSCode
 	//@todo make matching workflows for each build on Github to show status for each arch
-	//@todo implement http://tools.ietf.org/html/draft-ietf-websec-mime-sniff to check for files we cant parse like binary data
 	m := Cfg.IgnoredItems["ignore"]
 	//If we are outputting to a file ignore the output file by default
 	if outfile != "" {
@@ -84,7 +81,6 @@ func checkExclude(path string, outfile string) (string, bool) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(contentType)
 		regCheck := v.MatchString(strings.TrimSpace(path))
 		if regCheck {
 			if strings.Contains(contentType, "utf-8") {
@@ -110,7 +106,7 @@ func initSettings() error {
 		var SetFile *os.File
 		fmt.Println("Display line numbers by default(true/false):")
 		fmt.Scanln(&user_lines)
-		fmt.Println("Regex to match on by default for this project(ex: //@todo):")
+		fmt.Println("Regex to match on by default for this project(ex: @todo):")
 		fmt.Scanln(&user_match)
 		//write the settings to the file
 		SetFile, err = os.OpenFile(".flowcat", os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
@@ -148,18 +144,6 @@ func GetFileContentType(out *os.File) (string, error) {
 	return contentType, nil
 }
 
-func checklines(s *lexer.Scanner, ext string, Showlines bool) string {
-	//@todo if ext in Comments struct then get comment characters
-	//@todo if ext not in Comments struct then get default comment characters
-	if Showlines {
-		l := "\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText() + "\n"
-		return l
-	} else {
-		l := "\t" + s.TokenText() + "\n"
-		return l
-	}
-}
-
 func main() {
 	var F *os.File
 	var Showlines bool = false
@@ -185,7 +169,7 @@ func main() {
 		fmt.Println("-l")
 		fmt.Println("	If line numbers should be shown with todo items in output.")
 		fmt.Println("-m string")
-		fmt.Println("   The string to match to do items on. (default '//@todo')")
+		fmt.Println("   The string to match to do items on. (default '@todo')")
 		fmt.Println("-o string")
 		fmt.Println("   Optional output file to dump results to, note output will still be shown on terminal.")
 		fmt.Println("-h")
@@ -224,12 +208,11 @@ func main() {
 	}
 	matchexp = Cfg.Match
 	if *matchFlag != "" {
-		matchexp = *matchFlag //@todo create matchflag from Comments struct
+		matchexp = *matchFlag
 	}
 	//Fallback incase settings is missing the match and one is not specified per an argument
-	//@todo remove the fallback as we will get everything from the Comments Struct
 	if matchexp == "" {
-		matchexp = "//@todo"
+		matchexp = "@todo"
 	}
 	//reg, _ := regexp.Compile(matchexp)
 
@@ -248,35 +231,30 @@ func main() {
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
-				curfile, err := os.Open(file)
-				if err != nil {
-					fmt.Println("ERROR: could not open file", file, err)
-				}
 				contents, err := os.ReadFile(path)
 				if err != nil {
 					fmt.Println("ERROR: could not read file", file, err)
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					fmt.Println("Valid UTF-8")
 					var s lexer.Scanner
-					s.Init(curfile)
+					s.Match = matchexp
 					s.Error = func(*lexer.Scanner, string) {} // ignore errors
-					s.Init(curfile)
-					s.Mode = scanner.ScanComments
+					s.Init(file)
+					//fmt.Println(s.srcType)
+					s.Mode = lexer.ScanComments
 
 					//@todo make Showlines Exportable so we dont need to pass it thru in below function as it does not change after initially set
 					checklines := func(s lexer.Scanner, path string, Showlines bool) string {
-						//ext := filepath.Ext(path)
 						tok := s.Scan()
 						var line string
 						//fmt.Println(path)
-						for tok != scanner.EOF {
-							if tok == scanner.Comment {
+						for tok != lexer.EOF {
+							if tok == lexer.Comment {
 								if Showlines {
-									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText() + "\n"
+									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText()
 								} else {
-									line += "\t" + s.TokenText() + "\n"
+									line += "\t" + s.TokenText()
 									//@todo only return strings that start with the -m argument
 
 								}
