@@ -251,12 +251,13 @@ func main() {
 						//fmt.Println(path)
 						for tok != lexer.EOF {
 							if tok == lexer.Comment {
+								//remove newlines
+								linetext := strings.Replace(s.TokenText(), "\n", "", -1)
+								linetext = strings.Replace(linetext, "\t", " ", -1)
 								if Showlines {
-									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + s.TokenText()
+									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + linetext + "\n"
 								} else {
-									line += "\t" + s.TokenText()
-									//@todo only return strings that start with the -m argument
-
+									line += "\t" + linetext + "\n"
 								}
 							}
 							tok = s.Scan()
