@@ -15,54 +15,17 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	lexer "github.com/Acetolyne/sourcelex"
+	lexer "github.com/Acetolyne/commentlex"
 
 	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
-	Linenums     string              `yaml:"linenum"`
-	Match        string              `yaml:"match"`
 	IgnoredItems map[string][]string `yaml:"ignore"`
 }
 
-type Comments struct {
-	FileExt        []string
-	SingleLine     string
-	MultiLineStart string
-	MultiLineEnd   string
-}
-
-//comment types from https://geekflare.com/how-to-add-comments/
-//@todo we only need custom file mappings that are not covered in the lexer
-// var CommentTypes = map[int]Comments{
-// 	0: {
-// 		FileExt:        []string{".go", ".py", ".kt", ".kts", ".ktm"},
-// 		SingleLine:     "//",
-// 		MultiLineStart: "/*",
-// 		MultiLineEnd:   "*/",
-// 	},
-// 	1: {
-// 		FileExt:        []string{".js", ".ts", ".tsx", ".jsx", ".html", ".css", ".scss", ".sass", ".less", ".styl", ".stylus", ".json", ".yml", ".yaml", ".xml", ".toml", ".md", ".sh", ".bat", ".ini", ".conf", ".c", ".cpp", ".h", ".hpp", ".hxx", ".h++", ".cs", ".java", ".csproj", ".csproj.user", ".csproj.references", ".csproj.debug", ".csproj.release", ".csproj.unspecified", ".csproj.nuget", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget.user", ".csproj.nuget.unspecified", ".csproj.nuget.debug", ".csproj.nuget.release", ".csproj.nuget.references", ".csproj.nuget"},
-// 		SingleLine:     "//",
-// 		MultiLineStart: "/*",
-// 		MultiLineEnd:   "*/",
-// 	},
-// 	2: {
-// 		FileExt:        []string{""},
-// 		SingleLine:     "//",
-// 		MultiLineStart: "/*",
-// 		MultiLineEnd:   "*/",
-// 	},
-// }
-
-//@todo create Comments struct to match comments on different file types
-//@todo convert Config struct to get additional user defined comment matching and extend the comments struct with it if not nil
-//@todo when we have multi line comments include each line until we hit the comment end
-
 //@todo update master branch build badges
 //@todo add unit testing
-//@todo add github workflows for testing binaries on different OS's
 var ListedFiles []string
 var Cfg Config
 
@@ -77,6 +40,9 @@ func checkExclude(path string, outfile string) (string, bool) {
 	for _, i := range m {
 		v, _ := regexp.Compile(i)
 		f, err := os.Open(path)
+		if err != nil {
+			panic(err)
+		}
 		contentType, err := GetFileContentType(f)
 		if err != nil {
 			panic(err)
@@ -113,9 +79,10 @@ func initSettings() error {
 		if err != nil {
 			return errors.New("ERROR: could not create settings file")
 		}
+		//@todo where should this file be stored having it per directory is a bit messy for projects as we may run it specifying different directories
 		SetFile.WriteString("# Settings\n")
-		SetFile.WriteString("linenum: \"" + user_lines + "\"\n")
-		SetFile.WriteString("match: \"" + user_match + "\"\n\n")
+		// SetFile.WriteString("linenum: \"" + user_lines + "\"\n")
+		// SetFile.WriteString("match: \"" + user_match + "\"\n\n")
 		SetFile.WriteString("# File patterns to ignore\n")
 		SetFile.WriteString("ignore:\n")
 		SetFile.WriteString("  - \"\\\\.flowcat\"\n")
@@ -159,7 +126,7 @@ func main() {
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
 	//@todo update help menu and options
 	if *helpFlag {
-		fmt.Println("Flowcat version 2.1.0")
+		fmt.Println("Flowcat version 3.0.0")
 		fmt.Println("")
 		fmt.Println("Options for Flowcat:")
 		fmt.Println("init")
@@ -192,25 +159,25 @@ func main() {
 	settings, err := ioutil.ReadFile(dir + "/.flowcat")
 	//If there is a settings file then get the values
 	if err == nil {
-		err = yaml.Unmarshal(settings, &Cfg)
+		_ = yaml.Unmarshal(settings, &Cfg)
 		//Ignore errors
-		err = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
+		_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
 		//Ignore errors
-		Showlines, err = strconv.ParseBool(Cfg.Linenums)
-		//@todo should this block? else what should the default be
-		if err != nil {
-			fmt.Println("linenum should be true or false", err)
-		}
+		// Showlines, err = strconv.ParseBool(Cfg.Linenums)
+		// //@todo should this block? else what should the default be
+		// if err != nil {
+		// 	fmt.Println("linenum should be true or false", err)
+		// }
 	}
 
-	if *lineFlag != false {
+	if *lineFlag {
 		Showlines = *lineFlag
 	}
-	matchexp = Cfg.Match
+	// matchexp = Cfg.Match
 	if *matchFlag != "" {
 		matchexp = *matchFlag
 	}
-	//Fallback incase settings is missing the match and one is not specified per an argument
+	// //Fallback incase settings is missing the match and one is not specified per an argument
 	if matchexp == "" {
 		matchexp = "@todo"
 	}
@@ -220,6 +187,9 @@ func main() {
 
 		if *outputFlag != "" {
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
+			if err != nil {
+				panic(err)
+			}
 			defer F.Close()
 			if err != nil && F != nil {
 				fmt.Println("ERROR: could not write output to", *outputFlag)
@@ -244,15 +214,17 @@ func main() {
 					//fmt.Println(s.srcType)
 					s.Mode = lexer.ScanComments
 
-					//@todo make Showlines Exportable so we dont need to pass it thru in below function as it does not change after initially set
 					checklines := func(s lexer.Scanner, path string, Showlines bool) string {
 						tok := s.Scan()
 						var line string
 						//fmt.Println(path)
 						for tok != lexer.EOF {
+							// fmt.Println(":)", s.TokenText())
+							// fmt.Println("tok:", tok)
+							// fmt.Println("Comment?", lexer.Comment)
 							if tok == lexer.Comment {
 								//remove newlines
-								linetext := strings.Replace(s.TokenText(), "\n", "", -1)
+								linetext := strings.Replace(s.TokenText(), "\n", " ", -1)
 								linetext = strings.Replace(linetext, "\t", " ", -1)
 								if Showlines {
 									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + linetext + "\n"
@@ -283,7 +255,6 @@ func main() {
 	}
 	//Start crawling the base directory
 	//@todo change below to use filepath.WalkDir instead
-	//@todo fix tests for new functionality
 	err = filepath.Walk(*folderFlag, parseFiles)
 	if err != nil {
 		fmt.Println(err)
