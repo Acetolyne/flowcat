@@ -1,7 +1,5 @@
-VERSION 2.0.0
+VERSION 3.0.0
 
-Moved to GoLang
-Program is now a single binary
-Temporarily remove unfinished github issue feature
-Changed default match to \\@todo insteaed of #@todo
-Added better handling for unparsable files.
+Moved to using a custom lexer to parse files
+Adds ability to parse files with multiple comment styles such as html files that may have html comments as well as javascript comments in a single filetype
+
