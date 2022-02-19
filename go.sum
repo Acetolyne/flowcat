@@ -612,6 +612,10 @@ github.com/Acetolyne/commentlex v0.0.0-20220217070730-ed8aa9a5f65a h1:vKKuVioiao
 github.com/Acetolyne/commentlex v0.0.0-20220217070730-ed8aa9a5f65a/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
 github.com/Acetolyne/commentlex v0.0.0-20220217071930-4cfd2018091c h1:8F7cxtFJtKeRdIhBQqzZuN34bZcoDwLB/Uvtu3SRIlQ=
 github.com/Acetolyne/commentlex v0.0.0-20220217071930-4cfd2018091c/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
+github.com/Acetolyne/commentlex v0.0.0-20220217072219-d3f28710699b h1:7VfDLvCrdHKDvpCUEJnSiWfdl2O3iJB+zlCjlw/IEpM=
+github.com/Acetolyne/commentlex v0.0.0-20220217072219-d3f28710699b/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
+github.com/Acetolyne/commentlex v0.0.0-20220218063241-6fe34ab6a532 h1:gNjM2DDQNhJduuIVzC5H3rKFuxXKbHzJIuW18QaGBlo=
+github.com/Acetolyne/commentlex v0.0.0-20220218063241-6fe34ab6a532/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
 github.com/Acetolyne/sourcelex v0.0.0-20220128234401-9403dc4aa40a/go.mod h1:byj1TzytRCaB12d7JsU/at4/MRMTN92INt3/u7MZwhI=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=

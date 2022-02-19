@@ -8,7 +8,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
+
+	//"path"
+
+	//"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -16,7 +19,6 @@ import (
 	"unicode/utf8"
 
 	lexer "github.com/Acetolyne/commentlex"
-
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,63 +31,49 @@ type Config struct {
 var ListedFiles []string
 var Cfg Config
 
-func checkExclude(path string, outfile string) (string, bool) {
+func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
 	//@todo add builds to autorun in VSCode
 	//@todo make matching workflows for each build on Github to show status for each arch
+	regpath := strings.TrimPrefix(path, folderFlag)
 	m := Cfg.IgnoredItems["ignore"]
+	reg := []bool{}
 	//If we are outputting to a file ignore the output file by default
+	//@todo does the output file get ignored with the new path settings?
 	if outfile != "" {
 		m = append(m, outfile)
 	}
 	for _, i := range m {
 		v, _ := regexp.Compile(i)
-		f, err := os.Open(path)
-		if err != nil {
-			panic(err)
-		}
-		contentType, err := GetFileContentType(f)
-		if err != nil {
-			panic(err)
-		}
-		regCheck := v.MatchString(strings.TrimSpace(path))
+		regCheck := v.MatchString(strings.TrimSpace(regpath))
 		if regCheck {
-			if strings.Contains(contentType, "utf-8") {
-				return path, true
-			} else {
-				return path, false
-			}
+			reg = append(reg, true)
 		} else {
-			return path, false
+			reg = append(reg, false)
 		}
 	}
-
+	for _, r := range reg {
+		if r {
+			return path, true
+		}
+	}
 	return path, false
 }
 
 //@todo finish init create file with standard settings if not found after input from user
 func initSettings() error {
-	var user_lines string
-	var user_match string
-	f, err := os.Open(".flowcat")
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+	}
+	f, err := os.Open(dirname + "/.flowcat")
 	f.Close()
 	if err != nil {
 		var SetFile *os.File
-		fmt.Println("Display line numbers by default(true/false):")
-		fmt.Scanln(&user_lines)
-		fmt.Println("Regex to match on by default for this project(ex: @todo):")
-		fmt.Scanln(&user_match)
-		//write the settings to the file
-		SetFile, err = os.OpenFile(".flowcat", os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
+		SetFile, err = os.OpenFile(dirname+"/.flowcat", os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
 		if err != nil {
 			return errors.New("ERROR: could not create settings file")
 		}
-		//@todo where should this file be stored having it per directory is a bit messy for projects as we may run it specifying different directories
-		SetFile.WriteString("# Settings\n")
-		// SetFile.WriteString("linenum: \"" + user_lines + "\"\n")
-		// SetFile.WriteString("match: \"" + user_match + "\"\n\n")
 		SetFile.WriteString("# File patterns to ignore\n")
-		SetFile.WriteString("ignore:\n")
-		SetFile.WriteString("  - \"\\\\.flowcat\"\n")
 		SetFile.WriteString("  - \"^\\\\.\"\n")
 		SetFile.Close()
 		return nil
@@ -153,21 +141,26 @@ func main() {
 		os.Exit(0)
 	}
 
-	//If the -f argument contains a specific file then return the directory its in
-	dir, _ := path.Split(*folderFlag)
-	//Get settings if there is a settings file in the current directory
-	settings, err := ioutil.ReadFile(dir + "/.flowcat")
-	//If there is a settings file then get the values
+	//Get settings from .flowcat file in users home directory
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+	}
+	settings, err := ioutil.ReadFile(dirname + "/.flowcat")
+	// //If there is a settings file then get the values
+	if err != nil {
+		fmt.Println(err)
+	}
 	if err == nil {
-		_ = yaml.Unmarshal(settings, &Cfg)
-		//Ignore errors
+		// 	_ = yaml.Unmarshal(settings, &Cfg)
+		// 	//Ignore errors
 		_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
-		//Ignore errors
-		// Showlines, err = strconv.ParseBool(Cfg.Linenums)
-		// //@todo should this block? else what should the default be
-		// if err != nil {
-		// 	fmt.Println("linenum should be true or false", err)
-		// }
+		// 	//Ignore errors
+		// 	// Showlines, err = strconv.ParseBool(Cfg.Linenums)
+		// 	// //@todo should this block? else what should the default be
+		// 	// if err != nil {
+		// 	// 	fmt.Println("linenum should be true or false", err)
+		// 	// }
 	}
 
 	if *lineFlag {
@@ -197,7 +190,7 @@ func main() {
 		}
 		if info.Mode().IsRegular() {
 
-			file, exc := checkExclude(path, *outputFlag)
+			file, exc := checkExclude(path, *outputFlag, *folderFlag)
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
