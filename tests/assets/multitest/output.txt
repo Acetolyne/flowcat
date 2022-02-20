@@ -1,0 +1,7 @@
+tests/assets/multitest/test.php
+	# @todo comment 1
+	//@todo comment 2
+	/*@todo multiline comment value */
+	//@todo another comment
+	# @todo comment 5
+	//@todo comment 4

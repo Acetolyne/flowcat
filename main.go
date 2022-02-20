@@ -24,6 +24,7 @@ import (
 
 type Config struct {
 	IgnoredItems map[string][]string `yaml:"ignore"`
+	Match        string              `yaml:"match"`
 }
 
 //@todo update master branch build badges
@@ -73,9 +74,12 @@ func initSettings() error {
 		if err != nil {
 			return errors.New("ERROR: could not create settings file")
 		}
+		SetFile.WriteString("# Settings\n")
+		SetFile.WriteString("match: \"@todo\"\n\n")
 		SetFile.WriteString("# File patterns to ignore\n")
-		SetFile.WriteString("  - \"^\\\\.\"\n")
+		SetFile.WriteString("  - \"^\\\\..*\"\n")
 		SetFile.Close()
+		fmt.Println("Settings file created at ~/.flowcat")
 		return nil
 	} else {
 		return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
@@ -152,21 +156,18 @@ func main() {
 		fmt.Println(err)
 	}
 	if err == nil {
-		// 	_ = yaml.Unmarshal(settings, &Cfg)
+		_ = yaml.Unmarshal(settings, &Cfg)
 		// 	//Ignore errors
 		_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
 		// 	//Ignore errors
-		// 	// Showlines, err = strconv.ParseBool(Cfg.Linenums)
-		// 	// //@todo should this block? else what should the default be
-		// 	// if err != nil {
-		// 	// 	fmt.Println("linenum should be true or false", err)
-		// 	// }
 	}
 
 	if *lineFlag {
 		Showlines = *lineFlag
 	}
-	// matchexp = Cfg.Match
+	//Cfg.IgnoredItems["ignore"]
+	matchexp = Cfg.Match
+	fmt.Println("EXP", matchexp)
 	if *matchFlag != "" {
 		matchexp = *matchFlag
 	}
@@ -174,7 +175,6 @@ func main() {
 	if matchexp == "" {
 		matchexp = "@todo"
 	}
-	//reg, _ := regexp.Compile(matchexp)
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
@@ -204,13 +204,11 @@ func main() {
 					s.Match = matchexp
 					s.Error = func(*lexer.Scanner, string) {} // ignore errors
 					s.Init(file)
-					//fmt.Println(s.srcType)
 					s.Mode = lexer.ScanComments
 
 					checklines := func(s lexer.Scanner, path string, Showlines bool) string {
 						tok := s.Scan()
 						var line string
-						//fmt.Println(path)
 						for tok != lexer.EOF {
 							// fmt.Println(":)", s.TokenText())
 							// fmt.Println("tok:", tok)
