@@ -1,4 +1,4 @@
-# flowcat 2.0.0
+# flowcat 3.0.0
 
 ## Get updated task lists during development based on comments in your code
 
@@ -10,14 +10,14 @@ None
 
 ### ABOUT
 
-Flowcat is a GoLang program that parses the working directory or files of your development project and returns a list of tasks that need to be completed. This works by using a regex to parse comments in your code.
+Flowcat is a GoLang program that parses the working directory or files of your development project and returns a list of tasks that need to be completed. This works by looking thru all the comments in your files recursively and returning any comments that match a specified string.
 
 As an example if you leave a comment in your code //@todo Create function to sanitize variables
-flowcat lets you create a list of all the comments you have left in your files about what needs to be done and will return a list of each comment starting with //@todo.Flowcat will parse recursively through a directory you specify.
+flowcat lets you create a list of all the comments you have left in your files about what needs to be done and will return a list of each comment starting with @todo.Flowcat will parse recursively through a directory you specify.
 
-While //@todo is the default, it can be replaced by any regular expression by specifying it as the -m argument.
+While @todo is the default, it can be replaced by any regular expression by specifying it as the -m argument. You can also set a new default for your user by first running flowcat init then editing the file at ~/.flowcat
 
-Works great in team development environments as well! No need to track your outstanding tasks in different software or seperate files. With flowcat note the task that needs to be done while you are writing the code.
+Works great in team development environments as well! No need to track your outstanding tasks in different software or seperate files. With flowcat you can note the task that needs to be done while you are writing the code meaning you don't have to shift focus and come back to your development environment.
 
 If multiple people are working on a file simply note the name of the person in the comment to assign the task to them and let them use flowcat to match the tasks that belong to them.
 
@@ -30,11 +30,10 @@ SOME CODE
 //@marvin Create happy() function to define things that make you happy.
 ```
 
-Now when we run flowcat we can specify the regex in the argument as ```-m "//@marvin"``` to get all of Mavin's tasks and ```-m "//@Arthur"``` to get a list of Arthur's tasks. All tasks should be a comment in your code in PHP your line should start with ```\\``` in python and other laguages it will need to start with a ```#```
+Now when we run flowcat we can specify the regex in the argument as ```-m "@marvin"``` to get all of Mavin's tasks and ```-m "@Arthur"``` to get a list of Arthur's tasks.
 
-Note that flowcat will not recurse into hidden directories anymore, this caused a bug when parsing folders that had a .git directory.
-If you need to you can specify those directories in the -f argument to get the todo items from there but there should be no need to parse hidden directories.
-If there is a need please put in a feature request on GitHub.
+If you do not run flowcat init after you have downloaded it then there may be some issues as flowcat will not ignore any files or folders and will recurse into .git and other hidden directories.
+
 
 ### OPTIONS
 ```
@@ -66,7 +65,7 @@ Download the appropriate version for your system below then put the flowcat bina
 
 Flowcat is currently only tested on Linux systems, now that flowcat is written in GoLang I am looking at porting it to Windows systems as well. While not tested yet it should currently work with MacOS as well but feedback is required.
 
-#### Installation
+#### Build From Source
 
 To install from source clone the repository with the command ```git clone https://github.com/Acetolyne/flowcat```
 Fetch modules with ```go get github.com/Acetolyne/commentlex@master``` and ```go get gopkg.in/yaml.v2@v2.4.0```
@@ -110,7 +109,7 @@ A useful workflow is to have flowcat regenerate your todo list when you save a f
         },
     ],
 ```
-#### Supported filetypes
+### Supported filetypes
 flowcat currently supports the following filetypes additionally files with no extensions use the basic // comment style and /*  */ comment style for multiline comments.
 To have additional filetypes added to flowcat please open an issue on GitHub for the lexer that is used by flowcat at github.com/Acetolyne/commentlex
 
