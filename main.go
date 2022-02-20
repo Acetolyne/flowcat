@@ -29,6 +29,7 @@ var Cfg Config
 
 func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
 	//@todo add builds to autorun in VSCode
+	//@todo update the github action files to not use the bash shells for testing
 	//@todo make matching workflows for each build on Github to show status for each arch
 	regpath := strings.TrimPrefix(path, folderFlag)
 	m := Cfg.IgnoredItems["ignore"]

@@ -69,6 +69,7 @@ Flowcat is currently only tested on Linux systems, now that flowcat is written i
 #### Installation
 
 To install from source clone the repository with the command ```git clone https://github.com/Acetolyne/flowcat```
+Fetch modules with ```go get github.com/Acetolyne/commentlex@master``` and ```go get gopkg.in/yaml.v2@v2.4.0```
 build the binary for your system with ```go build -o flowcat```
 Now move the binary to a system path such as /usr/bin/
 alternatively if you don't want to setup a go environment to build from source you may use one of the pre-compiled binaries in the bin directory.

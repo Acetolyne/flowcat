@@ -616,6 +616,8 @@ github.com/Acetolyne/commentlex v0.0.0-20220217072219-d3f28710699b h1:7VfDLvCrdH
 github.com/Acetolyne/commentlex v0.0.0-20220217072219-d3f28710699b/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
 github.com/Acetolyne/commentlex v0.0.0-20220218063241-6fe34ab6a532 h1:gNjM2DDQNhJduuIVzC5H3rKFuxXKbHzJIuW18QaGBlo=
 github.com/Acetolyne/commentlex v0.0.0-20220218063241-6fe34ab6a532/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
+github.com/Acetolyne/commentlex v0.0.0-20220220182929-fddeb0bdebd0 h1:yl8yIT/YXzdfqmy3wgT/rfxe0Vv+qgaL+AmhadO0DCs=
+github.com/Acetolyne/commentlex v0.0.0-20220220182929-fddeb0bdebd0/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
 github.com/Acetolyne/sourcelex v0.0.0-20220128234401-9403dc4aa40a/go.mod h1:byj1TzytRCaB12d7JsU/at4/MRMTN92INt3/u7MZwhI=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=

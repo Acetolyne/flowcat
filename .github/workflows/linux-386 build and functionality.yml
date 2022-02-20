@@ -41,5 +41,5 @@
           run: |
             cd ${{ github.workspace }}
             cd tests
-            sh -e ./test.sh linux-386
+            sh -e ./test_runner.sh linux-386
             if [ `echo $?` -ne 0 ]; then exit 1; fi
