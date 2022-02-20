@@ -4,10 +4,9 @@
 arch=$1
 
 cd ..
-go mod init flowcat
+go install -v
 go get gopkg.in/yaml.v2
 go get github.com/Acetolyne/commentlex
-go install -v
 #Test that building the main.go file matches the binary that is in bin, confirms the binary is the latest build
 #//@todo push built binary only on PR (new workflow) to repo then remove diff checks below
 #//@todo add more archs for binaries
