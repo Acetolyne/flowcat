@@ -16,6 +16,7 @@ case $arch in
   "linux-amd64")
     dirsep="/"
     env GOOS=linux GOARCH=amd64 GO111MODULE=auto go build -o flowcat
+    git status
     #diff flowcat bin/flowcat-$arch/flowcat
     #if [ `echo $?` -ne 0 ]; then echo "Binary file $1 is not the latest" && exit 1; fi
     ;;
@@ -23,6 +24,7 @@ case $arch in
   "linux-386")
     dirsep="/"
     env GOOS=linux GOARCH=386 GO111MODULE=auto go build -o flowcat
+    git status
     #diff flowcat bin/flowcat-$arch/flowcat
     #if [ `echo $?` -ne 0 ]; then echo "Binary file $1 is not the latest" && exit 1; fi
     ;;
