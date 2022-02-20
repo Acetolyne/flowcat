@@ -110,4 +110,27 @@ A useful workflow is to have flowcat regenerate your todo list when you save a f
         },
     ],
 ```
+#### Supported filetypes
+flowcat currently supports the following filetypes additionally files with no extensions use the basic // comment style and /*  */ comment style for multiline comments.
+To have additional filetypes added to flowcat please open an issue on GitHub for the lexer that is used by flowcat at github.com/Acetolyne/commentlex
 
+.go
+.py
+.js
+.rs
+.html
+.gohtml
+.php
+.c
+.cpp
+.h
+.class
+.jar
+.java
+.jsp
+.html
+.gohtml
+.md
+.sh
+.php
+.lua
