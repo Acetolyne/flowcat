@@ -23,8 +23,8 @@ import (
 )
 
 type Config struct {
-	IgnoredItems map[string][]string `yaml:"ignore"`
 	Match        string              `yaml:"match"`
+	IgnoredItems map[string][]string `yaml:"ignore"`
 }
 
 //@todo update master branch build badges
@@ -77,6 +77,7 @@ func initSettings() error {
 		SetFile.WriteString("# Settings\n")
 		SetFile.WriteString("match: \"@todo\"\n\n")
 		SetFile.WriteString("# File patterns to ignore\n")
+		SetFile.WriteString("ignore:\n")
 		SetFile.WriteString("  - \"^\\\\..*\"\n")
 		SetFile.Close()
 		fmt.Println("Settings file created at ~/.flowcat")
@@ -167,7 +168,6 @@ func main() {
 	}
 	//Cfg.IgnoredItems["ignore"]
 	matchexp = Cfg.Match
-	fmt.Println("EXP", matchexp)
 	if *matchFlag != "" {
 		matchexp = *matchFlag
 	}

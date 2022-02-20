@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
@@ -9,6 +10,20 @@ import (
 
 // TestInitsettings tests that we can properly use the settings from the .flowcat settings file
 func TestCanChooseFile(t *testing.T) {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+	}
+	curcmd := exec.Command("rm", "-f", dirname+"/.flowcat")
+	_, err = curcmd.Output()
+	if err != nil {
+		fmt.Println(err)
+	}
+	curcmd = exec.Command("go", "run", "main.go", "init")
+	_, err = curcmd.Output()
+	if err != nil {
+		fmt.Println(err)
+	}
 	cmd := exec.Command("go", "run", "main.go", "-f", "tests/assets/test.go")
 	stdout, err := cmd.Output()
 
@@ -110,6 +125,47 @@ func TestCanOutputToFile(t *testing.T) {
 	ret = strings.Replace(ret, "\t", " ", -1)
 	if want != ret {
 		t.Errorf("got %s, want %s", ret, want)
+	}
+	_ = exec.Command("rm", "-f", "tests/assets/multitest/output.txt")
+
+}
+
+func TestCanUseCustomMatchInSettingsFile(t *testing.T) {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+	}
+	curcmd := exec.Command("cp", "tests/assets/.flowcat1", dirname+"/.flowcat")
+	_, err = curcmd.Output()
+	if err != nil {
+		fmt.Println(err)
+	}
+	cmd := exec.Command("go", "run", "main.go", "-f", "tests/assets/multitest/")
+	stdout, err := cmd.Output()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Print the output
+	//fmt.Println(string(stdout))
+	want := "tests/assets/multitest/test.php // Comment no todo"
+	cur := string(stdout)
+	ret := strings.Replace(cur, "\n", "", -1)
+	ret = strings.Replace(ret, "\t", " ", -1)
+	if want != ret {
+		t.Errorf("got %s, want %s", ret, want)
+	}
+
+	dirname, err = os.UserHomeDir()
+	if err != nil {
+		fmt.Println(err)
+	}
+	curcmd = exec.Command("rm", "-f", dirname+"/.flowcat")
+	_, err = curcmd.Output()
+	if err != nil {
+		fmt.Println(err)
 	}
 
 }
