@@ -1,8 +1,6 @@
 # Settings
-linenum: "false"
-match: "#@todo"
+match: "Comment"
 
 # File patterns to ignore
 ignore:
-  - "\\.flowcat"
-  - "^\\."
+  - "^\\..*"

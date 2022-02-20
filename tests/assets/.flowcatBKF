@@ -1,0 +1,8 @@
+# Settings
+linenum: "false"
+match: "@todo"
+
+# File patterns to ignore
+ignore:
+  - "\\.flowcat"
+  - "^\\."
