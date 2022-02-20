@@ -1,4 +1,4 @@
-module main
+module flowcat
 
 go 1.17
 
