@@ -28,7 +28,6 @@ type Config struct {
 }
 
 //@todo update master branch build badges
-//@todo add unit testing
 var ListedFiles []string
 var Cfg Config
 
@@ -38,10 +37,11 @@ func checkExclude(path string, outfile string, folderFlag string) (string, bool)
 	regpath := strings.TrimPrefix(path, folderFlag)
 	m := Cfg.IgnoredItems["ignore"]
 	reg := []bool{}
-	//If we are outputting to a file ignore the output file by default
-	//@todo does the output file get ignored with the new path settings?
+	//If we are outputting to a file ignore the output file by default if it is in the project path
 	if outfile != "" {
-		m = append(m, outfile)
+		if strings.Contains(outfile, folderFlag) {
+			m = append(m, outfile)
+		}
 	}
 	for _, i := range m {
 		v, _ := regexp.Compile(i)
@@ -60,7 +60,6 @@ func checkExclude(path string, outfile string, folderFlag string) (string, bool)
 	return path, false
 }
 
-//@todo finish init create file with standard settings if not found after input from user
 func initSettings() error {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
@@ -123,11 +122,11 @@ func main() {
 		fmt.Println("")
 		fmt.Println("Options for Flowcat:")
 		fmt.Println("init")
-		fmt.Println("using flowcat init allows you to create a settings file used when flowcat is run in the current directory, settings can be changed later in the .flowcat file")
+		fmt.Println("using flowcat init creates a settings file for the current user, settings can be changed later in the ~/.flowcat file")
 		fmt.Println("-f string")
 		fmt.Println("   The project top level directory, where flowcat should start recursing from. (default '.' Current Directory)")
 		fmt.Println("-l")
-		fmt.Println("	If line numbers should be shown with todo items in output.")
+		fmt.Println("	Display line numbers in the output.")
 		fmt.Println("-m string")
 		fmt.Println("   The string to match to do items on. (default '@todo')")
 		fmt.Println("-o string")
@@ -153,9 +152,9 @@ func main() {
 	}
 	settings, err := ioutil.ReadFile(dirname + "/.flowcat")
 	// //If there is a settings file then get the values
-	if err != nil {
-		fmt.Println(err)
-	}
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 	if err == nil {
 		_ = yaml.Unmarshal(settings, &Cfg)
 		// 	//Ignore errors
@@ -177,6 +176,7 @@ func main() {
 	}
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
+		//fmt.Println(path)
 
 		if *outputFlag != "" {
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)

@@ -66,14 +66,15 @@ Download the appropriate version for your system below then put the flowcat bina
 
 Flowcat is currently only tested on Linux systems, now that flowcat is written in GoLang I am looking at porting it to Windows systems as well. While not tested yet it should currently work with MacOS as well but feedback is required.
 
-#### Installation from source
+#### Installation
 
 To install from source clone the repository with the command ```git clone https://github.com/Acetolyne/flowcat```
 build the binary for your system with ```go build -o flowcat```
 Now move the binary to a system path such as /usr/bin/
+alternatively if you don't want to setup a go environment to build from source you may use one of the pre-compiled binaries in the bin directory.
 
-#### Project initialization
-running ```flowcat init``` will allow you to make a settings file for your project so you don't need to pass arguments if it is being run against the currect folder. This is the prefered way as it will also allow you to specify regex patterns for files to ignore. Once running flowcat init flowcat will ask you for the settings you would like to use and these will be written to a settings file called .flowcat, it is suggested to edit the .flowcat file to include the files or regex you would like to ignore will flowcat runs.
+#### Settings initialization
+running ```flowcat init``` will allow you to make a settings file for your user so that you can set the default -m argument as well as a list of regex for files to ignore. Once running flowcat init flowcat will confirm the file was written to ~/.flowcat, it is suggested to edit the settings file to include the files or regex you would like to ignore when flowcat runs.
 
 #### Regex
 The regex used for matching against ignore files and to match lines via the -m argument is described in the documentation at https://github.com/google/re2/wiki/Syntax and uses the MatchString method.

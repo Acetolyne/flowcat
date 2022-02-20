@@ -126,7 +126,11 @@ func TestCanOutputToFile(t *testing.T) {
 	if want != ret {
 		t.Errorf("got %s, want %s", ret, want)
 	}
-	_ = exec.Command("rm", "-f", "tests/assets/multitest/output.txt")
+	curcmd := exec.Command("rm", "-f", "tests/assets/multitest/output.txt")
+	_, err = curcmd.Output()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }
 
