@@ -8,10 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-
-	//"path"
-
-	//"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -96,8 +92,6 @@ func GetFileContentType(out *os.File) (string, error) {
 		return "", err
 	}
 
-	// Use the net/http package's handy DectectContentType function. Always returns a valid
-	// content-type by returning "application/octet-stream" if no others seemed to match.
 	contentType := http.DetectContentType(buffer)
 
 	return contentType, nil
@@ -151,10 +145,6 @@ func main() {
 		fmt.Println(err)
 	}
 	settings, err := ioutil.ReadFile(dirname + "/.flowcat")
-	// //If there is a settings file then get the values
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
 	if err == nil {
 		_ = yaml.Unmarshal(settings, &Cfg)
 		// 	//Ignore errors
@@ -165,7 +155,7 @@ func main() {
 	if *lineFlag {
 		Showlines = *lineFlag
 	}
-	//Cfg.IgnoredItems["ignore"]
+
 	matchexp = Cfg.Match
 	if *matchFlag != "" {
 		matchexp = *matchFlag
@@ -210,9 +200,6 @@ func main() {
 						tok := s.Scan()
 						var line string
 						for tok != lexer.EOF {
-							// fmt.Println(":)", s.TokenText())
-							// fmt.Println("tok:", tok)
-							// fmt.Println("Comment?", lexer.Comment)
 							if tok == lexer.Comment {
 								//remove newlines
 								linetext := strings.Replace(s.TokenText(), "\n", " ", -1)
