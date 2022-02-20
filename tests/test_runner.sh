@@ -6,7 +6,7 @@ arch=$1
 cd ..
 go install -v
 go get gopkg.in/yaml.v2
-go get github.com/Acetolyne/commentlex
+go get github.com/Acetolyne/commentlex@master
 #//@todo add more archs for binaries
 case $arch in
 
@@ -18,7 +18,6 @@ case $arch in
   "linux-386")
     dirsep="/"
     env GOOS=linux GOARCH=386 GO111MODULE=auto go build -o bin/flowcat-linux-386/flowcat
-    git status
     ;;
 
   *)
