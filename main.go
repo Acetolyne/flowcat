@@ -23,8 +23,6 @@ type Config struct {
 	IgnoredItems map[string][]string `yaml:"ignore"`
 }
 
-//@todo update master branch build badges
-
 //ListedFiles returns a string of all files in a directory.
 var ListedFiles []string
 
@@ -32,9 +30,6 @@ var ListedFiles []string
 var Cfg Config
 
 func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
-	//@todo add builds to autorun in VSCode
-	//@todo update the github action files to not use the bash shells for testing
-	//@todo make matching workflows for each build on Github to show status for each arch
 	regpath := strings.TrimPrefix(path, folderFlag)
 	m := Cfg.IgnoredItems["ignore"]
 	reg := []bool{}
@@ -99,7 +94,6 @@ func main() {
 	flag.Parse()
 
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
-	//@todo update help menu and options
 	if *helpFlag {
 		fmt.Println("Flowcat version 3.0.0")
 		fmt.Println("")
@@ -155,7 +149,6 @@ func main() {
 	}
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
-		//fmt.Println(path)
 
 		if *outputFlag != "" {
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
