@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -18,13 +17,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+//Config structure of configuration from a yaml settings file.
 type Config struct {
 	Match        string              `yaml:"match"`
 	IgnoredItems map[string][]string `yaml:"ignore"`
 }
 
 //@todo update master branch build badges
+
+//ListedFiles returns a string of all files in a directory.
 var ListedFiles []string
+
+//Cfg returns the user configurations from a file.
 var Cfg Config
 
 func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
@@ -78,24 +82,8 @@ func initSettings() error {
 		SetFile.Close()
 		fmt.Println("Settings file created at ~/.flowcat")
 		return nil
-	} else {
-		return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
 	}
-}
-
-func GetFileContentType(out *os.File) (string, error) {
-
-	// Only the first 512 bytes are used to sniff the content type.
-	buffer := make([]byte, 512)
-
-	_, err := out.Read(buffer)
-	if err != nil {
-		return "", err
-	}
-
-	contentType := http.DetectContentType(buffer)
-
-	return contentType, nil
+	return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
 }
 
 func main() {
