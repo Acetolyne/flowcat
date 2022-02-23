@@ -1,6 +1,6 @@
 # flowcat 3.0.0
 
-## Get updated task lists during development based on comments in your code
+## Flowcat helps developers bring their todo tasks forward to the user so you don't need to waste time looking for them. It provides a clear overview of your tasks and allows you to stay focused on your work. You can also output to a file for planning purposes or to separate tasks into different categories.
 
 <a href="https://goreportcard.com/report/github.com/Acetolyne/flowcat" target="_blank"><img src="https://goreportcard.com/badge/github.com/Acetolyne/flowcat?style=flat&logo=none" alt="go report" /></a>
 
