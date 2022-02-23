@@ -133,3 +133,4 @@ To have additional filetypes added to flowcat please open an issue on GitHub for
 .sh
 .php
 .lua
+.rb
