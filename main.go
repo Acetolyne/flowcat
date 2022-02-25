@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -18,19 +17,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+//Config structure of configuration from a yaml settings file.
 type Config struct {
 	Match        string              `yaml:"match"`
 	IgnoredItems map[string][]string `yaml:"ignore"`
 }
 
-//@todo update master branch build badges
+//ListedFiles returns a string of all files in a directory.
 var ListedFiles []string
+
+//Cfg returns the user configurations from a file.
 var Cfg Config
 
 func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
-	//@todo add builds to autorun in VSCode
-	//@todo update the github action files to not use the bash shells for testing
-	//@todo make matching workflows for each build on Github to show status for each arch
 	regpath := strings.TrimPrefix(path, folderFlag)
 	m := Cfg.IgnoredItems["ignore"]
 	reg := []bool{}
@@ -78,24 +77,8 @@ func initSettings() error {
 		SetFile.Close()
 		fmt.Println("Settings file created at ~/.flowcat")
 		return nil
-	} else {
-		return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
 	}
-}
-
-func GetFileContentType(out *os.File) (string, error) {
-
-	// Only the first 512 bytes are used to sniff the content type.
-	buffer := make([]byte, 512)
-
-	_, err := out.Read(buffer)
-	if err != nil {
-		return "", err
-	}
-
-	contentType := http.DetectContentType(buffer)
-
-	return contentType, nil
+	return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
 }
 
 func main() {
@@ -111,7 +94,6 @@ func main() {
 	flag.Parse()
 
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
-	//@todo update help menu and options
 	if *helpFlag {
 		fmt.Println("Flowcat version 3.0.0")
 		fmt.Println("")
@@ -167,7 +149,6 @@ func main() {
 	}
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
-		//fmt.Println(path)
 
 		if *outputFlag != "" {
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
