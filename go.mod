@@ -1,4 +1,4 @@
-module flowcat
+module github.com/Acetolyne/flowcat
 
 go 1.17
 
