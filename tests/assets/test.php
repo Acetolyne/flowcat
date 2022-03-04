@@ -18,6 +18,8 @@ value */
 comment no todo
 */
 
+/* non included comment? */
+
 // Comment no todo
 
 ?>
