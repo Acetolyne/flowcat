@@ -63,7 +63,7 @@
 
             # Optional. Used by `git-status`
             # See https://git-scm.com/docs/git-status#_options
-            status_options: '--untracked-files=yes'
+            status_options: '--untracked-files=all'
 
             # Optional. Used by `git-push`
             # See https://git-scm.com/docs/git-push#_options
