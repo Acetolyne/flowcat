@@ -57,9 +57,9 @@ Options for Flowcat:
 #### Installation
 Download the appropriate version for your system below then put the flowcat binary for your OS in one of your userpaths such as /usr/local/bin/, /bin/, /sbin/ or another path
 
-[![linux-amd64 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml) https://www.github.com/Acetolyne/flowcat/bin/flowcat-linux-amd64/flowcat
+[![linux-amd64 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml) https://github.com/Acetolyne/flowcat/raw/master/bin/flowcat-linux-amd64/flowcat
 
-[![linux-386 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml) https://www.github.com/Acetolyne/flowcat/bin/flowcat-linux-386/flowcat
+[![linux-386 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml) https://github.com/Acetolyne/flowcat/raw/master/bin/flowcat-linux-386/flowcat
 
 
 
