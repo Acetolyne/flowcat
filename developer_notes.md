@@ -12,4 +12,8 @@ This settings file will include regex patterns for excluding files from the flow
 Flowcat will by default exclude the output file when you use the -o flag
 
 
+Readme is updated on push to any branch
+
+Binaries are only autobuilt after a PR is committed to Master branch
+
 
