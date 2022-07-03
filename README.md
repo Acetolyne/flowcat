@@ -129,10 +129,11 @@ To have additional filetypes added to flowcat please open an issue on GitHub for
 .jar
 .java
 .jsp
+.sh
+.php
 .html
 .gohtml
 .md
-.sh
-.php
 .lua
 .rb
+.py
