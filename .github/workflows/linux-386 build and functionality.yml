@@ -3,9 +3,11 @@
   name: "linux-386 build and functionality"
   # Controls when the workflow will run
   on:
-    # Triggers the workflow on push or pull request events but only for the master branch
-    push:
-      branches: [ "*" ]
+    # Triggers after entry workflow "flowcat"
+    workflow_run:
+      workflows: ["flowcat"]
+      types:
+        - completed
     # pull_request:
     #   branches: [ "*" ]
     # Allows you to run this workflow manually from the Actions tab
