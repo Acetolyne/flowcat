@@ -1,11 +1,13 @@
 # This is a basic workflow to help you get started with Actions
 
-  name: "linux-amd64 build and functionality"
+  name: linux-amd64 build and functionality
   # Controls when the workflow will run
   on:
-    # Triggers the workflow on push or pull request events but only for the master branch
-    push:
-      branches: [ "*" ]
+    # Triggers after linux-386 build completes
+    workflow_run:
+      workflows: ["linux-386 build and functionality"]
+      types:
+        - completed
     # pull_request:
     #   branches: [ "*" ]
     # Allows you to run this workflow manually from the Actions tab
