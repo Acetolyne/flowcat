@@ -5,7 +5,7 @@
   on:
     # Triggers after linux-386 build completes
     workflow_run:
-      workflows: ["darwin-arm64 build and functionality"]
+      workflows: ["linux-amd64 build and functionality"]
       types:
         - completed
     # pull_request:
