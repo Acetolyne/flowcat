@@ -20,6 +20,11 @@ case $arch in
     env GOOS=linux GOARCH=386 GO111MODULE=auto go build -o bin/flowcat-linux-386/flowcat
     ;;
 
+  "darwin-arm64")
+    dirsep="/"
+    env GOOS=darwin GOARCH=arm64 GO111MODULE=auto go build -o bin/flowcat-darwin-arm64/flowcat
+    ;;
+
   *)
     echo "Unable to build for $arch" && exit 1
     ;;
