@@ -95,13 +95,13 @@ func main() {
 
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
 	if *helpFlag {
-		fmt.Println("Flowcat version 3.0.0")
+		fmt.Println("Flowcat version 3.1.1")
 		fmt.Println("")
 		fmt.Println("Options for Flowcat:")
 		fmt.Println("init")
 		fmt.Println("using flowcat init creates a settings file for the current user, settings can be changed later in the ~/.flowcat file")
 		fmt.Println("-f string")
-		fmt.Println("   The project top level directory, where flowcat should start recursing from. (default '.' Current Directory)")
+		fmt.Println("   The project top level directory, where flowcat should start recursing from. (default Current Directory)")
 		fmt.Println("-l")
 		fmt.Println("	Display line numbers in the output.")
 		fmt.Println("-m string")
@@ -219,4 +219,5 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	os.Exit(0)
 }
