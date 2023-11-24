@@ -10,6 +10,6 @@ require (
 )
 
 require (
-	github.com/Acetolyne/flowcat/lexer v0.0.0-20231124220849-7e537f3c2978 // indirect
+	github.com/Acetolyne/flowcat/lexer v0.0.0-20231124221203-0f63e0832953 // indirect
 	github.com/timtadh/data-structures v0.6.1 // indirect
 )

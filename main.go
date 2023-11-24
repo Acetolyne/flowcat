@@ -12,6 +12,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/Acetolyne/flowcat/lexer"
 	"gopkg.in/yaml.v2"
 )
 
@@ -170,7 +171,7 @@ func main() {
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					GetComments(true, contentbytes)
+					lexer.GetComments(true, contentbytes)
 					// var s lexer.Scanner
 					// s.Match = matchexp
 					// s.Error = func(*lexer.Scanner, string) {} // ignore errors
@@ -206,6 +207,10 @@ func main() {
 					// 	fmt.Println(path)
 					// 	fmt.Println(filelines)
 					// }
+					//TEMP
+					if Showlines {
+						fmt.Println("showlines")
+					}
 				}
 			}
 			return nil
