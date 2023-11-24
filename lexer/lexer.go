@@ -33,7 +33,7 @@ func init() {
 	}
 }
 
-func newLexer(dfa bool) *lexmachine.Lexer {
+func newLexer() *lexmachine.Lexer {
 	getToken := func(tokenType int) lexmachine.Action {
 		return func(s *lexmachine.Scanner, m *machines.Match) (interface{}, error) {
 			return s.Token(tokenType, string(m.Bytes), m), nil
@@ -64,15 +64,15 @@ func newLexer(dfa bool) *lexmachine.Lexer {
 	// lexer.Add([]byte(`\s+`), getToken(tokmap["SPACE"]))
 	lexer.Add([]byte(`//[^\n]*\n?`), getToken(tokmap["COMMENT"]))
 	lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"]))
+	//Skip anything in a string
+	lexer.Add([]byte(`/[\"\'].*[\"\']/`), skip)
+	//lexer.Add([]byte("( |\t|\n|\r)+"), skip)
 	// bs, _ := json.Marshal(tokmap)
 	// fmt.Println(string(bs))
 	//{"AT":0,"BACKSLASH":5,"BACKTICK":7,"BUS":11,"CARROT":6,"CHIP":13,"COMMA":8,"COMMENT":19,"COMPUTE":12,"DASH":3,"IGNORE":14,"LABEL":15,"LPAREN":9,"NAME":18,"NUMBER":17,"PLUS":1,"RPAREN":10,"SET":16,"SLASH":4,"SPACE":20,"STAR":2}
 	var err error
-	if dfa {
-		err = lexer.CompileDFA()
-	} else {
-		err = lexer.CompileNFA()
-	}
+
+	err = lexer.CompileDFA()
 	if err != nil {
 		panic(err)
 	}
@@ -100,10 +100,13 @@ func scan(text []byte) error {
 	return nil
 }
 
-func GetComments(dfa bool, text []byte) {
+func GetComments(text []byte) {
 
-	lexer = newLexer(dfa)
-	scan(text)
+	lexer = newLexer()
+	err := scan(text)
+	if err != nil {
+		fmt.Println("Error scanning text", err)
+	}
 
 	// scanner, err := lexer.Scanner(text)
 	// if err != nil {
