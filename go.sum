@@ -1,5 +1,7 @@
 github.com/Acetolyne/commentlex v0.0.0-20231123093842-ada8ee1635f0 h1:mre87GM1e9OK15r5ENA5Tp0dZfNlQYGvTolMxr0Y1Vw=
 github.com/Acetolyne/commentlex v0.0.0-20231123093842-ada8ee1635f0/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
+github.com/Acetolyne/flowcat/lexer v0.0.0-20231124220849-7e537f3c2978 h1:FHhLH8MlghouOHSn1kU6zoSx554Qnv4DiJ1xSz3+t0A=
+github.com/Acetolyne/flowcat/lexer v0.0.0-20231124220849-7e537f3c2978/go.mod h1:c2hu52aTD1FS/OhLQyc7SP34HVoRKKu7OXziNlp61pI=
 github.com/timtadh/data-structures v0.6.1 h1:76eDpwngj2rEi9r/qvdH6YL7wMXGsoFFzhEylo/IacA=
 github.com/timtadh/data-structures v0.6.1/go.mod h1:uYUnI1cQi/5yMCc7s23I+x8Mn8BCMf4WgK+7/4QSEk4=
 github.com/timtadh/getopt v1.0.0/go.mod h1:L3EL6YN2G0eIAhYBo9b7SB9d/kEQmdnwthIlMJfj210=
