@@ -9,24 +9,22 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"unicode/utf8"
 
-	lexer "github.com/Acetolyne/commentlex"
 	"gopkg.in/yaml.v2"
 )
 
-//Config structure of configuration from a yaml settings file.
+// Config structure of configuration from a yaml settings file.
 type Config struct {
 	Match        string              `yaml:"match"`
 	IgnoredItems map[string][]string `yaml:"ignore"`
 }
 
-//ListedFiles returns a string of all files in a directory.
+// ListedFiles returns a string of all files in a directory.
 var ListedFiles []string
 
-//Cfg returns the user configurations from a file.
+// Cfg returns the user configurations from a file.
 var Cfg Config
 
 func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
@@ -172,41 +170,42 @@ func main() {
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					var s lexer.Scanner
-					s.Match = matchexp
-					s.Error = func(*lexer.Scanner, string) {} // ignore errors
-					s.Init(file)
-					s.Mode = lexer.ScanComments
+					GetComments(true, contentbytes)
+					// var s lexer.Scanner
+					// s.Match = matchexp
+					// s.Error = func(*lexer.Scanner, string) {} // ignore errors
+					// s.Init(file)
+					// s.Mode = lexer.ScanComments
 
-					checklines := func(s lexer.Scanner, path string, Showlines bool) string {
-						tok := s.Scan()
-						var line string
-						for tok != lexer.EOF {
-							if tok == lexer.Comment {
-								//remove newlines
-								linetext := strings.Replace(s.TokenText(), "\n", " ", -1)
-								linetext = strings.Replace(linetext, "\t", " ", -1)
-								if Showlines {
-									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + linetext + "\n"
-								} else {
-									line += "\t" + linetext + "\n"
-								}
-							}
-							tok = s.Scan()
-						}
+					// checklines := func(s lexer.Scanner, path string, Showlines bool) string {
+					// 	tok := s.Scan()
+					// 	var line string
+					// 	for tok != lexer.EOF {
+					// 		if tok == lexer.Comment {
+					// 			//remove newlines
+					// 			linetext := strings.Replace(s.TokenText(), "\n", " ", -1)
+					// 			linetext = strings.Replace(linetext, "\t", " ", -1)
+					// 			if Showlines {
+					// 				line += "\t" + strconv.Itoa(s.Position.Line) + ")" + linetext + "\n"
+					// 			} else {
+					// 				line += "\t" + linetext + "\n"
+					// 			}
+					// 		}
+					// 		tok = s.Scan()
+					// 	}
 
-						return line
-					}
-					filelines := checklines(s, path, Showlines)
-					if filelines != "" {
-						if *outputFlag != "" {
-							F.WriteString(path)
-							F.WriteString("\n")
-							F.WriteString(filelines)
-						}
-						fmt.Println(path)
-						fmt.Println(filelines)
-					}
+					// 	return line
+					// }
+					// filelines := checklines(s, path, Showlines)
+					// if filelines != "" {
+					// 	if *outputFlag != "" {
+					// 		F.WriteString(path)
+					// 		F.WriteString("\n")
+					// 		F.WriteString(filelines)
+					// 	}
+					// 	fmt.Println(path)
+					// 	fmt.Println(filelines)
+					// }
 				}
 			}
 			return nil
