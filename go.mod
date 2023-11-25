@@ -6,7 +6,7 @@ toolchain go1.21.4
 
 require (
 	github.com/Acetolyne/commentlex v0.0.0-20231123093842-ada8ee1635f0
-	github.com/Acetolyne/flowcat/lexer v0.0.0-20231125202214-2ba101560e31
+	github.com/Acetolyne/flowcat/lexer v0.0.0-20231125202622-70fe9a7ddaf2
 	gopkg.in/yaml.v2 v2.4.0
 )
 
