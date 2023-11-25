@@ -62,7 +62,7 @@ func newLexer() *lexmachine.Lexer {
 	// lexer.Add([]byte(`"[^"]*"`), getToken(tokmap["NAME"]))
 	lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
 	// lexer.Add([]byte(`\s+`), getToken(tokmap["SPACE"]))
-	lexer.Add([]byte(`//[^\n]@todo\n?`), getToken(tokmap["COMMENT"]))
+	lexer.Add([]byte(`//[\n\s\t]*@todo.*\n`), getToken(tokmap["COMMENT"]))
 	lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"]))
 	//Skip anything in a string
 	// lexer.Add([]byte(`[\"\'].*[\"\']`), func(s *lexmachine.Scanner, m *machines.Match) (interface{}, error) {
