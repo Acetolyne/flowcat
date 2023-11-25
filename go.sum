@@ -6,6 +6,8 @@ github.com/Acetolyne/flowcat/lexer v0.0.0-20231125001227-60a8ebeba9e1 h1:lJ7i8yC
 github.com/Acetolyne/flowcat/lexer v0.0.0-20231125001227-60a8ebeba9e1/go.mod h1:abPJL0TnQHKgi2zaC66b6lRRcUmDzKfnBAypYUOtzmw=
 github.com/Acetolyne/flowcat/lexer v0.0.0-20231125001858-43b06b811f94 h1:SueG7FQKOk7SZV+kcztT8KIPLmdblUNDWti8Ohd52pw=
 github.com/Acetolyne/flowcat/lexer v0.0.0-20231125001858-43b06b811f94/go.mod h1:abPJL0TnQHKgi2zaC66b6lRRcUmDzKfnBAypYUOtzmw=
+github.com/Acetolyne/flowcat/lexer v0.0.0-20231125200657-5db33096cbb4 h1:96PsjtvyWVCrvluhMDYa/BWtRGd1Hi23/CgtnxpxgzY=
+github.com/Acetolyne/flowcat/lexer v0.0.0-20231125200657-5db33096cbb4/go.mod h1:abPJL0TnQHKgi2zaC66b6lRRcUmDzKfnBAypYUOtzmw=
 github.com/timtadh/data-structures v0.6.1 h1:76eDpwngj2rEi9r/qvdH6YL7wMXGsoFFzhEylo/IacA=
 github.com/timtadh/data-structures v0.6.1/go.mod h1:uYUnI1cQi/5yMCc7s23I+x8Mn8BCMf4WgK+7/4QSEk4=
 github.com/timtadh/getopt v1.0.0/go.mod h1:L3EL6YN2G0eIAhYBo9b7SB9d/kEQmdnwthIlMJfj210=
