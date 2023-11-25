@@ -65,20 +65,15 @@ func newLexer() *lexmachine.Lexer {
 	lexer.Add([]byte(`//[^\n]*\n?`), getToken(tokmap["COMMENT"]))
 	lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"]))
 	//Skip anything in a string
-	lexer.Add(
-		[]byte(`[\"\'].*[\"\']`),
-		func(scan *Scanner, match *machines.Match) (interface{}, error) {
-			// skip white space
-			return nil, nil
-		},
-	)
+	lexer.Add([]byte(`[\"\'].*[\"\']`), func(s *lexmachine.Scanner, m *machines.Match) (interface{}, error) {
+		return nil, nil
+	})
 	//lexer.Add([]byte("( |\t|\n|\r)+"), skip)
 	// bs, _ := json.Marshal(tokmap)
 	// fmt.Println(string(bs))
 	//{"AT":0,"BACKSLASH":5,"BACKTICK":7,"BUS":11,"CARROT":6,"CHIP":13,"COMMA":8,"COMMENT":19,"COMPUTE":12,"DASH":3,"IGNORE":14,"LABEL":15,"LPAREN":9,"NAME":18,"NUMBER":17,"PLUS":1,"RPAREN":10,"SET":16,"SLASH":4,"SPACE":20,"STAR":2}
-	var err error
 
-	err = lexer.CompileDFA()
+	err := lexer.CompileDFA()
 	if err != nil {
 		panic(err)
 	}
