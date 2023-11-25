@@ -65,7 +65,13 @@ func newLexer() *lexmachine.Lexer {
 	lexer.Add([]byte(`//[^\n]*\n?`), getToken(tokmap["COMMENT"]))
 	lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"]))
 	//Skip anything in a string
-	lexer.Add([]byte(`/[\"\'].*[\"\']/`), skip)
+	lexer.Add(
+		[]byte(`[\"\'].*[\"\']`),
+		func(scan *Scanner, match *machines.Match) (interface{}, error) {
+			// skip white space
+			return nil, nil
+		},
+	)
 	//lexer.Add([]byte("( |\t|\n|\r)+"), skip)
 	// bs, _ := json.Marshal(tokmap)
 	// fmt.Println(string(bs))
