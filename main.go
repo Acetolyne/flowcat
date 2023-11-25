@@ -171,7 +171,7 @@ func main() {
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					lexer.GetComments(true, contentbytes)
+					lexer.GetComments(contentbytes)
 					// var s lexer.Scanner
 					// s.Match = matchexp
 					// s.Error = func(*lexer.Scanner, string) {} // ignore errors
