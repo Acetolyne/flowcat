@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -68,11 +67,26 @@ func initSettings() error {
 		if err != nil {
 			return errors.New("ERROR: could not create settings file")
 		}
-		SetFile.WriteString("# Settings\n")
-		SetFile.WriteString("match: \"@todo\"\n\n")
-		SetFile.WriteString("# File patterns to ignore\n")
-		SetFile.WriteString("ignore:\n")
-		SetFile.WriteString("  - \"^\\\\..*\"\n")
+		_, err = SetFile.WriteString("# Settings\n")
+		if err != nil {
+			return errors.New("ERROR: could not create settings file")
+		}
+		_, err = SetFile.WriteString("match: \"@todo\"\n\n")
+		if err != nil {
+			return errors.New("ERROR: could not create settings file")
+		}
+		_, err = SetFile.WriteString("# File patterns to ignore\n")
+		if err != nil {
+			return errors.New("ERROR: could not create settings file")
+		}
+		_, err = SetFile.WriteString("ignore:\n")
+		if err != nil {
+			return errors.New("ERROR: could not create settings file")
+		}
+		_, err = SetFile.WriteString("  - \"^\\\\..*\"\n")
+		if err != nil {
+			return errors.New("ERROR: could not create settings file")
+		}
 		SetFile.Close()
 		fmt.Println("Settings file created at ~/.flowcat")
 		return nil
@@ -126,13 +140,22 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	settings, err := ioutil.ReadFile(dirname + "/.flowcat")
-	if err == nil {
-		_ = yaml.Unmarshal(settings, &Cfg)
-		// 	//Ignore errors
-		_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
-		// 	//Ignore errors
+	settings, err := os.OpenFile(dirname+"/.flowcat", os.O_RDONLY, 0600)
+	if err != nil {
+		fmt.Println("Error opening configuration file")
 	}
+	defer settings.Close()
+	configuration := yaml.NewDecoder(settings)
+	err = configuration.Decode(&Cfg)
+	if err != nil {
+		fmt.Println("Unable to get settings from configuration file.")
+	}
+	// if err == nil {
+	// 	_ = yaml.Unmarshal(settings, &Cfg)
+	// 	// 	//Ignore errors
+	// 	_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems
+	// 	// 	//Ignore errors
+	// }
 
 	if *lineFlag {
 		Showlines = *lineFlag
@@ -141,9 +164,7 @@ func main() {
 	matchexp = Cfg.Match
 	if *matchFlag != "" {
 		matchexp = *matchFlag
-	}
-	// //Fallback incase settings is missing the match and one is not specified per an argument
-	if matchexp == "" {
+	} else {
 		matchexp = "@todo"
 	}
 
@@ -171,7 +192,7 @@ func main() {
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					lexer.GetComments(contentbytes)
+					lexer.GetComments(contentbytes, matchexp)
 					// var s lexer.Scanner
 					// s.Match = matchexp
 					// s.Error = func(*lexer.Scanner, string) {} // ignore errors
