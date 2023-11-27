@@ -64,6 +64,7 @@ func newLexer() *lexmachine.Lexer {
 }
 
 func scan(text []byte) error {
+	var AllTokens []Token
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
 		return err
@@ -76,8 +77,9 @@ func scan(text []byte) error {
 			return err
 		} else {
 			curtok := tk.(*lexmachine.Token)
-			if curtok.Type == 19 {
+			if curtok.Type == 1 {
 				fmt.Println(curtok.Value)
+				AllTokens = append(AllTokens, curtok)
 			}
 		}
 	}
