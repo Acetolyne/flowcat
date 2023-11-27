@@ -63,18 +63,18 @@ func newLexer() *lexmachine.Lexer {
 	return lexer
 }
 
-func scan(text []byte) error {
-	var AllTokens []Token
+func scan(text []byte) ([]*lexmachine.Token, error) {
+	var AllTokens []*lexmachine.Token
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for tk, err, eof := scanner.Next(); !eof; tk, err, eof = scanner.Next() {
 		if ui, is := err.(*machines.UnconsumedInput); ui != nil && is {
 			scanner.TC = ui.FailTC
 			//log.Printf("skipping %v", ui)
 		} else if err != nil {
-			return err
+			return nil, err
 		} else {
 			curtok := tk.(*lexmachine.Token)
 			if curtok.Type == 1 {
@@ -83,16 +83,18 @@ func scan(text []byte) error {
 			}
 		}
 	}
-	return nil
+	return AllTokens, nil
 }
 
-func GetComments(text []byte) {
-
+func GetComments(text []byte, match string) []*lexmachine.Token {
+	fmt.Println("matching on", match)
+	var AllTokens []*lexmachine.Token
 	lexer = newLexer()
-	err := scan(text)
+	AllTokens, err := scan(text)
 	if err != nil {
 		fmt.Println("Error scanning text", err)
 	}
+	return AllTokens
 
 	// scanner, err := lexer.Scanner(text)
 	// if err != nil {
