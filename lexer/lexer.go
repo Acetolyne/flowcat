@@ -1,6 +1,15 @@
 package lexer
 
+//@todo create map of file extensions or file headers and comment types
+//@todo use the map like if map[FILE TYPE] == tok.Type then add token to a slice of token structs
+//@todo return a slice of structs {Line, Token}
+//@todo add current todo regex into middle of comment regex when adding to lexer
+//@todo pass in the users regex to call to GetComments from main file
+//@todo create more types of comments
+//@todo make a go test file
+//@todo make the test.txt file be one file to test all types of comments
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/timtadh/lexmachine"
@@ -19,9 +28,7 @@ type Token struct {
 }
 
 var tokens = []string{
-	"AT", "PLUS", "STAR", "DASH", "SLASH", "BACKSLASH", "CARROT", "BACKTICK", "COMMA", "LPAREN", "RPAREN",
-	"BUS", "COMPUTE", "CHIP", "IGNORE", "LABEL", "SET", "NUMBER", "NAME",
-	"COMMENT", "SPACE",
+	"IGNORE", "COMMENT",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
@@ -40,37 +47,13 @@ func newLexer() *lexmachine.Lexer {
 		}
 	}
 	var lexer = lexmachine.NewLexer()
-	// lexer.Add([]byte("@"), getToken(tokmap["AT"]))
-	// lexer.Add([]byte(`\+`), getToken(tokmap["PLUS"]))
-	// lexer.Add([]byte(`\*`), getToken(tokmap["STAR"]))
-	// lexer.Add([]byte("-"), getToken(tokmap["DASH"]))
-	// lexer.Add([]byte("/"), getToken(tokmap["SLASH"]))
-	// lexer.Add([]byte("\\"), getToken(tokmap["BACKSLASH"]))
-	// lexer.Add([]byte(`\^`), getToken(tokmap["CARROT"]))
-	// lexer.Add([]byte("`"), getToken(tokmap["BACKTICK"]))
-	// lexer.Add([]byte(","), getToken(tokmap["COMMA"]))
-	// lexer.Add([]byte(`\(`), getToken(tokmap["LPAREN"]))
-	// lexer.Add([]byte(`\)`), getToken(tokmap["RPAREN"]))
-	// lexer.Add([]byte("bus"), getToken(tokmap["BUS"]))
-	// lexer.Add([]byte("chip"), getToken(tokmap["CHIP"]))
-	// lexer.Add([]byte("label"), getToken(tokmap["LABEL"]))
-	// lexer.Add([]byte("compute"), getToken(tokmap["COMPUTE"]))
-	// lexer.Add([]byte("ignore"), getToken(tokmap["IGNORE"]))
-	// lexer.Add([]byte("set"), getToken(tokmap["SET"]))
-	// lexer.Add([]byte(`[0-9]*\.?[0-9]+`), getToken(tokmap["NUMBER"]))
-	// lexer.Add([]byte(`[a-zA-Z_][a-zA-Z0-9_]*`), getToken(tokmap["NAME"]))
-	// lexer.Add([]byte(`"[^"]*"`), getToken(tokmap["NAME"]))
-	lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
-	// lexer.Add([]byte(`\s+`), getToken(tokmap["SPACE"]))
-	lexer.Add([]byte(`//[^\n]@todo*\n?`), getToken(tokmap["COMMENT"]))
-	lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"]))
-	//Skip anything in a string
-	// lexer.Add([]byte(`[\"\'].*[\"\']`), func(s *lexmachine.Scanner, m *machines.Match) (interface{}, error) {
-	// 	return nil, nil
-	// })
-	//lexer.Add([]byte("( |\t|\n|\r)+"), skip)
-	// bs, _ := json.Marshal(tokmap)
-	// fmt.Println(string(bs))
+	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
+	lexer.Add([]byte(`[\"]//[ ]*@todo[^\n]*[\"][^\n]*`), getToken(tokmap["IGNORE"]))
+	lexer.Add([]byte(`//[ ]*@todo[^\n]*`), getToken(tokmap["COMMENT"]))
+	//lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"])) //Multi line comments
+	//Gets all the token types and their cooresponding ids
+	bs, _ := json.Marshal(tokmap)
+	fmt.Println(string(bs))
 	//{"AT":0,"BACKSLASH":5,"BACKTICK":7,"BUS":11,"CARROT":6,"CHIP":13,"COMMA":8,"COMMENT":19,"COMPUTE":12,"DASH":3,"IGNORE":14,"LABEL":15,"LPAREN":9,"NAME":18,"NUMBER":17,"PLUS":1,"RPAREN":10,"SET":16,"SLASH":4,"SPACE":20,"STAR":2}
 
 	err := lexer.CompileDFA()
