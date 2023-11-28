@@ -35,7 +35,7 @@ type CommentValues struct {
 }
 
 var tokens = []string{
-	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE",
+	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
@@ -58,11 +58,15 @@ var Extensions = []CommentValues{
 		Type: 3,
 	},
 	{
-		Ext: []string{".html", ".gohtml", ".md"},
-		// startSingle: "",
+		Ext: []string{"html", "gohtml", "md"},
+		// Singleline HTML STYLE:  "<!--" COMMENT "-->",
+		Type: 4,
+	},
+	{
+		Ext: []string{"html", "gohtml", "md"},
 		// startMulti:  "<!--",
 		// endMulti:    "-->",
-		Type: 0,
+		Type: 5,
 	},
 	{
 		Ext: []string{".lua"},
@@ -124,6 +128,8 @@ func newLexer(match string) *lexmachine.Lexer {
 	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                //SL-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`/\*([^*/]*|\r|\n)*`), match, []byte(`[^*/]*\*/`)), getToken(tokmap["ML-COMMENT-COMMON-A"])) //ML-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                      //SL-SHELL-STYLE
+	lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["SL-HTML-STYLE"]))                 //SL-HTML-STYLE
+	lexer.Add(lexReg([]byte(`<!--([^-->]*|\r|\n)*`), match, []byte(`[^-->]*-->`)), getToken(tokmap["ML-HTML-STYLE"]))    //ML-HTML-STYLE
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
 	fmt.Println(string(bs))
