@@ -44,7 +44,7 @@ var Extensions = []CommentValues{
 		// startSingle: "//",
 		// startMulti:  "/*",
 		// endMulti:    "*/",
-		Types: []int{1},
+		Types: []int{1, 2},
 	},
 	{
 		Ext: []string{".sh", ".php"},
@@ -103,8 +103,8 @@ func newLexer() *lexmachine.Lexer {
 	var lexer = lexmachine.NewLexer()
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
 	lexer.Add([]byte(`[\"]//[ ]*@todo[^\n]*[\"][^\n]*`), getToken(tokmap["IGNORE"]))
-	lexer.Add([]byte(`//[ ]*@todo[^\n]*`), getToken(tokmap["SL-COMMENT-COMMON-A"])) //SL-COMMENT-COMMON-A
-	//lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"])) //ML-COMMENT-COMMON-A
+	lexer.Add([]byte(`//[ ]*@todo[^\n]*`), getToken(tokmap["SL-COMMENT-COMMON-A"]))                       //SL-COMMENT-COMMON-A
+	lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["ML-COMMENT-COMMON-A"])) //ML-COMMENT-COMMON-A
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
 	fmt.Println(string(bs))
