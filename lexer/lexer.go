@@ -133,7 +133,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	return lexer
 }
 
-func scan(text []byte, path string) ([]*lexmachine.Token, error) {
+func scan(text []byte, path string, showlines bool) ([]*lexmachine.Token, error) {
 	var AllTokens []*lexmachine.Token
 	printfile := true
 	_, curfile := filepath.Split(path)
@@ -164,7 +164,11 @@ func scan(text []byte, path string) ([]*lexmachine.Token, error) {
 										fmt.Println(path)
 										printfile = false
 									}
-									fmt.Println(" ", curtok.Value)
+									if showlines {
+										fmt.Println(" ", curtok.StartLine, ")", curtok.Value)
+									} else {
+										fmt.Println(" ", curtok.Value)
+									}
 									AllTokens = append(AllTokens, curtok)
 								}
 							}
@@ -181,11 +185,11 @@ func scan(text []byte, path string) ([]*lexmachine.Token, error) {
 	return AllTokens, nil
 }
 
-func GetComments(text []byte, match string, path string) []*lexmachine.Token {
+func GetComments(text []byte, match string, path string, showlines bool) []*lexmachine.Token {
 	fmt.Println("matching on", match)
 	var AllTokens []*lexmachine.Token
 	lexer = newLexer(match)
-	AllTokens, err := scan(text, path)
+	AllTokens, err := scan(text, path, showlines)
 	if err != nil {
 		fmt.Println("Error scanning text", err)
 	}
