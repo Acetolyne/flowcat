@@ -186,14 +186,12 @@ func main() {
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
 				contents, err := os.ReadFile(path)
-				_, curfile := filepath.Split(path)
-				ext := strings.Split(curfile, ".")
 				if err != nil {
 					fmt.Println("ERROR: could not read file", file, err)
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					lexer.GetComments(contentbytes, matchexp, ext[1])
+					lexer.GetComments(contentbytes, matchexp, path)
 					// var s lexer.Scanner
 					// s.Match = matchexp
 					// s.Error = func(*lexer.Scanner, string) {} // ignore errors

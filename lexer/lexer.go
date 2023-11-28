@@ -10,6 +10,8 @@ package lexer
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
+	"strings"
 
 	"github.com/timtadh/lexmachine"
 	"github.com/timtadh/lexmachine/machines"
@@ -92,9 +94,22 @@ func init() {
 	for id, name := range tokens {
 		tokmap[name] = id
 	}
+	// logFile, err := os.OpenFile("LOGPATH", os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	// if err != nil {
+	//     log.Panic(err)
+	// }
+	// defer logFile.Close()
+	// log.SetOutput(logfile)
+	// log.SetFlags(log.Lshortfile | log.LstdFlags)
 }
 
-func newLexer() *lexmachine.Lexer {
+func lexReg(a []byte, b string, c []byte) []byte {
+	reg := append(a, b...)
+	reg = append(reg, c...)
+	return reg
+}
+
+func newLexer(match string) *lexmachine.Lexer {
 	getToken := func(tokenType int) lexmachine.Action {
 		return func(s *lexmachine.Scanner, m *machines.Match) (interface{}, error) {
 			return s.Token(tokenType, string(m.Bytes), m), nil
@@ -103,7 +118,8 @@ func newLexer() *lexmachine.Lexer {
 	var lexer = lexmachine.NewLexer()
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
 	lexer.Add([]byte(`[\"]//[ ]*@todo[^\n]*[\"][^\n]*`), getToken(tokmap["IGNORE"]))
-	lexer.Add([]byte(`//[ ]*@todo[^\n]*`), getToken(tokmap["SL-COMMENT-COMMON-A"]))                       //SL-COMMENT-COMMON-A
+	//lexer.Add([]byte(`//[ ]*@todo[^\n]*`), getToken(tokmap["SL-COMMENT-COMMON-A"]))                       //SL-COMMENT-COMMON-A
+	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))
 	lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["ML-COMMENT-COMMON-A"])) //ML-COMMENT-COMMON-A
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
@@ -117,8 +133,10 @@ func newLexer() *lexmachine.Lexer {
 	return lexer
 }
 
-func scan(text []byte, ext string) ([]*lexmachine.Token, error) {
+func scan(text []byte, path string) ([]*lexmachine.Token, error) {
 	var AllTokens []*lexmachine.Token
+	_, curfile := filepath.Split(path)
+	ext := strings.Split(curfile, ".")
 	//var CommentValue *CommentValues
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
@@ -132,13 +150,18 @@ func scan(text []byte, ext string) ([]*lexmachine.Token, error) {
 			return nil, err
 		} else {
 			curtok := tk.(*lexmachine.Token)
-			for _, CommentValue := range Extensions {
-				for _, curext := range CommentValue.Ext {
-					if curext == ext {
-						for _, id := range CommentValue.Types {
-							if id == curtok.Type {
-								fmt.Println(curtok.Value)
-								AllTokens = append(AllTokens, curtok)
+			if ext[1] == "" {
+				// log.Println("Logging to custom file")
+				fmt.Println("No extension for file not parsing")
+			} else {
+				for _, CommentValue := range Extensions {
+					for _, curext := range CommentValue.Ext {
+						if curext == ext[1] {
+							for _, id := range CommentValue.Types {
+								if id == curtok.Type {
+									fmt.Println(curtok.Value)
+									AllTokens = append(AllTokens, curtok)
+								}
 							}
 						}
 					}
@@ -153,12 +176,11 @@ func scan(text []byte, ext string) ([]*lexmachine.Token, error) {
 	return AllTokens, nil
 }
 
-func GetComments(text []byte, match string, ext string) []*lexmachine.Token {
+func GetComments(text []byte, match string, path string) []*lexmachine.Token {
 	fmt.Println("matching on", match)
-	fmt.Println("EXT:", ext)
 	var AllTokens []*lexmachine.Token
-	lexer = newLexer()
-	AllTokens, err := scan(text, ext)
+	lexer = newLexer(match)
+	AllTokens, err := scan(text, path)
 	if err != nil {
 		fmt.Println("Error scanning text", err)
 	}
