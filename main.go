@@ -187,13 +187,13 @@ func main() {
 			if !exc {
 				contents, err := os.ReadFile(path)
 				_, curfile := filepath.Split(path)
-				ext := strings.LastIndex(curfile, ".")
+				ext := strings.Split(curfile, ".")
 				if err != nil {
 					fmt.Println("ERROR: could not read file", file, err)
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					lexer.GetComments(contentbytes, matchexp, ext)
+					lexer.GetComments(contentbytes, matchexp, ext[1])
 					// var s lexer.Scanner
 					// s.Match = matchexp
 					// s.Error = func(*lexer.Scanner, string) {} // ignore errors

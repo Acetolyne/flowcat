@@ -28,8 +28,8 @@ type Token struct {
 
 // add function and the type will point to the comment with the appropriate regex
 type CommentValues struct {
-	ext   []string //list of all the file extentions associated with the TYPES for lexer tokens
-	types []int    //list of the token types used for this typically one regex for single line comments and one for multiline
+	Ext   []string //list of all the file extentions associated with the TYPES for lexer tokens
+	Types []int    //list of the token types used for this typically one regex for single line comments and one for multiline
 }
 
 var tokens = []string{
@@ -38,59 +38,59 @@ var tokens = []string{
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
 
+var Extensions = []CommentValues{
+	{
+		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp"},
+		// startSingle: "//",
+		// startMulti:  "/*",
+		// endMulti:    "*/",
+		Types: []int{1},
+	},
+	{
+		Ext: []string{".sh", ".php"},
+		// startSingle: "#",
+		// startMulti:  "",
+		// endMulti:    "",
+		Types: []int{0},
+	},
+	{
+		Ext: []string{".html", ".gohtml", ".md"},
+		// startSingle: "",
+		// startMulti:  "<!--",
+		// endMulti:    "-->",
+		Types: []int{0},
+	},
+	{
+		Ext: []string{".lua"},
+		// startSingle: "--",
+		// startMulti:  "--[[",
+		// endMulti:    "--]]",
+		Types: []int{0},
+	},
+	{
+		Ext: []string{".rb"},
+		// startSingle: "#",
+		// startMulti:  "=begin",
+		// endMulti:    "=end",
+		Types: []int{0},
+	},
+	{
+		Ext: []string{".py"},
+		// startSingle: "#",
+		Types: []int{0},
+	},
+	{
+		Ext: []string{".tmpl"},
+		// startMulti: "{{/*",
+		// endMulti:   "*/}}",
+		Types: []int{0},
+	},
+}
+
 func init() {
 	tokmap = make(map[string]int)
 	for id, name := range tokens {
 		tokmap[name] = id
-	}
-
-	var Extensions = []CommentValues{
-		{
-			ext: []string{"", ".go", ".py", ".js", ".rs", ".html", ".gohtml", ".php", ".c", ".cpp", ".h", ".class", ".jar", ".java", ".jsp"},
-			// startSingle: "//",
-			// startMulti:  "/*",
-			// endMulti:    "*/",
-			types: []int{1},
-		},
-		{
-			ext: []string{".sh", ".php"},
-			// startSingle: "#",
-			// startMulti:  "",
-			// endMulti:    "",
-			types: []int{0},
-		},
-		{
-			ext: []string{".html", ".gohtml", ".md"},
-			// startSingle: "",
-			// startMulti:  "<!--",
-			// endMulti:    "-->",
-			types: []int{0},
-		},
-		{
-			ext: []string{".lua"},
-			// startSingle: "--",
-			// startMulti:  "--[[",
-			// endMulti:    "--]]",
-			types: []int{0},
-		},
-		{
-			ext: []string{".rb"},
-			// startSingle: "#",
-			// startMulti:  "=begin",
-			// endMulti:    "=end",
-			types: []int{0},
-		},
-		{
-			ext: []string{".py"},
-			// startSingle: "#",
-			types: []int{0},
-		},
-		{
-			ext: []string{".tmpl"},
-			// startMulti: "{{/*",
-			// endMulti:   "*/}}",
-			types: []int{0},
-		},
 	}
 }
 
@@ -117,8 +117,9 @@ func newLexer() *lexmachine.Lexer {
 	return lexer
 }
 
-func scan(text []byte) ([]*lexmachine.Token, error) {
+func scan(text []byte, ext string) ([]*lexmachine.Token, error) {
 	var AllTokens []*lexmachine.Token
+	//var CommentValue *CommentValues
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
 		return nil, err
@@ -131,10 +132,22 @@ func scan(text []byte) ([]*lexmachine.Token, error) {
 			return nil, err
 		} else {
 			curtok := tk.(*lexmachine.Token)
-			if curtok.Type == 1 {
-				fmt.Println(curtok.Value)
-				AllTokens = append(AllTokens, curtok)
+			for _, CommentValue := range Extensions {
+				for _, curext := range CommentValue.Ext {
+					if curext == ext {
+						for _, id := range CommentValue.Types {
+							if id == curtok.Type {
+								fmt.Println(curtok.Value)
+								AllTokens = append(AllTokens, curtok)
+							}
+						}
+					}
+				}
 			}
+			// if curtok.Type == 1 {
+			// 	fmt.Println(curtok.Value)
+			// 	AllTokens = append(AllTokens, curtok)
+			// }
 		}
 	}
 	return AllTokens, nil
@@ -145,7 +158,7 @@ func GetComments(text []byte, match string, ext string) []*lexmachine.Token {
 	fmt.Println("EXT:", ext)
 	var AllTokens []*lexmachine.Token
 	lexer = newLexer()
-	AllTokens, err := scan(text)
+	AllTokens, err := scan(text, ext)
 	if err != nil {
 		fmt.Println("Error scanning text", err)
 	}
