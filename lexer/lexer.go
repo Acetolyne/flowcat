@@ -27,8 +27,14 @@ type Token struct {
 	EndColumn   int
 }
 
+// add function and the type will point to the comment with the appropriate regex
+type CommentValues struct {
+	ext   []string //list of all the file extentions associated with the TYPES for lexer tokens
+	types []int    //list of the token types used for this typically one regex for single line comments and one for multiline
+}
+
 var tokens = []string{
-	"IGNORE", "COMMENT",
+	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
@@ -37,6 +43,55 @@ func init() {
 	tokmap = make(map[string]int)
 	for id, name := range tokens {
 		tokmap[name] = id
+	}
+
+	var Extensions = []CommentValues{
+		{
+			ext: []string{"", ".go", ".py", ".js", ".rs", ".html", ".gohtml", ".php", ".c", ".cpp", ".h", ".class", ".jar", ".java", ".jsp"},
+			// startSingle: "//",
+			// startMulti:  "/*",
+			// endMulti:    "*/",
+			types: []int{1},
+		},
+		{
+			ext: []string{".sh", ".php"},
+			// startSingle: "#",
+			// startMulti:  "",
+			// endMulti:    "",
+			types: []int{0},
+		},
+		{
+			ext: []string{".html", ".gohtml", ".md"},
+			// startSingle: "",
+			// startMulti:  "<!--",
+			// endMulti:    "-->",
+			types: []int{0},
+		},
+		{
+			ext: []string{".lua"},
+			// startSingle: "--",
+			// startMulti:  "--[[",
+			// endMulti:    "--]]",
+			types: []int{0},
+		},
+		{
+			ext: []string{".rb"},
+			// startSingle: "#",
+			// startMulti:  "=begin",
+			// endMulti:    "=end",
+			types: []int{0},
+		},
+		{
+			ext: []string{".py"},
+			// startSingle: "#",
+			types: []int{0},
+		},
+		{
+			ext: []string{".tmpl"},
+			// startMulti: "{{/*",
+			// endMulti:   "*/}}",
+			types: []int{0},
+		},
 	}
 }
 
@@ -49,8 +104,8 @@ func newLexer() *lexmachine.Lexer {
 	var lexer = lexmachine.NewLexer()
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
 	lexer.Add([]byte(`[\"]//[ ]*@todo[^\n]*[\"][^\n]*`), getToken(tokmap["IGNORE"]))
-	lexer.Add([]byte(`//[ ]*@todo[^\n]*`), getToken(tokmap["COMMENT"]))
-	//lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"])) //Multi line comments
+	lexer.Add([]byte(`//[ ]*@todo[^\n]*`), getToken(tokmap["SL-COMMENT-COMMON-A"])) //SL-COMMENT-COMMON-A
+	//lexer.Add([]byte(`/\*([^*]|\r|\n|(\*+([^*/]|\r|\n)))*\*+/`), getToken(tokmap["COMMENT"])) //ML-COMMENT-COMMON-A
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
 	fmt.Println(string(bs))

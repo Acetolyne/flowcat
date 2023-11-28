@@ -181,7 +181,6 @@ func main() {
 			}
 		}
 		if info.Mode().IsRegular() {
-
 			file, exc := checkExclude(path, *outputFlag, *folderFlag)
 
 			//If the file does not match our exclusion regex then use it.
