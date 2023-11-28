@@ -35,7 +35,7 @@ type CommentValues struct {
 }
 
 var tokens = []string{
-	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE",
+	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
@@ -69,11 +69,15 @@ var Extensions = []CommentValues{
 		Type: 5,
 	},
 	{
-		Ext: []string{".lua"},
+		Ext: []string{"lua"},
 		// startSingle: "--",
+		Type: 6,
+	},
+	{
+		Ext: []string{"lua"},
 		// startMulti:  "--[[",
 		// endMulti:    "--]]",
-		Type: 0,
+		Type: 7,
 	},
 	{
 		Ext: []string{".rb"},
@@ -123,13 +127,15 @@ func newLexer(match string) *lexmachine.Lexer {
 	}
 	var lexer = lexmachine.NewLexer()
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
-	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"]))               //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
-	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"]))               //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
-	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                //SL-COMMENT-COMMON-A
-	lexer.Add(lexReg([]byte(`/\*([^*/]*|\r|\n)*`), match, []byte(`[^*/]*\*/`)), getToken(tokmap["ML-COMMENT-COMMON-A"])) //ML-COMMENT-COMMON-A
-	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                      //SL-SHELL-STYLE
-	lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["SL-HTML-STYLE"]))                 //SL-HTML-STYLE
-	lexer.Add(lexReg([]byte(`<!--([^-->]*|\r|\n)*`), match, []byte(`[^-->]*-->`)), getToken(tokmap["ML-HTML-STYLE"]))    //ML-HTML-STYLE
+	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"]))                              //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
+	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"]))                              //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
+	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                               //SL-COMMENT-COMMON-A
+	lexer.Add(lexReg([]byte(`/\*([^*/]*|\r|\n)*`), match, []byte(`[^*/]*\*/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                //ML-COMMENT-COMMON-A
+	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                                     //SL-SHELL-STYLE
+	lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["SL-HTML-STYLE"]))                                //SL-HTML-STYLE
+	lexer.Add(lexReg([]byte(`<!--([^-->]*|\r|\n)*`), match, []byte(`[^-->]*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                   //ML-HTML-STYLE
+	lexer.Add(lexReg([]byte(`\-\-[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-LUA-STYLE"]))                                    //SL-LUA-STYLE
+	lexer.Add(lexReg([]byte(`\-\-\[\[([^\-\-\]\]]*|\r|\n)*`), match, []byte(`[^\-\-\]\]]*\-\-\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
 	fmt.Println(string(bs))
