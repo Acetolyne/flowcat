@@ -135,6 +135,7 @@ func newLexer(match string) *lexmachine.Lexer {
 
 func scan(text []byte, path string) ([]*lexmachine.Token, error) {
 	var AllTokens []*lexmachine.Token
+	printfile := true
 	_, curfile := filepath.Split(path)
 	ext := strings.Split(curfile, ".")
 	//var CommentValue *CommentValues
@@ -159,7 +160,11 @@ func scan(text []byte, path string) ([]*lexmachine.Token, error) {
 						if curext == ext[1] {
 							for _, id := range CommentValue.Types {
 								if id == curtok.Type {
-									fmt.Println(curtok.Value)
+									if printfile {
+										fmt.Println(path)
+										printfile = false
+									}
+									fmt.Println(" ", curtok.Value)
 									AllTokens = append(AllTokens, curtok)
 								}
 							}
