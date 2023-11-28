@@ -1,6 +1,5 @@
 package lexer
 
-//@todo create map of file extensions or file headers and comment types
 //@todo use the map like if map[FILE TYPE] == tok.Type then add token to a slice of token structs
 //@todo return a slice of structs {Line, Token}
 //@todo add current todo regex into middle of comment regex when adding to lexer
@@ -141,8 +140,9 @@ func scan(text []byte) ([]*lexmachine.Token, error) {
 	return AllTokens, nil
 }
 
-func GetComments(text []byte, match string) []*lexmachine.Token {
+func GetComments(text []byte, match string, ext string) []*lexmachine.Token {
 	fmt.Println("matching on", match)
+	fmt.Println("EXT:", ext)
 	var AllTokens []*lexmachine.Token
 	lexer = newLexer()
 	AllTokens, err := scan(text)
