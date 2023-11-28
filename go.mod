@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/Acetolyne/commentlex v0.0.0-20231123093842-ada8ee1635f0
-	github.com/Acetolyne/flowcat/lexer v0.0.0-20231127171114-58f73f610638
+	github.com/Acetolyne/flowcat/lexer v0.0.0-20231127191214-95c434b2843a
 	gopkg.in/yaml.v2 v2.4.0
 )
 
