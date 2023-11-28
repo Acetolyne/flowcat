@@ -192,45 +192,6 @@ func main() {
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
 					lexer.GetComments(contentbytes, matchexp, path, Showlines)
-					// var s lexer.Scanner
-					// s.Match = matchexp
-					// s.Error = func(*lexer.Scanner, string) {} // ignore errors
-					// s.Init(file)
-					// s.Mode = lexer.ScanComments
-
-					// checklines := func(s lexer.Scanner, path string, Showlines bool) string {
-					// 	tok := s.Scan()
-					// 	var line string
-					// 	for tok != lexer.EOF {
-					// 		if tok == lexer.Comment {
-					// 			//remove newlines
-					// 			linetext := strings.Replace(s.TokenText(), "\n", " ", -1)
-					// 			linetext = strings.Replace(linetext, "\t", " ", -1)
-					// 			if Showlines {
-					// 				line += "\t" + strconv.Itoa(s.Position.Line) + ")" + linetext + "\n"
-					// 			} else {
-					// 				line += "\t" + linetext + "\n"
-					// 			}
-					// 		}
-					// 		tok = s.Scan()
-					// 	}
-
-					// 	return line
-					// }
-					// filelines := checklines(s, path, Showlines)
-					// if filelines != "" {
-					// 	if *outputFlag != "" {
-					// 		F.WriteString(path)
-					// 		F.WriteString("\n")
-					// 		F.WriteString(filelines)
-					// 	}
-					// 	fmt.Println(path)
-					// 	fmt.Println(filelines)
-					// }
-					//TEMP
-					if Showlines {
-						fmt.Println("showlines")
-					}
 				}
 			}
 			return nil

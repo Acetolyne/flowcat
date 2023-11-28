@@ -30,62 +30,64 @@ type Token struct {
 
 // add function and the type will point to the comment with the appropriate regex
 type CommentValues struct {
-	Ext   []string //list of all the file extentions associated with the TYPES for lexer tokens
-	Types []int    //list of the token types used for this typically one regex for single line comments and one for multiline
+	Ext  []string //list of all the file extentions associated with the TYPES for lexer tokens
+	Type int      //list of the token types used for this typically one regex for single line comments and one for multiline
 }
 
 var tokens = []string{
-	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A",
+	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
 
 var Extensions = []CommentValues{
 	{
-		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp"},
+		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp", "php"},
 		// startSingle: "//",
-		// startMulti:  "/*",
-		// endMulti:    "*/",
-		Types: []int{1, 2},
+		Type: 1,
 	},
 	{
-		Ext: []string{".sh", ".php"},
+		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp", "php"},
+		// startMulti:  "/*",
+		// endMulti:    "*/",
+		Type: 2,
+	},
+	{
+		Ext: []string{"sh", "php"},
 		// startSingle: "#",
-		// startMulti:  "",
-		// endMulti:    "",
-		Types: []int{0},
+		Type: 3,
 	},
 	{
 		Ext: []string{".html", ".gohtml", ".md"},
 		// startSingle: "",
 		// startMulti:  "<!--",
 		// endMulti:    "-->",
-		Types: []int{0},
+		Type: 0,
 	},
 	{
 		Ext: []string{".lua"},
 		// startSingle: "--",
 		// startMulti:  "--[[",
 		// endMulti:    "--]]",
-		Types: []int{0},
+		Type: 0,
 	},
 	{
 		Ext: []string{".rb"},
 		// startSingle: "#",
 		// startMulti:  "=begin",
 		// endMulti:    "=end",
-		Types: []int{0},
+		Type: 0,
 	},
 	{
 		Ext: []string{".py"},
 		// startSingle: "#",
-		Types: []int{0},
+		Type: 0,
 	},
 	{
 		Ext: []string{".tmpl"},
 		// startMulti: "{{/*",
 		// endMulti:   "*/}}",
-		Types: []int{0},
+		Type: 0,
 	},
 }
 
@@ -117,10 +119,11 @@ func newLexer(match string) *lexmachine.Lexer {
 	}
 	var lexer = lexmachine.NewLexer()
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
-	lexer.Add([]byte(`[\"]//[ ]*@todo[^\n]*[\"][^\n]*`), getToken(tokmap["IGNORE"]))
+	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"]))               //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
+	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"]))               //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
 	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                //SL-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`/\*([^*/]*|\r|\n)*`), match, []byte(`[^*/]*\*/`)), getToken(tokmap["ML-COMMENT-COMMON-A"])) //ML-COMMENT-COMMON-A
-	///\*([^*/]*|\r|\n)*@todo([^*/]*|\r|\n)\*/
+	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                      //SL-SHELL-STYLE
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
 	fmt.Println(string(bs))
@@ -133,43 +136,41 @@ func newLexer(match string) *lexmachine.Lexer {
 	return lexer
 }
 
-func scan(text []byte, path string, showlines bool) ([]*lexmachine.Token, error) {
-	var AllTokens []*lexmachine.Token
+func scan(text []byte, path string, showlines bool) error {
 	printfile := true
 	_, curfile := filepath.Split(path)
 	ext := strings.Split(curfile, ".")
 	//var CommentValue *CommentValues
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	for tk, err, eof := scanner.Next(); !eof; tk, err, eof = scanner.Next() {
 		if ui, is := err.(*machines.UnconsumedInput); ui != nil && is {
 			scanner.TC = ui.FailTC
 			//log.Printf("skipping %v", ui)
 		} else if err != nil {
-			return nil, err
+			return err
 		} else {
 			curtok := tk.(*lexmachine.Token)
 			if ext[1] == "" {
 				// log.Println("Logging to custom file")
 				fmt.Println("No extension for file not parsing")
 			} else {
+				//fmt.Println("EXT:", ext[1])
 				for _, CommentValue := range Extensions {
 					for _, curext := range CommentValue.Ext {
 						if curext == ext[1] {
-							for _, id := range CommentValue.Types {
-								if id == curtok.Type {
-									if printfile {
-										fmt.Println(path)
-										printfile = false
-									}
-									if showlines {
-										fmt.Println(" ", curtok.StartLine, ")", curtok.Value)
-									} else {
-										fmt.Println(" ", curtok.Value)
-									}
-									AllTokens = append(AllTokens, curtok)
+							//fmt.Println(CommentValue.Type, curtok.Type)
+							if CommentValue.Type == curtok.Type {
+								if printfile {
+									fmt.Println(path)
+									printfile = false
+								}
+								if showlines {
+									fmt.Println(" ", curtok.StartLine, ")", curtok.Value)
+								} else {
+									fmt.Println(" ", curtok.Value)
 								}
 							}
 						}
@@ -182,18 +183,16 @@ func scan(text []byte, path string, showlines bool) ([]*lexmachine.Token, error)
 			// }
 		}
 	}
-	return AllTokens, nil
+	return nil
 }
 
-func GetComments(text []byte, match string, path string, showlines bool) []*lexmachine.Token {
+func GetComments(text []byte, match string, path string, showlines bool) {
 	fmt.Println("matching on", match)
-	var AllTokens []*lexmachine.Token
 	lexer = newLexer(match)
-	AllTokens, err := scan(text, path, showlines)
+	err := scan(text, path, showlines)
 	if err != nil {
 		fmt.Println("Error scanning text", err)
 	}
-	return AllTokens
 
 	// scanner, err := lexer.Scanner(text)
 	// if err != nil {
