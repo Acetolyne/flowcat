@@ -35,7 +35,7 @@ type CommentValues struct {
 }
 
 var tokens = []string{
-	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE",
+	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
@@ -83,7 +83,7 @@ var Extensions = []CommentValues{
 		Ext: []string{"rb"},
 		// startMulti:  "=begin",
 		// endMulti:    "=end",
-		Type: 0,
+		Type: 8,
 	},
 	{
 		Ext: []string{".py"},
@@ -125,7 +125,7 @@ func newLexer(match string) *lexmachine.Lexer {
 		}
 	}
 	var lexer = lexmachine.NewLexer()
-	//NEGATIVE LOOKAHEADS NOT SUPPORTED use START([^E]|E[^N]|EN[^D])*END to generate a long POSIX compatible regex
+	//NEGATIVE LOOKAHEADS NOT SUPPORTED use START([^E]|E[^N]|EN[^D])*MATCH([^E]|E[^N]|EN[^D])*END to generate a long POSIX compatible regex
 	//@todo create tests for:
 	//partial ending token in middle of comment does not cut comment off
 	//comment in double quotes
@@ -140,7 +140,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	lexer.Add(lexReg([]byte(`<!--([^-]|-[^-]|--[^>])*`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                              //ML-HTML-STYLE
 	lexer.Add(lexReg([]byte(`\-\-[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-LUA-STYLE"]))                                                                //SL-LUA-STYLE
 	lexer.Add(lexReg([]byte(`--\[\[([^-]|-[^-]|--[^\]|\-\-\][^\]])*`), match, []byte(`([^-]|-[^-]|--[^\]]|\-\-\][^\]])*--\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
-	//lexer.Add([]byte(`(^<!--([^-]|-(-|--)*([^--]|-[^>-]))*(-(-|--)*-?)?$)`), getToken(tokmap["ML-LUA-STYLE"]))
+	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*`)), getToken(tokmap["ML-RUBY-STYLE"]))
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
 	fmt.Println(string(bs))
