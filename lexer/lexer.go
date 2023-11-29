@@ -134,7 +134,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"]))                                                          //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
 	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"]))                                                          //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
 	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                                                           //SL-COMMENT-COMMON-A
-	lexer.Add(lexReg([]byte(`/\*([^*/]*|\r|\n)*`), match, []byte(`[^*/]*\*/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                                            //ML-COMMENT-COMMON-A
+	lexer.Add(lexReg([]byte(`\/\*([^\*]|\*[^\/])*`), match, []byte(`([^\*]|\*[^\/])*\*\/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                               //ML-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                                                                 //SL-SHELL-STYLE
 	lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["SL-HTML-STYLE"]))                                                            //SL-HTML-STYLE
 	lexer.Add(lexReg([]byte(`<!--([^-]|-[^-]|--[^>])*`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                              //ML-HTML-STYLE
