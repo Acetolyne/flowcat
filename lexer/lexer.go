@@ -53,7 +53,7 @@ var Extensions = []CommentValues{
 		Type: 2,
 	},
 	{
-		Ext: []string{"sh", "php"},
+		Ext: []string{"sh", "php", "rb"},
 		// startSingle: "#",
 		Type: 3,
 	},
@@ -80,8 +80,7 @@ var Extensions = []CommentValues{
 		Type: 7,
 	},
 	{
-		Ext: []string{".rb"},
-		// startSingle: "#",
+		Ext: []string{"rb"},
 		// startMulti:  "=begin",
 		// endMulti:    "=end",
 		Type: 0,
@@ -126,16 +125,18 @@ func newLexer(match string) *lexmachine.Lexer {
 		}
 	}
 	var lexer = lexmachine.NewLexer()
+	//NEGATIVE LOOKAHEADS NOT SUPPORTED use https://www.formauri.es/personal/pgimeno/misc/non-match-regex/ to generate a long POSIX compatible regex
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
-	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"]))                              //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
-	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"]))                              //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
-	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                               //SL-COMMENT-COMMON-A
-	lexer.Add(lexReg([]byte(`/\*([^*/]*|\r|\n)*`), match, []byte(`[^*/]*\*/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                //ML-COMMENT-COMMON-A
-	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                                     //SL-SHELL-STYLE
-	lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["SL-HTML-STYLE"]))                                //SL-HTML-STYLE
-	lexer.Add(lexReg([]byte(`<!--([^-->]*|\r|\n)*`), match, []byte(`[^-->]*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                   //ML-HTML-STYLE
-	lexer.Add(lexReg([]byte(`\-\-[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-LUA-STYLE"]))                                    //SL-LUA-STYLE
-	lexer.Add(lexReg([]byte(`\-\-\[\[([^\-\-\]\]]*|\r|\n)*`), match, []byte(`[^\-\-\]\]]*\-\-\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
+	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"]))                             //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
+	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"]))                             //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
+	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                              //SL-COMMENT-COMMON-A
+	lexer.Add(lexReg([]byte(`/\*([^*/]*|\r|\n)*`), match, []byte(`[^*/]*\*/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))               //ML-COMMENT-COMMON-A
+	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                                    //SL-SHELL-STYLE
+	lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["SL-HTML-STYLE"]))                               //SL-HTML-STYLE
+	lexer.Add(lexReg([]byte(`<!--([^-]|-[^-]|--[^>])*`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-HTML-STYLE"])) //ML-HTML-STYLE
+	//lexer.Add(lexReg([]byte(`\-\-[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-LUA-STYLE"]))                                  //SL-LUA-STYLE
+	//lexer.Add(lexReg([]byte(`<!--([^-]|-[^-]|--[^>])*`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
+	//lexer.Add([]byte(`(^<!--([^-]|-(-|--)*([^--]|-[^>-]))*(-(-|--)*-?)?$)`), getToken(tokmap["ML-LUA-STYLE"]))
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
 	fmt.Println(string(bs))
@@ -169,11 +170,11 @@ func scan(text []byte, path string, showlines bool) error {
 				// log.Println("Logging to custom file")
 				fmt.Println("No extension for file not parsing")
 			} else {
-				//fmt.Println("EXT:", ext[1])
+				fmt.Println("EXT:", ext[1])
 				for _, CommentValue := range Extensions {
 					for _, curext := range CommentValue.Ext {
 						if curext == ext[1] {
-							//fmt.Println(CommentValue.Type, curtok.Type)
+							fmt.Println(CommentValue.Type, curtok.Type)
 							if CommentValue.Type == curtok.Type {
 								if printfile {
 									fmt.Println(path)
