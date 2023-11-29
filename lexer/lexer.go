@@ -35,7 +35,7 @@ type CommentValues struct {
 }
 
 var tokens = []string{
-	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE",
+	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE", "TEMPLATE-STYLE",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
@@ -53,7 +53,7 @@ var Extensions = []CommentValues{
 		Type: 2,
 	},
 	{
-		Ext: []string{"sh", "php", "rb"},
+		Ext: []string{"sh", "php", "rb", "py"},
 		// startSingle: "#",
 		Type: 3,
 	},
@@ -86,15 +86,10 @@ var Extensions = []CommentValues{
 		Type: 8,
 	},
 	{
-		Ext: []string{".py"},
-		// startSingle: "#",
-		Type: 0,
-	},
-	{
-		Ext: []string{".tmpl"},
+		Ext: []string{"tmpl"},
 		// startMulti: "{{/*",
 		// endMulti:   "*/}}",
-		Type: 0,
+		Type: 9,
 	},
 }
 
@@ -141,6 +136,14 @@ func newLexer(match string) *lexmachine.Lexer {
 	lexer.Add(lexReg([]byte(`\-\-[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-LUA-STYLE"]))                                                                //SL-LUA-STYLE
 	lexer.Add(lexReg([]byte(`--\[\[([^-]|-[^-]|--[^\]|\-\-\][^\]])*`), match, []byte(`([^-]|-[^-]|--[^\]]|\-\-\][^\]])*--\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
 	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*`)), getToken(tokmap["ML-RUBY-STYLE"]))
+	lexer.Add(lexReg([]byte(`\{\{\/\*([^\*]|\*[^\/]|\*\/[^\}]|\*\/\}[^\}])*`), match, []byte(`([^\*]|\*[^\/]|\*\/[^\}]|\*\/}[^}])*\*\/\}\}`)), getToken(tokmap["TEMPLATE-STYLE"]))
+	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
+	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
+	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
+	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
+	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
+	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
+
 	//Gets all the token types and their cooresponding ids
 	bs, _ := json.Marshal(tokmap)
 	fmt.Println(string(bs))

@@ -114,11 +114,11 @@ func main() {
 		fmt.Println("init")
 		fmt.Println("using flowcat init creates a settings file for the current user, settings can be changed later in the ~/.flowcat file")
 		fmt.Println("-f string")
-		fmt.Println("   The project top level directory, where flowcat should start recursing from. (default Current Directory)")
+		fmt.Println("   The project top level directory, where flowcat should start recursing from or a specific file (default Current Directory)")
 		fmt.Println("-l")
 		fmt.Println("	Display line numbers in the output.")
 		fmt.Println("-m string")
-		fmt.Println("   The string to match to do items on. (default '@todo')")
+		fmt.Println("   The string to match to do items on. (default 'TODO')")
 		fmt.Println("-o string")
 		fmt.Println("   Optional output file to dump results to, note output will still be shown on terminal.")
 		fmt.Println("-h")
@@ -165,7 +165,7 @@ func main() {
 	if *matchFlag != "" {
 		matchexp = *matchFlag
 	} else {
-		matchexp = "@todo"
+		matchexp = "TODO"
 	}
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
