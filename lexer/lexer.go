@@ -35,61 +35,71 @@ type CommentValues struct {
 }
 
 var tokens = []string{
-	"IGNORE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE", "TEMPLATE-STYLE",
+	"IGNORE", "ML-SINGLE-STYLE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE", "TEMPLATE-STYLE",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
 
 var Extensions = []CommentValues{
 	{
+		Ext: []string{"rs"},
+		// Multiline each starting with //
+		Type: 1,
+	},
+	{
 		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp", "php"},
 		// startSingle: "//",
-		Type: 1,
+		Type: 2,
 	},
 	{
 		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp", "php"},
 		// startMulti:  "/*",
 		// endMulti:    "*/",
-		Type: 2,
+		Type: 3,
 	},
 	{
 		Ext: []string{"sh", "php", "rb", "py"},
 		// startSingle: "#",
-		Type: 3,
+		Type: 4,
 	},
 	{
 		Ext: []string{"html", "gohtml", "md"},
 		// Singleline HTML STYLE:  "<!--" COMMENT "-->",
-		Type: 4,
+		Type: 5,
 	},
 	{
 		Ext: []string{"html", "gohtml", "md"},
 		// startMulti:  "<!--",
 		// endMulti:    "-->",
-		Type: 5,
+		Type: 6,
 	},
 	{
 		Ext: []string{"lua"},
 		// startSingle: "--",
-		Type: 6,
+		Type: 7,
 	},
 	{
 		Ext: []string{"lua"},
 		// startMulti:  "--[[",
 		// endMulti:    "--]]",
-		Type: 7,
+		Type: 8,
 	},
 	{
 		Ext: []string{"rb"},
 		// startMulti:  "=begin",
 		// endMulti:    "=end",
-		Type: 8,
+		Type: 9,
 	},
 	{
 		Ext: []string{"tmpl"},
 		// startMulti: "{{/*",
 		// endMulti:   "*/}}",
-		Type: 9,
+		Type: 10,
+	},
+	{
+		Ext: []string{"rs"},
+		// Multiline each starting with //
+		Type: 11,
 	},
 }
 
@@ -110,6 +120,7 @@ func init() {
 func lexReg(a []byte, b string, c []byte) []byte {
 	reg := append(a, b...)
 	reg = append(reg, c...)
+	//fmt.Println("REGEX:", string(reg))
 	return reg
 }
 
@@ -126,8 +137,9 @@ func newLexer(match string) *lexmachine.Lexer {
 	//comment in double quotes
 	//comment in single quotes
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
-	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"]))                                                          //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
-	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"]))                                                          //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
+	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
+	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
+	lexer.Add(lexReg([]byte(`//.*(\n[\/][\/].*)*`), match, []byte(`.*(\n[\/][\/].*)*`)), getToken(tokmap["ML-SINGLE-STYLE"]))
 	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                                                           //SL-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`\/\*([^\*]|\*[^\/])*`), match, []byte(`([^\*]|\*[^\/])*\*\/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                               //ML-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                                                                 //SL-SHELL-STYLE
@@ -136,8 +148,8 @@ func newLexer(match string) *lexmachine.Lexer {
 	lexer.Add(lexReg([]byte(`\-\-[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-LUA-STYLE"]))                                                                //SL-LUA-STYLE
 	lexer.Add(lexReg([]byte(`--\[\[([^-]|-[^-]|--[^\]|\-\-\][^\]])*`), match, []byte(`([^-]|-[^-]|--[^\]]|\-\-\][^\]])*--\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
 	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*`)), getToken(tokmap["ML-RUBY-STYLE"]))
-	lexer.Add(lexReg([]byte(`\{\{\/\*([^\*]|\*[^\/]|\*\/[^\}]|\*\/\}[^\}])*`), match, []byte(`([^\*]|\*[^\/]|\*\/[^\}]|\*\/}[^}])*\*\/\}\}`)), getToken(tokmap["TEMPLATE-STYLE"]))
-	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
+	//@todo regex below has a bug so does not return the last token when doing the match on all chars except */}} when we add the last } it makes the asterisk not match in ending of token.
+	lexer.Add(lexReg([]byte(`\{\{\/\*([^\*]|\*[^\/]|\*\/[^\}]|\*\/\}[^\}])*`), match, []byte(`([^\*]|\*[^\/]|\*\/[^\}]|\*\/}[^}])*`)), getToken(tokmap["TEMPLATE-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
@@ -157,9 +169,11 @@ func newLexer(match string) *lexmachine.Lexer {
 }
 
 func scan(text []byte, path string, showlines bool) error {
+	fmt.Println("PATH:", path)
 	printfile := true
 	_, curfile := filepath.Split(path)
 	ext := strings.Split(curfile, ".")
+	fmt.Println(ext)
 	//var CommentValue *CommentValues
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
@@ -168,8 +182,9 @@ func scan(text []byte, path string, showlines bool) error {
 	for tk, err, eof := scanner.Next(); !eof; tk, err, eof = scanner.Next() {
 		if ui, is := err.(*machines.UnconsumedInput); ui != nil && is {
 			scanner.TC = ui.FailTC
-			//log.Printf("skipping %v", ui)
+			//fmt.Println("skipping", ui)
 		} else if err != nil {
+			fmt.Println(err)
 			return err
 		} else {
 			curtok := tk.(*lexmachine.Token)

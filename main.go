@@ -140,6 +140,10 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	//@todo check if the folder .flowcat exists in the user dir
+	//@todo if it does not exist create it
+	//@todo if there is no .flowcat/settings file then create it with defaults
+	//@todo logs should go in the .flowcat folder as debug.log and error.log each should be overwritten every time.
 	settings, err := os.OpenFile(dirname+"/.flowcat", os.O_RDONLY, 0600)
 	if err != nil {
 		fmt.Println("Error opening configuration file")
@@ -150,10 +154,10 @@ func main() {
 	if err != nil {
 		fmt.Println("Unable to get settings from configuration file.")
 	}
-	// if err == nil {
+	// else {
 	// 	_ = yaml.Unmarshal(settings, &Cfg)
 	// 	// 	//Ignore errors
-	// 	_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems
+	// 	_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
 	// 	// 	//Ignore errors
 	// }
 
