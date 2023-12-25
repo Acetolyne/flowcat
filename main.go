@@ -11,14 +11,16 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/Acetolyne/flowcat/lexer"
 	"gopkg.in/yaml.v2"
 )
 
+// @todo add logger
+// @todo add debug option in config file
 // Config structure of configuration from a yaml settings file.
 type Config struct {
-	Match        string              `yaml:"match"`
-	IgnoredItems map[string][]string `yaml:"ignore"`
+	Linenum      string   `yaml:"linenum"`
+	Match        string   `yaml:"match"`
+	IgnoredItems []string `yaml:"ignore"`
 }
 
 // ListedFiles returns a string of all files in a directory.
@@ -27,11 +29,13 @@ var ListedFiles []string
 // Cfg returns the user configurations from a file.
 var Cfg Config
 
+// @todo excluded regex not working when -f is specified because -f value is part of the path
 func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
 	regpath := strings.TrimPrefix(path, folderFlag)
-	m := Cfg.IgnoredItems["ignore"]
+	m := Cfg.IgnoredItems
 	reg := []bool{}
 	//If we are outputting to a file ignore the output file by default if it is in the project path
+	//@todo fix this logic see if path ends with the outfile
 	if outfile != "" {
 		if strings.Contains(outfile, folderFlag) {
 			m = append(m, outfile)
@@ -144,7 +148,7 @@ func main() {
 	//@todo if it does not exist create it
 	//@todo if there is no .flowcat/settings file then create it with defaults
 	//@todo logs should go in the .flowcat folder as debug.log and error.log each should be overwritten every time.
-	settings, err := os.OpenFile(dirname+"/.flowcat", os.O_RDONLY, 0600)
+	settings, err := os.OpenFile(dirname+"/.flowcat/config", os.O_RDONLY, 0600)
 	if err != nil {
 		fmt.Println("Error opening configuration file")
 	}
@@ -152,7 +156,7 @@ func main() {
 	configuration := yaml.NewDecoder(settings)
 	err = configuration.Decode(&Cfg)
 	if err != nil {
-		fmt.Println("Unable to get settings from configuration file.")
+		fmt.Println("Unable to get settings from configuration file.", err.Error())
 	}
 	// else {
 	// 	_ = yaml.Unmarshal(settings, &Cfg)
@@ -165,12 +169,14 @@ func main() {
 		Showlines = *lineFlag
 	}
 
-	matchexp = Cfg.Match
 	if *matchFlag != "" {
 		matchexp = *matchFlag
+	} else if Cfg.Match != "" {
+		matchexp = Cfg.Match
 	} else {
 		matchexp = "TODO"
 	}
+	fmt.Println("MATCHING ON", matchexp)
 
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
@@ -195,7 +201,7 @@ func main() {
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					lexer.GetComments(contentbytes, matchexp, path, Showlines)
+					GetComments(contentbytes, matchexp, path, Showlines)
 				}
 			}
 			return nil
