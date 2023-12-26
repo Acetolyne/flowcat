@@ -176,8 +176,6 @@ func main() {
 	} else {
 		matchexp = "TODO"
 	}
-	fmt.Println("MATCHING ON", matchexp)
-	//@todo comething in cloudswar todo file creates panic if file is not excluded, this should not happen
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
 		if *outputFlag != "" {

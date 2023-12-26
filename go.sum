@@ -1,7 +1,6 @@
-github.com/Acetolyne/commentlex v0.0.0-20231123093842-ada8ee1635f0 h1:mre87GM1e9OK15r5ENA5Tp0dZfNlQYGvTolMxr0Y1Vw=
-github.com/Acetolyne/commentlex v0.0.0-20231123093842-ada8ee1635f0/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
-github.com/timtadh/data-structures v0.6.1 h1:76eDpwngj2rEi9r/qvdH6YL7wMXGsoFFzhEylo/IacA=
 github.com/timtadh/data-structures v0.6.1/go.mod h1:uYUnI1cQi/5yMCc7s23I+x8Mn8BCMf4WgK+7/4QSEk4=
+github.com/timtadh/data-structures v0.6.2 h1:zybDnU5NLjJ7WKMDJpvVwczQuf1wSLBgdRHZ9O4AqJ0=
+github.com/timtadh/data-structures v0.6.2/go.mod h1:uYUnI1cQi/5yMCc7s23I+x8Mn8BCMf4WgK+7/4QSEk4=
 github.com/timtadh/getopt v1.0.0/go.mod h1:L3EL6YN2G0eIAhYBo9b7SB9d/kEQmdnwthIlMJfj210=
 github.com/timtadh/lexmachine v0.2.3 h1:ZqlfHnfMcAygtbNM5Gv7jQf8hmM8LfVzDjfCrq235NQ=
 github.com/timtadh/lexmachine v0.2.3/go.mod h1:oK1NW+93fQSIF6s+J6sXBFWsCPCFbNmrwKV1i0aqvW0=
