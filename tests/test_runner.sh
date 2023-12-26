@@ -6,7 +6,6 @@ arch=$1
 cd ..
 go install -v
 go get gopkg.in/yaml.v2
-go get github.com/Acetolyne/commentlex@master
 #//@todo add more archs for binaries
 case $arch in
 
