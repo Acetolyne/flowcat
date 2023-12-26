@@ -177,7 +177,7 @@ func main() {
 		matchexp = "TODO"
 	}
 	fmt.Println("MATCHING ON", matchexp)
-
+	//@todo comething in cloudswar todo file creates panic if file is not excluded, this should not happen
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
 		if *outputFlag != "" {
@@ -195,6 +195,7 @@ func main() {
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
+				fmt.Println("Checking file", path)
 				contents, err := os.ReadFile(path)
 				if err != nil {
 					fmt.Println("ERROR: could not read file", file, err)

@@ -172,6 +172,7 @@ func scan(text []byte, path string, showlines bool) error {
 	printfile := true
 	_, curfile := filepath.Split(path)
 	ext := strings.Split(curfile, ".")
+	fmt.Println(">>>>", len(ext))
 	// fmt.Println(ext)
 	//var CommentValue *CommentValues
 	scanner, err := lexer.Scanner(text)
@@ -187,6 +188,8 @@ func scan(text []byte, path string, showlines bool) error {
 			return err
 		} else {
 			curtok := tk.(*lexmachine.Token)
+			//@todo does not handle filenames with no ext index 1 out of range<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,,
+			fmt.Println(len(ext))
 			if ext[1] == "" {
 				// log.Println("Logging to custom file")
 				fmt.Println("No extension for file not parsing")

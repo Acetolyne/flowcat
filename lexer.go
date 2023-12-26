@@ -172,6 +172,9 @@ func scan(text []byte, path string, showlines bool) error {
 	printfile := true
 	_, curfile := filepath.Split(path)
 	ext := strings.Split(curfile, ".")
+	if len(ext) < 2 {
+		ext = append(ext, "")
+	}
 	// fmt.Println(ext)
 	//var CommentValue *CommentValues
 	scanner, err := lexer.Scanner(text)
@@ -187,28 +190,25 @@ func scan(text []byte, path string, showlines bool) error {
 			return err
 		} else {
 			curtok := tk.(*lexmachine.Token)
-			if ext[1] == "" {
-				// log.Println("Logging to custom file")
-				fmt.Println("No extension for file not parsing")
-			} else {
-				//fmt.Println("EXT:", ext[1])
-				for _, CommentValue := range Extensions {
-					for _, curext := range CommentValue.Ext {
-						if curext == ext[1] {
-							//fmt.Println(CommentValue.Type, curtok.Type)
-							if CommentValue.Type == curtok.Type {
-								if printfile {
-									fmt.Println(path)
-									printfile = false
-								}
-								if showlines {
-									fmt.Println(" ", curtok.StartLine, ")", curtok.Value)
-								} else {
-									fmt.Println(" ", curtok.Value)
-								}
+			//fmt.Println("EXT:", ext[1])
+			for _, CommentValue := range Extensions {
+				for _, curext := range CommentValue.Ext {
+					// if len(ext) > 1 {
+					if curext == ext[1] {
+						//fmt.Println(CommentValue.Type, curtok.Type)
+						if CommentValue.Type == curtok.Type {
+							if printfile {
+								fmt.Println(path)
+								printfile = false
+							}
+							if showlines {
+								fmt.Println(" ", curtok.StartLine, ")", curtok.Value)
+							} else {
+								fmt.Println(" ", curtok.Value)
 							}
 						}
 					}
+					// }
 				}
 			}
 			// if curtok.Type == 1 {
