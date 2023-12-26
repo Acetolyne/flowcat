@@ -14,6 +14,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var DebugMap map[string]int
+
 // @todo add logger
 // @todo add debug option in config file
 // Config structure of configuration from a yaml settings file.
@@ -21,6 +23,7 @@ type Config struct {
 	Linenum      string   `yaml:"linenum"`
 	Match        string   `yaml:"match"`
 	IgnoredItems []string `yaml:"ignore"`
+	DebugLevel   string   `yaml:"debuglevel"`
 }
 
 // ListedFiles returns a string of all files in a directory.
@@ -28,6 +31,7 @@ var ListedFiles []string
 
 // Cfg returns the user configurations from a file.
 var Cfg Config
+var Debug int
 
 // @todo excluded regex not working when -f is specified because -f value is part of the path
 func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
@@ -59,6 +63,7 @@ func checkExclude(path string, outfile string, folderFlag string) (string, bool)
 }
 
 func initSettings() error {
+
 	dirname, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println(err)
@@ -102,6 +107,11 @@ func main() {
 	var F *os.File
 	var Showlines bool = false
 	var matchexp string
+	DebugMap := map[string]int{
+		"v":   1,
+		"vv":  2,
+		"vvv": 3,
+	}
 
 	folderFlag := flag.String("f", "./", "The project top level directory, where flowcat should start recursing from.")
 	outputFlag := flag.String("o", "", "Optional output file to dump results to, note output will still be shown on terminal.")
@@ -176,6 +186,9 @@ func main() {
 	} else {
 		matchexp = "TODO"
 	}
+	fmt.Println(Cfg.DebugLevel)
+	Debug := DebugMap["vvv"]
+	fmt.Println(Debug)
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
 		if *outputFlag != "" {
@@ -193,7 +206,9 @@ func main() {
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
-				fmt.Println("Checking file", path)
+				if Debug > 2 {
+					fmt.Println("Checking file", path)
+				}
 				contents, err := os.ReadFile(path)
 				if err != nil {
 					fmt.Println("ERROR: could not read file", file, err)
