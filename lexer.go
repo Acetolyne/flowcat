@@ -160,7 +160,16 @@ func newLexer(match string) *lexmachine.Lexer {
 	// fmt.Println(string(bs))
 	//{"AT":0,"BACKSLASH":5,"BACKTICK":7,"BUS":11,"CARROT":6,"CHIP":13,"COMMA":8,"COMMENT":19,"COMPUTE":12,"DASH":3,"IGNORE":14,"LABEL":15,"LPAREN":9,"NAME":18,"NUMBER":17,"PLUS":1,"RPAREN":10,"SET":16,"SLASH":4,"SPACE":20,"STAR":2}
 
-	err := lexer.CompileDFA()
+	//@todo create conf variable to assign NFA or DFA and compile accordingly below
+	// DFA but DFA uses less memory
+	// real    1m13.999s
+	// user    1m21.119s
+	// sys     0m3.862s
+	// NFA better times but more memory intensive
+	// real    0m6.187s
+	// user    0m5.289s
+	// sys     0m1.491s
+	err := lexer.CompileNFA()
 	if err != nil {
 		panic(err)
 	}
