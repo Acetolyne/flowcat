@@ -4,10 +4,8 @@
   # Controls when the workflow will run
   on:
     # Triggers after entry workflow "flowcat"
-    workflow_run:
-      workflows: [flowcat]
-      types:
-        - completed
+    push:
+      branches: [ "master" ]
     # pull_request:
     #   branches: [ "*" ]
     # Allows you to run this workflow manually from the Actions tab
