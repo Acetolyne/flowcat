@@ -1,11 +1,9 @@
-github.com/Acetolyne/commentlex v0.0.0-20220220182929-fddeb0bdebd0 h1:yl8yIT/YXzdfqmy3wgT/rfxe0Vv+qgaL+AmhadO0DCs=
-github.com/Acetolyne/commentlex v0.0.0-20220220182929-fddeb0bdebd0/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
-github.com/Acetolyne/commentlex v0.0.0-20220225065538-8b633570c2f2 h1:xXQ5TW9E534Sl9siWKGR7+xqciS4g3SVWC5QQYrScmc=
-github.com/Acetolyne/commentlex v0.0.0-20220225065538-8b633570c2f2/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
-github.com/Acetolyne/commentlex v0.0.0-20220304233638-39d8d3e45dcb h1:JTSvVDu6ddFtJPij1JdO6rK664CdOOo4rpxz+SyTX7Y=
-github.com/Acetolyne/commentlex v0.0.0-20220304233638-39d8d3e45dcb/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
-github.com/Acetolyne/commentlex v0.0.0-20220703062704-ce95a098f1a7 h1:Xaccjr0rj6uwQ+d6s7arwY+EoE/yLOShcDVYa16XuSo=
-github.com/Acetolyne/commentlex v0.0.0-20220703062704-ce95a098f1a7/go.mod h1:CvdwI0VqCAPYjw3H7IHyiScrc5CEHHPPSR60LWnninQ=
+github.com/timtadh/data-structures v0.6.1/go.mod h1:uYUnI1cQi/5yMCc7s23I+x8Mn8BCMf4WgK+7/4QSEk4=
+github.com/timtadh/data-structures v0.6.2 h1:zybDnU5NLjJ7WKMDJpvVwczQuf1wSLBgdRHZ9O4AqJ0=
+github.com/timtadh/data-structures v0.6.2/go.mod h1:uYUnI1cQi/5yMCc7s23I+x8Mn8BCMf4WgK+7/4QSEk4=
+github.com/timtadh/getopt v1.0.0/go.mod h1:L3EL6YN2G0eIAhYBo9b7SB9d/kEQmdnwthIlMJfj210=
+github.com/timtadh/lexmachine v0.2.3 h1:ZqlfHnfMcAygtbNM5Gv7jQf8hmM8LfVzDjfCrq235NQ=
+github.com/timtadh/lexmachine v0.2.3/go.mod h1:oK1NW+93fQSIF6s+J6sXBFWsCPCFbNmrwKV1i0aqvW0=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=

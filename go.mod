@@ -1,8 +1,10 @@
 module github.com/Acetolyne/flowcat
 
-go 1.17
+go 1.20
 
 require (
-	github.com/Acetolyne/commentlex v0.0.0-20220703062704-ce95a098f1a7
+	github.com/timtadh/lexmachine v0.2.3
 	gopkg.in/yaml.v2 v2.4.0
 )
+
+require github.com/timtadh/data-structures v0.6.2 // indirect

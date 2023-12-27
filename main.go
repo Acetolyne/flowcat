@@ -5,35 +5,38 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"unicode/utf8"
 
-	lexer "github.com/Acetolyne/commentlex"
 	"gopkg.in/yaml.v2"
 )
 
-//Config structure of configuration from a yaml settings file.
+// @todo add logger
+// @todo add debug option in config file
+// Config structure of configuration from a yaml settings file.
 type Config struct {
-	Match        string              `yaml:"match"`
-	IgnoredItems map[string][]string `yaml:"ignore"`
+	Linenum      string   `yaml:"linenum"`
+	Match        string   `yaml:"match"`
+	IgnoredItems []string `yaml:"ignore"`
 }
 
-//ListedFiles returns a string of all files in a directory.
+// ListedFiles returns a string of all files in a directory.
 var ListedFiles []string
 
-//Cfg returns the user configurations from a file.
+// Cfg returns the user configurations from a file.
 var Cfg Config
+var Debug int
 
+// @todo excluded regex not working when -f is specified because -f value is part of the path
 func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
 	regpath := strings.TrimPrefix(path, folderFlag)
-	m := Cfg.IgnoredItems["ignore"]
+	m := Cfg.IgnoredItems
 	reg := []bool{}
 	//If we are outputting to a file ignore the output file by default if it is in the project path
+	//@todo fix this logic see if path ends with the outfile
 	if outfile != "" {
 		if strings.Contains(outfile, folderFlag) {
 			m = append(m, outfile)
@@ -57,55 +60,105 @@ func checkExclude(path string, outfile string, folderFlag string) (string, bool)
 }
 
 func initSettings() error {
+	logger := GetLoggerType()
 	dirname, err := os.UserHomeDir()
 	if err != nil {
-		fmt.Println(err)
+		logger.Err.Println("Could not get the users home directory", err.Error())
 	}
-	f, err := os.Open(dirname + "/.flowcat")
+	f, err := os.Open(dirname + "/.flowcat/config")
 	f.Close()
 	if err != nil {
 		var SetFile *os.File
-		SetFile, err = os.OpenFile(dirname+"/.flowcat", os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
+		SetFile, err = os.OpenFile(dirname+"/.flowcatconfig", os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
 		if err != nil {
+			logger.Err.Println("Could not create settings file when running init", err.Error())
 			return errors.New("ERROR: could not create settings file")
 		}
-		SetFile.WriteString("# Settings\n")
-		SetFile.WriteString("match: \"@todo\"\n\n")
-		SetFile.WriteString("# File patterns to ignore\n")
-		SetFile.WriteString("ignore:\n")
-		SetFile.WriteString("  - \"^\\\\..*\"\n")
+		defer SetFile.Close()
+		_, err = SetFile.WriteString("# Settings\n")
+		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
+			return errors.New("ERROR: could not create settings file")
+		}
+		_, err = SetFile.WriteString("match: \"@todo\"\n\n")
+		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
+			return errors.New("ERROR: could not create settings file")
+		}
+		_, err = SetFile.WriteString("# File patterns to ignore\n")
+		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
+			return errors.New("ERROR: could not create settings file")
+		}
+		_, err = SetFile.WriteString("ignore:\n")
+		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
+			return errors.New("ERROR: could not create settings file")
+		}
+		_, err = SetFile.WriteString("  - \"^\\\\..*\"\n")
+		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
+			return errors.New("ERROR: could not create settings file")
+		}
 		SetFile.Close()
-		fmt.Println("Settings file created at ~/.flowcat")
+		logger.Info.Println("Settings file created at ~/.flowcat/config")
 		return nil
 	}
-	return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
+	logger.Err.Println("User ran init but the config file already exists")
+	fmt.Println("setting file already exists consider editing the file ~/.flowcat/config or delete it before running init if you want to refresh it")
+	return errors.New("setting file already exists")
+}
+
+func init() {
+	logger := GetLoggerType()
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		logger.Err.Println("Could not get the users home directory", err.Error())
+	}
+	//Make sure the user directory has a folder called .flowcat and there is a logs folder in it
+	err = os.MkdirAll(homedir+"/.flowcat/logs", 0775)
+	if err != nil {
+		logger.Err.Println("Could not create flowcat directories in user folder", homedir+"/.flowcat/logs", err.Error())
+	}
+	//Delete the logs each time so we dont fill the harddisk
+	err = os.Truncate(homedir+"/.flowcat/logs/info.log", 0)
+	if err != nil {
+		logger.Err.Println("Could not trucate info.log file", err.Error())
+	}
+	err = os.Truncate(homedir+"/.flowcat/logs/error.log", 0)
+	if err != nil {
+		logger.Err.Println("Could not trucate error.log file", err.Error())
+	}
+
 }
 
 func main() {
+	logger := GetLoggerType()
 	var F *os.File
 	var Showlines bool = false
 	var matchexp string
+	var outputFile string
 
 	folderFlag := flag.String("f", "./", "The project top level directory, where flowcat should start recursing from.")
 	outputFlag := flag.String("o", "", "Optional output file to dump results to, note output will still be shown on terminal.")
 	matchFlag := flag.String("m", "", "The string to match to do items on.")
-	lineFlag := flag.Bool("l", false, "If line numbers should be shown with todo items in output.")
+	lineFlag := flag.Bool("l", false, "If line numbers should be shown with todo items in output.") //@todo change this to string so we can override the default in the configuration file if needed
 	helpFlag := flag.Bool("h", false, "Shows the help menu.")
 	flag.Parse()
 
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
 	if *helpFlag {
-		fmt.Println("Flowcat version 3.0.0")
+		fmt.Println("Flowcat version 3.1.1")
 		fmt.Println("")
 		fmt.Println("Options for Flowcat:")
 		fmt.Println("init")
-		fmt.Println("using flowcat init creates a settings file for the current user, settings can be changed later in the ~/.flowcat file")
+		fmt.Println("using flowcat init creates a settings file for the current user, settings can be changed later in the ~/.flowcat/config file")
 		fmt.Println("-f string")
-		fmt.Println("   The project top level directory, where flowcat should start recursing from. (default '.' Current Directory)")
+		fmt.Println("   The project top level directory, where flowcat should start recursing from or a specific file (default Current Directory)")
 		fmt.Println("-l")
 		fmt.Println("	Display line numbers in the output.")
 		fmt.Println("-m string")
-		fmt.Println("   The string to match to do items on. (default '@todo')")
+		fmt.Println("   The string to match to do items on. (default 'TODO')")
 		fmt.Println("-o string")
 		fmt.Println("   Optional output file to dump results to, note output will still be shown on terminal.")
 		fmt.Println("-h")
@@ -116,7 +169,7 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "init" {
 		err := initSettings()
 		if err != nil {
-			fmt.Println(err)
+			logger.Warn.Println("Could not init settings when running flowcat with init argument", err.Error())
 		}
 		//always exit without running if we were using init argument
 		os.Exit(0)
@@ -125,88 +178,82 @@ func main() {
 	//Get settings from .flowcat file in users home directory
 	dirname, err := os.UserHomeDir()
 	if err != nil {
-		fmt.Println(err)
+		logger.Warn.Println("Could not find user home directory", dirname, err.Error())
 	}
-	settings, err := ioutil.ReadFile(dirname + "/.flowcat")
-	if err == nil {
-		_ = yaml.Unmarshal(settings, &Cfg)
-		// 	//Ignore errors
-		_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
-		// 	//Ignore errors
+	//@todo check if the folder .flowcat exists in the user dir
+	//@todo if it does not exist create it
+	//@todo if there is no .flowcat/settings file then create it with defaults
+	//@todo logs should go in the .flowcat folder as debug.log and error.log each should be overwritten every time.
+	settings, err := os.OpenFile(dirname+"/.flowcat/config", os.O_RDONLY, 0600)
+	if err != nil {
+		logger.Warn.Println("Could not open user configuration file", dirname+"/.flowcat/config", err.Error())
 	}
+	defer settings.Close()
+	configuration := yaml.NewDecoder(settings)
+	err = configuration.Decode(&Cfg)
+	if err != nil {
+		logger.Warn.Println("Unable to get settings from configuration file.", err.Error())
+	}
+	// else {
+	// 	_ = yaml.Unmarshal(settings, &Cfg)
+	// 	// 	//Ignore errors
+	// 	_ = yaml.Unmarshal(settings, &Cfg.IgnoredItems)
+	// 	// 	//Ignore errors
+	// }
 
+	if Cfg.Linenum == "true" {
+		Showlines = true
+	}
 	if *lineFlag {
 		Showlines = *lineFlag
 	}
 
-	matchexp = Cfg.Match
 	if *matchFlag != "" {
 		matchexp = *matchFlag
-	}
-	// //Fallback incase settings is missing the match and one is not specified per an argument
-	if matchexp == "" {
-		matchexp = "@todo"
+	} else if Cfg.Match != "" {
+		matchexp = Cfg.Match
+	} else {
+		matchexp = "TODO"
 	}
 
+	if *outputFlag != "" {
+		if *folderFlag != "" {
+			outputFile = *folderFlag + *outputFlag
+		} else {
+			outputFile = *outputFlag
+		}
+		//Truncate the output file once before we scan
+		err := os.Truncate(outputFile, 0)
+		if err != nil {
+			logger.Err.Println("Could not trucate output file", outputFile, err.Error())
+		}
+	}
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
-		if *outputFlag != "" {
-			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
+		if outputFile != "" {
+			F, err = os.OpenFile(outputFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
 			if err != nil {
-				panic(err)
+				logger.Err.Println("could not open specified output file", outputFile, err.Error())
+				fmt.Println("WARNING could not create output file", err.Error())
 			}
 			defer F.Close()
 			if err != nil && F != nil {
-				fmt.Println("ERROR: could not write output to", *outputFlag)
+				logger.Err.Println("could not write to the specified output file", outputFile, err.Error())
 			}
 		}
 		if info.Mode().IsRegular() {
-
-			file, exc := checkExclude(path, *outputFlag, *folderFlag)
+			file, exc := checkExclude(path, outputFile, *folderFlag)
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
+				logger.Info.Println("Checking file", path)
 				contents, err := os.ReadFile(path)
 				if err != nil {
-					fmt.Println("ERROR: could not read file", file, err)
+					logger.Err.Println("could not read file", file, err)
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					var s lexer.Scanner
-					s.Match = matchexp
-					s.Error = func(*lexer.Scanner, string) {} // ignore errors
-					s.Init(file)
-					s.Mode = lexer.ScanComments
-
-					checklines := func(s lexer.Scanner, path string, Showlines bool) string {
-						tok := s.Scan()
-						var line string
-						for tok != lexer.EOF {
-							if tok == lexer.Comment {
-								//remove newlines
-								linetext := strings.Replace(s.TokenText(), "\n", " ", -1)
-								linetext = strings.Replace(linetext, "\t", " ", -1)
-								if Showlines {
-									line += "\t" + strconv.Itoa(s.Position.Line) + ")" + linetext + "\n"
-								} else {
-									line += "\t" + linetext + "\n"
-								}
-							}
-							tok = s.Scan()
-						}
-
-						return line
-					}
-					filelines := checklines(s, path, Showlines)
-					if filelines != "" {
-						if *outputFlag != "" {
-							F.WriteString(path)
-							F.WriteString("\n")
-							F.WriteString(filelines)
-						}
-						fmt.Println(path)
-						fmt.Println(filelines)
-					}
+					GetComments(contentbytes, matchexp, path, Showlines, outputFile)
 				}
 			}
 			return nil
@@ -217,6 +264,7 @@ func main() {
 	//@todo change below to use filepath.WalkDir instead
 	err = filepath.Walk(*folderFlag, parseFiles)
 	if err != nil {
-		fmt.Println(err)
+		logger.Err.Println("An error occured while walking directory", err.Error())
 	}
+	os.Exit(0)
 }
