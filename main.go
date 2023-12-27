@@ -120,6 +120,16 @@ func init() {
 	if err != nil {
 		logger.Err.Println("Could not create flowcat directories in user folder", homedir+"/.flowcat/logs", err.Error())
 	}
+	//Delete the logs each time so we dont fill the harddisk
+	err = os.Truncate(homedir+"/.flowcat/logs/info.log", 0)
+	if err != nil {
+		logger.Err.Println("Could not trucate info.log file", err.Error())
+	}
+	err = os.Truncate(homedir+"/.flowcat/logs/error.log", 0)
+	if err != nil {
+		logger.Err.Println("Could not trucate error.log file", err.Error())
+	}
+
 }
 
 func main() {
