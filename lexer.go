@@ -8,6 +8,7 @@ package main
 //@todo make a go test file
 //@todo make the test.txt file be one file to test all types of comments
 import (
+	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -119,11 +120,11 @@ func init() {
 func lexReg(a []byte, b string, c []byte) []byte {
 	reg := append(a, b...)
 	reg = append(reg, c...)
-	//fmt.Println("REGEX:", string(reg))
 	return reg
 }
 
 func newLexer(match string) *lexmachine.Lexer {
+	logger := GetLoggerType()
 	getToken := func(tokenType int) lexmachine.Action {
 		return func(s *lexmachine.Scanner, m *machines.Match) (interface{}, error) {
 			return s.Token(tokenType, string(m.Bytes), m), nil
@@ -156,10 +157,8 @@ func newLexer(match string) *lexmachine.Lexer {
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 
 	//Gets all the token types and their cooresponding ids
-	// bs, _ := json.Marshal(tokmap)
-	// fmt.Println(string(bs))
-	//{"AT":0,"BACKSLASH":5,"BACKTICK":7,"BUS":11,"CARROT":6,"CHIP":13,"COMMA":8,"COMMENT":19,"COMPUTE":12,"DASH":3,"IGNORE":14,"LABEL":15,"LPAREN":9,"NAME":18,"NUMBER":17,"PLUS":1,"RPAREN":10,"SET":16,"SLASH":4,"SPACE":20,"STAR":2}
-
+	bs, _ := json.Marshal(tokmap)
+	logger.Info.Println("LEXER REGEX MAP\n", string(bs))
 	//@todo create conf variable to assign NFA or DFA and compile accordingly below
 	// DFA but DFA uses less memory
 	// real    1m13.999s
@@ -171,21 +170,21 @@ func newLexer(match string) *lexmachine.Lexer {
 	// sys     0m1.491s
 	err := lexer.CompileNFA()
 	if err != nil {
+		logger.Fatal.Println("Could not compile the lexer", err.Error())
 		panic(err)
 	}
 	return lexer
 }
 
 func scan(text []byte, path string, showlines bool) error {
-	// fmt.Println("PATH:", path)
+	logger.Info.Println("Scanning file:", path)
+	//ensures we print the filename only once per file
 	printfile := true
 	_, curfile := filepath.Split(path)
 	ext := strings.Split(curfile, ".")
 	if len(ext) < 2 {
 		ext = append(ext, "")
 	}
-	// fmt.Println(ext)
-	//var CommentValue *CommentValues
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
 		return err
@@ -195,14 +194,12 @@ func scan(text []byte, path string, showlines bool) error {
 			scanner.TC = ui.FailTC
 			//fmt.Println("skipping", ui)
 		} else if err != nil {
-			fmt.Println(err)
+			logger.Err.Println("Error while lexing for comments", err.Error())
 			return err
 		} else {
 			curtok := tk.(*lexmachine.Token)
-			//fmt.Println("EXT:", ext[1])
 			for _, CommentValue := range Extensions {
 				for _, curext := range CommentValue.Ext {
-					// if len(ext) > 1 {
 					if curext == ext[1] {
 						//fmt.Println(CommentValue.Type, curtok.Type)
 						if CommentValue.Type == curtok.Type {
@@ -220,40 +217,16 @@ func scan(text []byte, path string, showlines bool) error {
 					// }
 				}
 			}
-			// if curtok.Type == 1 {
-			// 	fmt.Println(curtok.Value)
-			// 	AllTokens = append(AllTokens, curtok)
-			// }
 		}
 	}
 	return nil
 }
 
 func GetComments(text []byte, match string, path string, showlines bool) {
-	//fmt.Println("matching on", match)
+	logger.Info.Println("matching on", match)
 	lexer = newLexer(match)
 	err := scan(text, path, showlines)
 	if err != nil {
-		fmt.Println("Error scanning text", err)
+		logger.Err.Println("Error scanning text", err.Error())
 	}
-
-	// scanner, err := lexer.Scanner(text)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// for tok, err, eos := scanner.Next(); !eos; tok, err, eos = scanner.Next() {
-	// 	if err != nil {
-	// 		// handle the error and exit the loop. For example:
-	// 		fmt.Println(err)
-	// 	}
-	// 	// do some processing on tok or store it somewhere. eg.
-	// 	curtok := tok.(*lexmachine.Token)
-	// 	fmt.Println(string(curtok.Lexeme))
-	// }
-	// for i := 0; i < 1000; i++ {
-	// 	err = scan(text)
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }
 }

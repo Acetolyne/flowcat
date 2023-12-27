@@ -14,8 +14,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var DebugMap map[string]int
-
 // @todo add logger
 // @todo add debug option in config file
 // Config structure of configuration from a yaml settings file.
@@ -23,7 +21,6 @@ type Config struct {
 	Linenum      string   `yaml:"linenum"`
 	Match        string   `yaml:"match"`
 	IgnoredItems []string `yaml:"ignore"`
-	DebugLevel   string   `yaml:"debuglevel"`
 }
 
 // ListedFiles returns a string of all files in a directory.
@@ -63,44 +60,53 @@ func checkExclude(path string, outfile string, folderFlag string) (string, bool)
 }
 
 func initSettings() error {
-
+	logger := GetLoggerType()
 	dirname, err := os.UserHomeDir()
 	if err != nil {
-		fmt.Println(err)
+		logger.Err.Println("Could not get the users home directory", err.Error())
 	}
-	f, err := os.Open(dirname + "/.flowcat")
+	f, err := os.Open(dirname + "/.flowcat/config")
 	f.Close()
 	if err != nil {
 		var SetFile *os.File
-		SetFile, err = os.OpenFile(dirname+"/.flowcat", os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
+		SetFile, err = os.OpenFile(dirname+"/.flowcatconfig", os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
 		if err != nil {
+			logger.Err.Println("Could not create settings file when running init", err.Error())
 			return errors.New("ERROR: could not create settings file")
 		}
+		defer SetFile.Close()
 		_, err = SetFile.WriteString("# Settings\n")
 		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
 			return errors.New("ERROR: could not create settings file")
 		}
 		_, err = SetFile.WriteString("match: \"@todo\"\n\n")
 		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
 			return errors.New("ERROR: could not create settings file")
 		}
 		_, err = SetFile.WriteString("# File patterns to ignore\n")
 		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
 			return errors.New("ERROR: could not create settings file")
 		}
 		_, err = SetFile.WriteString("ignore:\n")
 		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
 			return errors.New("ERROR: could not create settings file")
 		}
 		_, err = SetFile.WriteString("  - \"^\\\\..*\"\n")
 		if err != nil {
+			logger.Err.Println("Could not write to settings file during init", err.Error())
 			return errors.New("ERROR: could not create settings file")
 		}
 		SetFile.Close()
-		fmt.Println("Settings file created at ~/.flowcat")
+		logger.Info.Println("Settings file created at ~/.flowcat/config")
 		return nil
 	}
-	return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
+	logger.Err.Println("User ran init but the config file already exists")
+	fmt.Println("setting file already exists consider editing the file ~/.flowcat/config or delete it before running init if you want to refresh it")
+	return errors.New("setting file already exists")
 }
 
 func init() {
@@ -121,11 +127,6 @@ func main() {
 	var F *os.File
 	var Showlines bool = false
 	var matchexp string
-	DebugMap := map[string]int{
-		"v":   1,
-		"vv":  2,
-		"vvv": 3,
-	}
 
 	folderFlag := flag.String("f", "./", "The project top level directory, where flowcat should start recursing from.")
 	outputFlag := flag.String("o", "", "Optional output file to dump results to, note output will still be shown on terminal.")
@@ -203,17 +204,17 @@ func main() {
 	} else {
 		matchexp = "TODO"
 	}
-	Debug := DebugMap[Cfg.DebugLevel]
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
 		if *outputFlag != "" {
 			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
 			if err != nil {
-				panic(err)
+				logger.Err.Println("could not open specified output file", *outputFlag, err.Error())
+				fmt.Println("WARNING could not create output file", err.Error())
 			}
 			defer F.Close()
 			if err != nil && F != nil {
-				fmt.Println("ERROR: could not write output to", *outputFlag)
+				logger.Err.Println("could not write to the specified output file", *outputFlag, err.Error())
 			}
 		}
 		if info.Mode().IsRegular() {
@@ -221,12 +222,10 @@ func main() {
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
-				if Debug > 2 {
-					fmt.Println("Checking file", path)
-				}
+				logger.Info.Println("Checking file", path)
 				contents, err := os.ReadFile(path)
 				if err != nil {
-					fmt.Println("ERROR: could not read file", file, err)
+					logger.Err.Println("could not read file", file, err)
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
@@ -241,7 +240,7 @@ func main() {
 	//@todo change below to use filepath.WalkDir instead
 	err = filepath.Walk(*folderFlag, parseFiles)
 	if err != nil {
-		fmt.Println(err)
+		logger.Err.Println("An error occured while walking directory", err.Error())
 	}
 	os.Exit(0)
 }
