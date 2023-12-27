@@ -104,6 +104,7 @@ func initSettings() error {
 }
 
 func main() {
+	logger := GetLoggerType()
 	var F *os.File
 	var Showlines bool = false
 	var matchexp string
@@ -116,7 +117,7 @@ func main() {
 	folderFlag := flag.String("f", "./", "The project top level directory, where flowcat should start recursing from.")
 	outputFlag := flag.String("o", "", "Optional output file to dump results to, note output will still be shown on terminal.")
 	matchFlag := flag.String("m", "", "The string to match to do items on.")
-	lineFlag := flag.Bool("l", false, "If line numbers should be shown with todo items in output.")
+	lineFlag := flag.Bool("l", false, "If line numbers should be shown with todo items in output.") //@todo change this to string so we can override the default in the configuration file if needed
 	helpFlag := flag.Bool("h", false, "Shows the help menu.")
 	flag.Parse()
 
@@ -143,7 +144,7 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "init" {
 		err := initSettings()
 		if err != nil {
-			fmt.Println(err)
+			logger.Warn.Println("Could not init settings when running flowcat with init argument", err.Error())
 		}
 		//always exit without running if we were using init argument
 		os.Exit(0)
@@ -152,7 +153,7 @@ func main() {
 	//Get settings from .flowcat file in users home directory
 	dirname, err := os.UserHomeDir()
 	if err != nil {
-		fmt.Println(err)
+		logger.Warn.Println("Could not find user home directory", dirname, err.Error())
 	}
 	//@todo check if the folder .flowcat exists in the user dir
 	//@todo if it does not exist create it
@@ -160,13 +161,13 @@ func main() {
 	//@todo logs should go in the .flowcat folder as debug.log and error.log each should be overwritten every time.
 	settings, err := os.OpenFile(dirname+"/.flowcat/config", os.O_RDONLY, 0600)
 	if err != nil {
-		fmt.Println("Error opening configuration file")
+		logger.Warn.Println("Could not open user configuration file", dirname+"/.flowcat/config", err.Error())
 	}
 	defer settings.Close()
 	configuration := yaml.NewDecoder(settings)
 	err = configuration.Decode(&Cfg)
 	if err != nil {
-		fmt.Println("Unable to get settings from configuration file.", err.Error())
+		logger.Warn.Println("Unable to get settings from configuration file.", err.Error())
 	}
 	// else {
 	// 	_ = yaml.Unmarshal(settings, &Cfg)
@@ -175,6 +176,9 @@ func main() {
 	// 	// 	//Ignore errors
 	// }
 
+	if Cfg.Linenum == "true" {
+		Showlines = true
+	}
 	if *lineFlag {
 		Showlines = *lineFlag
 	}
@@ -186,8 +190,7 @@ func main() {
 	} else {
 		matchexp = "TODO"
 	}
-	fmt.Println(Cfg.DebugLevel)
-	Debug := DebugMap["vvv"]
+	Debug := DebugMap[Cfg.DebugLevel]
 	fmt.Println(Debug)
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
