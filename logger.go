@@ -27,12 +27,12 @@ func GetLoggerType() AllLoggers {
 	var allloggers AllLoggers
 	homedir, _ := os.UserHomeDir()
 	//@todo check if they exist first
-	Infolog, err := os.OpenFile(homedir+"/.flowcat/logs/info.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0660)
+	Infolog, err := os.OpenFile(homedir+"/.flowcat/logs/info.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0775)
 	if err != nil {
 		fmt.Println("info log file not created", err.Error())
 	}
 
-	Errorlog, err := os.OpenFile(homedir+"/.flowcat/logs/error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0660)
+	Errorlog, err := os.OpenFile(homedir+"/.flowcat/logs/error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0775)
 	if err != nil {
 		fmt.Println("error log file not created", err.Error())
 	}

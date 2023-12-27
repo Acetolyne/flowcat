@@ -103,6 +103,19 @@ func initSettings() error {
 	return errors.New("setting file already exists consider editing the .flowcat file or delete it before running init")
 }
 
+func init() {
+	logger := GetLoggerType()
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		logger.Err.Println("Could not get the users home directory", err.Error())
+	}
+	//Make sure the user directory has a folder called .flowcat and there is a logs folder in it
+	err = os.MkdirAll(homedir+"/.flowcat/logs", 0775)
+	if err != nil {
+		logger.Err.Println("Could not create flowcat directories in user folder", homedir+"/.flowcat/logs", err.Error())
+	}
+}
+
 func main() {
 	logger := GetLoggerType()
 	var F *os.File
@@ -127,7 +140,7 @@ func main() {
 		fmt.Println("")
 		fmt.Println("Options for Flowcat:")
 		fmt.Println("init")
-		fmt.Println("using flowcat init creates a settings file for the current user, settings can be changed later in the ~/.flowcat file")
+		fmt.Println("using flowcat init creates a settings file for the current user, settings can be changed later in the ~/.flowcat/config file")
 		fmt.Println("-f string")
 		fmt.Println("   The project top level directory, where flowcat should start recursing from or a specific file (default Current Directory)")
 		fmt.Println("-l")
@@ -191,7 +204,6 @@ func main() {
 		matchexp = "TODO"
 	}
 	Debug := DebugMap[Cfg.DebugLevel]
-	fmt.Println(Debug)
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
 		if *outputFlag != "" {
