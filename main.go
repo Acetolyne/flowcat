@@ -137,6 +137,7 @@ func main() {
 	var F *os.File
 	var Showlines bool = false
 	var matchexp string
+	var outputFile string
 
 	folderFlag := flag.String("f", "./", "The project top level directory, where flowcat should start recursing from.")
 	outputFlag := flag.String("o", "", "Optional output file to dump results to, note output will still be shown on terminal.")
@@ -214,21 +215,34 @@ func main() {
 	} else {
 		matchexp = "TODO"
 	}
+
+	if *outputFlag != "" {
+		if *folderFlag != "" {
+			outputFile = *folderFlag + *outputFlag
+		} else {
+			outputFile = *outputFlag
+		}
+		//Truncate the output file once before we scan
+		err := os.Truncate(outputFile, 0)
+		if err != nil {
+			logger.Err.Println("Could not trucate output file", outputFile, err.Error())
+		}
+	}
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
-		if *outputFlag != "" {
-			F, err = os.OpenFile(*outputFlag, os.O_WRONLY|io.SeekStart|os.O_CREATE, 0755)
+		if outputFile != "" {
+			F, err = os.OpenFile(outputFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
 			if err != nil {
-				logger.Err.Println("could not open specified output file", *outputFlag, err.Error())
+				logger.Err.Println("could not open specified output file", outputFile, err.Error())
 				fmt.Println("WARNING could not create output file", err.Error())
 			}
 			defer F.Close()
 			if err != nil && F != nil {
-				logger.Err.Println("could not write to the specified output file", *outputFlag, err.Error())
+				logger.Err.Println("could not write to the specified output file", outputFile, err.Error())
 			}
 		}
 		if info.Mode().IsRegular() {
-			file, exc := checkExclude(path, *outputFlag, *folderFlag)
+			file, exc := checkExclude(path, outputFile, *folderFlag)
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
@@ -239,7 +253,7 @@ func main() {
 				}
 				contentbytes := []byte(contents)
 				if utf8.Valid(contentbytes) {
-					GetComments(contentbytes, matchexp, path, Showlines)
+					GetComments(contentbytes, matchexp, path, Showlines, outputFile)
 				}
 			}
 			return nil

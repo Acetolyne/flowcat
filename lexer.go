@@ -10,7 +10,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/timtadh/lexmachine"
@@ -176,8 +178,20 @@ func newLexer(match string) *lexmachine.Lexer {
 	return lexer
 }
 
-func scan(text []byte, path string, showlines bool) error {
+func scan(text []byte, path string, showlines bool, outputFile string) error {
 	logger.Info.Println("Scanning file:", path)
+	var f *os.File
+	var err error
+
+	//open output file in preparation
+	if outputFile != "" {
+		logger.Info.Println("Output will be sent to", outputFile)
+		f, err = os.OpenFile(outputFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
+		if err != nil {
+			logger.Err.Println("Could not open output file", err.Error())
+		}
+		//defer f.Close()
+	}
 	//ensures we print the filename only once per file
 	printfile := true
 	_, curfile := filepath.Split(path)
@@ -205,12 +219,30 @@ func scan(text []byte, path string, showlines bool) error {
 						if CommentValue.Type == curtok.Type {
 							if printfile {
 								fmt.Println(path)
+								_, err = f.WriteString(path + "\n")
+								if err != nil {
+									logger.Err.Println("Could not write output file", err.Error())
+								}
 								printfile = false
 							}
 							if showlines {
 								fmt.Println(" ", curtok.StartLine, ")", curtok.Value)
+								if outputFile != "" {
+									str := fmt.Sprintf(" %s)%s\n", strconv.Itoa(curtok.StartLine), curtok.Value.(string))
+									_, err = f.WriteString(str)
+									if err != nil {
+										logger.Err.Println("Could not write to output file", err.Error())
+									}
+								}
 							} else {
 								fmt.Println(" ", curtok.Value)
+								if outputFile != "" {
+									str := fmt.Sprintf("  %s\n", curtok.Value.(string))
+									_, err = f.WriteString(str)
+									if err != nil {
+										logger.Err.Println("Could not write output file", err.Error())
+									}
+								}
 							}
 						}
 					}
@@ -219,13 +251,14 @@ func scan(text []byte, path string, showlines bool) error {
 			}
 		}
 	}
+	//f.Close()
 	return nil
 }
 
-func GetComments(text []byte, match string, path string, showlines bool) {
+func GetComments(text []byte, match string, path string, showlines bool, outputFile string) {
 	logger.Info.Println("matching on", match)
 	lexer = newLexer(match)
-	err := scan(text, path, showlines)
+	err := scan(text, path, showlines, outputFile)
 	if err != nil {
 		logger.Err.Println("Error scanning text", err.Error())
 	}
