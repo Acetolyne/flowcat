@@ -32,7 +32,7 @@ type Token struct {
 
 // add function and the type will point to the comment with the appropriate regex
 type CommentValues struct {
-	Ext  []string //list of all the file extentions associated with the TYPES for lexer tokens
+	Ext  []string //list of all the file extensions associated with the TYPES for lexer tokens
 	Type int      //list of the token types used for this typically one regex for single line comments and one for multiline
 }
 
@@ -158,7 +158,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 
-	//Gets all the token types and their cooresponding ids
+	//Gets all the token types and their corresponding ids
 	bs, _ := json.Marshal(tokmap)
 	logger.Info.Println("LEXER REGEX MAP\n", string(bs))
 	//@todo create conf variable to assign NFA or DFA and compile accordingly below

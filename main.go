@@ -264,7 +264,7 @@ func main() {
 	//@todo change below to use filepath.WalkDir instead
 	err = filepath.Walk(*folderFlag, parseFiles)
 	if err != nil {
-		logger.Err.Println("An error occured while walking directory", err.Error())
+		logger.Err.Println("An error occurred while walking directory", err.Error())
 	}
 	os.Exit(0)
 }

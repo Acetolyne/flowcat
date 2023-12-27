@@ -107,7 +107,7 @@ func TestCanParseMultipleFiles(t *testing.T) {
 
 }
 
-//tests that we can send the output to a file and that file is not included in the scan
+// tests that we can send the output to a file and that file is not included in the scan
 func TestCanOutputToFile(t *testing.T) {
 	cmd := exec.Command("go", "run", "main.go", "-f", "tests/assets/multitest/", "-o", "tests/assets/multitest/output.txt")
 	stdout, err := cmd.Output()
