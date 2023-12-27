@@ -11,16 +11,19 @@ case $arch in
 
   "linux-amd64")
     dirsep="/"
+    echo "Building binary for linux-and64"
     env GOOS=linux GOARCH=amd64 GO111MODULE=auto go build -o bin/flowcat-linux-amd64/flowcat
     ;;
 
   "linux-386")
     dirsep="/"
+    echo "Building binary for linux-386"
     env GOOS=linux GOARCH=386 GO111MODULE=auto go build -o bin/flowcat-linux-386/flowcat
     ;;
 
   "darwin-arm64")
     dirsep="/"
+    echo "Building binary for darwin-arm64"
     env GOOS=darwin GOARCH=arm64 GO111MODULE=auto go build -o bin/flowcat-darwin-arm64/flowcat
     ;;
 
