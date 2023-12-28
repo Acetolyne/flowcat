@@ -32,26 +32,42 @@ func TestPre(t *testing.T) {
 		t.Fatal("[PRE-TEST][BIN FOLDER] creating the folder bin/flowcat-linux-amd64 failed", err.Error())
 	}
 	//Create the binaries
-	fmt.Printf("Building binary for darwin-arm64")
+	fmt.Println("Building binary for darwin-arm64")
 	//env GOOS=darwin GOARCH=arm64 GO111MODULE=auto go build *.go -o bin/flowcat-darwin-arm64/flowcat
-	cmd := exec.Command("go build *.go -o bin/flowcat-darwin-arm64/flowcat")
-	//cmd.Dir = os.Getenv("TMP_PATH") + u
-	env := []string{"GOOS=darwin", "GOARCH=arm64", "GO111MODULE=auto", "PATH=$PATH:/usr/local/go/bin"}
-	cmd.Env = env
+	cmd := exec.Command("/usr/bin/bash", "-c", "export PATH=$PATH:/usr/local/go/bin; env GOOS=darwin GOARCH=arm64 GO111MODULE=auto go build -o bin/flowcat-darwin-arm64/flowcat")
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		t.Fatal("Error comiling binary darwin-arm64", err.Error())
+		t.Fatal("Error compiling binary darwin-arm64", err.Error())
 	}
 	if stdout.String() != "" {
 		fmt.Println(stdout.String())
 	}
 	fmt.Println("Building binary for linux-386")
-	// env GOOS=linux GOARCH=386 GO111MODULE=auto go build -o bin/flowcat-linux-386/flowcat
+	cmd = exec.Command("/usr/bin/bash", "-c", "export PATH=$PATH:/usr/local/go/bin; env GOOS=linux GOARCH=386 GO111MODULE=auto go build -o bin/flowcat-linux-386/flowcat")
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		t.Fatal("Error compiling binary linux-386", err.Error())
+	}
+	if stdout.String() != "" {
+		fmt.Println(stdout.String())
+	}
 
 	fmt.Println("Building binary for linux-amd64")
-	// env GOOS=linux GOARCH=amd64 GO111MODULE=auto go build -o bin/flowcat-linux-amd64/flowcat
+	cmd = exec.Command("/usr/bin/bash", "-c", "export PATH=$PATH:/usr/local/go/bin; env GOOS=linux GOARCH=amd64 GO111MODULE=auto go build -o bin/flowcat-linux-amd64/flowcat")
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		t.Fatal("Error compiling binary linux-amd64", err.Error())
+	}
+	if stdout.String() != "" {
+		fmt.Println(stdout.String())
+	}
+
 	//Create tmp file folder
 	err = os.MkdirAll("tests/files", 0775)
 	if err != nil {
