@@ -1,0 +1,42 @@
+# trunk-ignore-all(checkov/CKV2_GHA_1)
+# builds binaries and runs go test to make sure functionality works as expected
+
+name: Functionality Test
+# Controls when the workflow will run
+on:
+  # Triggers after linux-386 build completes
+  # workflow_run:
+  #   workflows: [darwin-arm64 build and functionality]
+  #   types:
+  #     - completed
+  push:
+    branches: [ "master" ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  #Job1
+  build:
+  # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+  # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '^1.20.0'
+        #with:
+          # The Go version to download (if necessary) and use. Supports semver spec and ranges.
+          #go-version: # optional
+          # Whether to download only stable versions
+          #stable: # optional, default is true
+          # Used to pull node distributions from go-versions.  Since there's a default, this is typically not supplied by the user.
+          #token: # optional, default is ${{ github.token }}
+
+    # Runs a set of commands using the runners shell
+      - name: build-script
+        run: |
+          cd ${{ github.workspace }}
+          go test *.go

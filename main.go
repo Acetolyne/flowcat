@@ -31,7 +31,7 @@ var Cfg Config
 var Debug int
 
 // @todo excluded regex not working when -f is specified because -f value is part of the path
-func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
+func CheckExclude(path string, outfile string, folderFlag string) (string, bool) {
 	regpath := strings.TrimPrefix(path, folderFlag)
 	m := Cfg.IgnoredItems
 	reg := []bool{}
@@ -242,7 +242,7 @@ func main() {
 			}
 		}
 		if info.Mode().IsRegular() {
-			file, exc := checkExclude(path, outputFile, *folderFlag)
+			file, exc := CheckExclude(path, outputFile, *folderFlag)
 
 			//If the file does not match our exclusion regex then use it.
 			if !exc {

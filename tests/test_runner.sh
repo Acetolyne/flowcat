@@ -11,7 +11,7 @@ case $arch in
 
   "linux-amd64")
     dirsep="/"
-    echo "Building binary for linux-and64"
+    echo "Building binary for linux-amd64"
     env GOOS=linux GOARCH=amd64 GO111MODULE=auto go build -o bin/flowcat-linux-amd64/flowcat
     ;;
 
