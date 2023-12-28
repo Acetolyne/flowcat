@@ -36,7 +36,7 @@ func TestPre(t *testing.T) {
 	//env GOOS=darwin GOARCH=arm64 GO111MODULE=auto go build *.go -o bin/flowcat-darwin-arm64/flowcat
 	cmd := exec.Command("go build *.go -o bin/flowcat-darwin-arm64/flowcat")
 	//cmd.Dir = os.Getenv("TMP_PATH") + u
-	env := []string{"GOOS=darwin", "GOARCH=arm64", "GO111MODULE=auto"}
+	env := []string{"GOOS=darwin", "GOARCH=arm64", "GO111MODULE=auto", "PATH=$PATH:/usr/local/go/bin"}
 	cmd.Env = env
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
