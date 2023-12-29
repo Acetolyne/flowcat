@@ -178,13 +178,17 @@ func newLexer(match string) *lexmachine.Lexer {
 	return lexer
 }
 
-func scan(text []byte, path string, showlines bool, outputFile string) error {
+func Scan(text []byte, path string, showlines bool, outputFile string) error {
 	logger.Info.Println("Scanning file:", path)
 	var f *os.File
 	var err error
-
 	//open output file in preparation
 	if outputFile != "" {
+		dir, _ := filepath.Split(outputFile)
+		if dir == "" {
+			folder, _ := filepath.Split(path)
+			outputFile = folder + outputFile
+		}
 		logger.Info.Println("Output will be sent to", outputFile)
 		f, err = os.OpenFile(outputFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
 		if err != nil {
@@ -201,6 +205,7 @@ func scan(text []byte, path string, showlines bool, outputFile string) error {
 	}
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
+		logger.Err.Println("Error while scanning text", string(text), err.Error())
 		return err
 	}
 	for tk, err, eof := scanner.Next(); !eof; tk, err, eof = scanner.Next() {
@@ -219,9 +224,11 @@ func scan(text []byte, path string, showlines bool, outputFile string) error {
 						if CommentValue.Type == curtok.Type {
 							if printfile {
 								fmt.Println(path)
-								_, err = f.WriteString(path + "\n")
-								if err != nil {
-									logger.Err.Println("Could not write output file", err.Error())
+								if outputFile != "" {
+									_, err = f.WriteString(path + "\n")
+									if err != nil {
+										logger.Err.Println("Could not write output file", err.Error())
+									}
 								}
 								printfile = false
 							}
@@ -258,7 +265,7 @@ func scan(text []byte, path string, showlines bool, outputFile string) error {
 func GetComments(text []byte, match string, path string, showlines bool, outputFile string) {
 	logger.Info.Println("matching on", match)
 	lexer = newLexer(match)
-	err := scan(text, path, showlines, outputFile)
+	err := Scan(text, path, showlines, outputFile)
 	if err != nil {
 		logger.Err.Println("Error scanning text", err.Error())
 	}

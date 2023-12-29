@@ -218,16 +218,25 @@ func main() {
 
 	if *outputFlag != "" {
 		if *folderFlag != "" {
-			outputFile = *folderFlag + *outputFlag
+			//If the user only supplied a filename without a path then use the filepath supplied at -f
+			dir, _ := filepath.Split(*outputFlag)
+			if dir == "" {
+				dir, _ := filepath.Split(*folderFlag)
+				outputFile = dir + *outputFlag
+			} else {
+				outputFile = *outputFlag
+			}
 		} else {
 			outputFile = *outputFlag
 		}
+		fmt.Println(outputFile)
 		//Truncate the output file once before we scan
 		err := os.Truncate(outputFile, 0)
 		if err != nil {
 			logger.Err.Println("Could not trucate output file", outputFile, err.Error())
 		}
 	}
+	//Todo make this its own function and pass in relative information
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
 		if outputFile != "" {
@@ -243,7 +252,6 @@ func main() {
 		}
 		if info.Mode().IsRegular() {
 			file, exc := CheckExclude(path, outputFile, *folderFlag)
-
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
 				logger.Info.Println("Checking file", path)
