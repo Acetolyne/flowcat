@@ -37,71 +37,76 @@ type CommentValues struct {
 }
 
 var tokens = []string{
-	"IGNORE", "ML-SINGLE-STYLE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE", "TEMPLATE-STYLE",
+	"IGNORE", "ML-COMMENT-COMMON-B", "ML-SINGLE-STYLE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE", "TEMPLATE-STYLE",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
 
 var Extensions = []CommentValues{
 	{
+		Ext: []string{"py"},
+		// Multiline each starting with #
+		Type: 1,
+	},
+	{
 		Ext: []string{"rs"},
 		// Multiline each starting with //
-		Type: 1,
+		Type: 2,
 	},
 	{
 		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp", "php"},
 		// startSingle: "//",
-		Type: 2,
+		Type: 3,
 	},
 	{
 		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp", "php"},
 		// startMulti:  "/*",
 		// endMulti:    "*/",
-		Type: 3,
+		Type: 4,
 	},
 	{
 		Ext: []string{"sh", "php", "rb", "py"},
 		// startSingle: "#",
-		Type: 4,
+		Type: 5,
 	},
 	{
 		Ext: []string{"html", "gohtml", "md"},
 		// Singleline HTML STYLE:  "<!--" COMMENT "-->",
-		Type: 5,
+		Type: 6,
 	},
 	{
 		Ext: []string{"html", "gohtml", "md"},
 		// startMulti:  "<!--",
 		// endMulti:    "-->",
-		Type: 6,
+		Type: 7,
 	},
 	{
 		Ext: []string{"lua"},
 		// startSingle: "--",
-		Type: 7,
+		Type: 8,
 	},
 	{
 		Ext: []string{"lua"},
 		// startMulti:  "--[[",
 		// endMulti:    "--]]",
-		Type: 8,
+		Type: 9,
 	},
 	{
 		Ext: []string{"rb"},
 		// startMulti:  "=begin",
 		// endMulti:    "=end",
-		Type: 9,
+		Type: 10,
 	},
 	{
 		Ext: []string{"tmpl"},
 		// startMulti: "{{/*",
 		// endMulti:   "*/}}",
-		Type: 10,
+		Type: 11,
 	},
 	{
 		Ext: []string{"rs"},
 		// Multiline each starting with //
-		Type: 11,
+		Type: 12,
 	},
 }
 
@@ -141,6 +146,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
 	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
 	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
+	lexer.Add(lexReg([]byte(`#([^\n]|\n[\s|\t]+)*#`), match, []byte(`([^\n]|\n[#])*`)), getToken(tokmap["ML-COMMENT-COMMON-B"]))
 	//lexer.Add(lexReg([]byte(`//.*(\n[\/][\/].*)*`), match, []byte(`.*(\n[\/][\/].*)*`)), getToken(tokmap["ML-SINGLE-STYLE"]))
 	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                                                           //SL-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`\/\*([^\*]|\*[^\/])*`), match, []byte(`([^\*]|\*[^\/])*\*\/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                               //ML-COMMENT-COMMON-A
