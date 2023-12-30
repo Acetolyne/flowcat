@@ -3,7 +3,6 @@ package main
 //This file holds test performed on binaries
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -29,30 +28,13 @@ var outputfiletests = []struct {
 	outputFile string
 	exp        string
 }{
-	{[]byte("//@todo some comment"), "tests/assets/test.go", true, "output.txt", "tests/assets/test.go\n 1)//@todo some comment\n"},
-	{[]byte("//@todo some comment"), "tests/assets/test.go", true, "./output.txt", "tests/assets/test.go\n 1)//@todo some comment\n"},
+	{[]byte("//@todo some comment"), "tests/files/test.go", true, "output.txt", "tests/files/test.go\n 1)//@todo some comment\n"},
+	{[]byte("//@todo some comment"), "tests/files/test.go", true, "./output.txt", "tests/files/test.go\n 1)//@todo some comment\n"},
 }
-
-// (text []byte, path string, showlines bool, outputFile string)
-// var scantests = []struct {
-// 	text       []byte
-// 	path       string
-// 	showlines  bool
-// 	outputFile string
-// 	exp        string
-// }{
-// 	{[]byte("//@todo some comment"), "test.go", true, "output.txt", ""},
-// }
-
-//Language specific tests
-
-////Helper functions
 
 // //Testing starts
 // Performs pre-test actions like creating the binaries and a tmp folder for test files
 func TestPre(t *testing.T) {
-	// var stdout bytes.Buffer
-	// var stderr bytes.Buffer
 	//Create binaries folders
 	err := os.MkdirAll("bin/flowcat-darwin-arm64", 0775)
 	if err != nil {
@@ -68,10 +50,10 @@ func TestPre(t *testing.T) {
 	}
 
 	//Create tmp file folder
-	// err = os.MkdirAll("tests/files", 0775)
-	// if err != nil {
-	// 	t.Fatal("Could not perform pre-test actions, creating the tmp file folder failed", err.Error())
-	// }
+	err = os.MkdirAll("tests/files", 0775)
+	if err != nil {
+		t.Fatal("Could not perform pre-test actions, creating the tmp file folder failed", err.Error())
+	}
 	// TmpDir := t.TempDir()
 
 	// //Create a tmp file
@@ -98,14 +80,12 @@ func TestCheckExclude(t *testing.T) {
 
 func TestOutputFile(t *testing.T) {
 	for _, e := range outputfiletests {
-		fmt.Println("TESTING", e)
 		lexer = newLexer("@todo") //sets the matching string
 		err := Scan(e.text, e.path, e.showlines, e.outputFile)
 		if err != nil {
 			t.Errorf("Scan failed %s", err.Error())
 		}
 		dir, _ := filepath.Split(e.outputFile)
-		fmt.Println("FOLDER", dir)
 		if dir == "" {
 			folder, _ := filepath.Split(e.path)
 			b, err := os.ReadFile(folder + e.outputFile) // pass path at -f plus output filename
@@ -135,16 +115,6 @@ func TestOutputFile(t *testing.T) {
 
 	}
 }
-
-// func TestScan(t *testing.T) {
-// 	for _, e := range scantests {
-// 		lexer = newLexer("@todo")                              //sets the matching string
-// 		err := Scan(e.text, e.path, e.showlines, e.outputFile) //e.text, e.path, e.showlines, e.outputFile
-// 		if err != nil {
-// 			t.Errorf("Scan failed %s", err.Error())
-// 		}
-// 	}
-// }
 
 //@todo init settings works
 //@todo init settings fails if ran a second time and the file is already there
