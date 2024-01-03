@@ -3,9 +3,16 @@ package main
 //This file holds test performed on binaries
 
 import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"sort"
 	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -113,6 +120,102 @@ func TestOutputFile(t *testing.T) {
 			}
 		}
 
+	}
+}
+
+func TestReadme(t *testing.T) {
+	var buffer string
+	set := map[string]struct{}{}
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+
+	//copy the readme.md file to readme_copy.md
+	source, err := os.Open("README.md") //open the source file
+	if err != nil {
+		panic(err)
+	}
+	defer source.Close()
+
+	destination, err := os.Create("README_COPY.md") //create the destination file
+	if err != nil {
+		panic(err)
+	}
+	_, err = io.Copy(destination, source)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	//Update the extensions in the readme
+	file, err := os.Open("README.md")
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		buffer += scanner.Text() + "\n"
+		if strings.Contains(buffer, "#### Supported Filetypes") {
+			break
+		}
+	}
+	buffer += "\n```text\n"
+	if err := scanner.Err(); err != nil {
+		t.Errorf(err.Error())
+	}
+	//creates a set so we dont have duplicates
+	for l := range Extensions {
+		curext := Extensions[l]
+		for _, ext := range curext.Ext {
+			if ext != "" {
+				set[ext] = struct{}{}
+			}
+		}
+	}
+	keys := make([]string, 0, len(set))
+	for k := range set {
+		keys = append(keys, k)
+	}
+	//sort the keys so they are always list in the same order
+	sort.Strings(keys)
+	for _, k := range keys {
+		buffer += "." + k + "\n"
+	}
+	buffer += "```"
+	file.Close()
+	file, err = os.OpenFile("README.md", os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	err = file.Truncate(0)
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	_, err = file.Seek(0, 0)
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	_, err = fmt.Fprintf(file, "%s", buffer)
+
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	//Run diff on the two }files
+	cmd := exec.Command("/usr/bin/bash", "-c", "diff README.md README_COPY.md")
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	//Remove COPY
+	err = os.Remove("README_COPY.md")
+	if err != nil {
+		t.Errorf(err.Error())
 	}
 }
 
