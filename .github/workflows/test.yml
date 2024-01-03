@@ -1,7 +1,7 @@
 # trunk-ignore-all(checkov/CKV2_GHA_1)
 # builds binaries and runs go test to make sure functionality works as expected
 
-name: Functionality Test
+name: functionality
 # Controls when the workflow will run
 on:
   # Triggers after linux-386 build completes

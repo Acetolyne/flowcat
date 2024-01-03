@@ -59,12 +59,9 @@ Options for Flowcat:
 #### Installation
 Download the appropriate version for your system below then put the flowcat binary for your OS in one of your userpaths such as /usr/local/bin/, /bin/, /sbin/ or another path
 
-[![linux-amd64 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml) https://github.com/Acetolyne/flowcat/raw/master/bin/flowcat-linux-amd64/flowcat
+[![functionality](https://github.com/Acetolyne/flowcat/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/test.yml)
 
-[![linux-386 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml) https://github.com/Acetolyne/flowcat/raw/master/bin/flowcat-linux-386/flowcat
-
-[![darwin-arm64 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/darwin-arm64%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/darwin-arm64%20build%20and%20functionality.yml) https://github.com/Acetolyne/flowcat/raw/master/bin/flowcat-darwin-arm64/flowcat
-
+[![build](https://github.com/Acetolyne/flowcat/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/build.yml)
 
 
 Flowcat is currently only tested on Linux systems, now that flowcat is written in GoLang I am looking at porting it to Windows systems as well. While not tested yet it should currently work with MacOS as well but feedback is required.
