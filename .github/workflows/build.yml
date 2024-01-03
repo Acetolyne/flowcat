@@ -55,6 +55,7 @@
           - name: build-script
             run: |
               cd ${{ github.workspace }}
+              mkdir bin
               mkdir bin/flowcat-linux-386
               cd tests
               sh -e ./test_runner.sh linux-386
@@ -76,6 +77,7 @@
           - name: build-script
             run: |
               cd ${{ github.workspace }}
+              mkdir bin
               mkdir bin/flowcat-linux-386
               cd tests
               sh -e ./test_runner.sh linux-amd64
