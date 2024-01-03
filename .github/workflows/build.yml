@@ -73,7 +73,7 @@
   
       steps:
         - name: "Determine tag"
-          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && echo 'Artifact is ${{ steps.upload-linux-amd64-artifact.outputs.path }}"
+          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && echo 'Artifact is ${{ steps.upload-linux-amd64-artifact.outputs.path }}'"
   
         - name: "Create release"
           uses: "actions/github-script@v6"
