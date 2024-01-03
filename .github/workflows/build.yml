@@ -20,7 +20,8 @@
     build:
     # The type of runner that the job will run on
       runs-on: ubuntu-latest
-
+      outputs:
+        output1: ${{ steps.flowcat-linux-amd64.outputs.path }}
     # Steps represent a sequence of tasks that will be executed as part of the job
       steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -72,7 +73,7 @@
   
       steps:
         - name: "Determine tag"
-          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls ${{ github.workspace }}/bin/flowcat-linux-amd64/"
+          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && echo 'Artifact is ${{ steps.upload-linux-amd64-artifact.outputs.path }}"
   
         - name: "Create release"
           uses: "actions/github-script@v6"
