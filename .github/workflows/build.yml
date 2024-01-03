@@ -85,6 +85,7 @@
 
     release:
       name: "Release"
+      needs: [darwin-amd64-build, linux-386-build, linux-amd64-build]
   
       runs-on: "ubuntu-latest"
   
