@@ -39,5 +39,5 @@ jobs:
       - name: build-script
         run: |
           cd ${{ github.workspace }}
-          sh -e /home/runner/go test *.go
+          sh -e /home/runner/go test -v *.go
           if [ `echo $?` -ne 0 ]; then exit 1; fi
