@@ -20,8 +20,6 @@
     build:
     # The type of runner that the job will run on
       runs-on: ubuntu-latest
-      outputs:
-        output1: ${{ steps.flowcat-linux-amd64.outputs.artifact-id }}
     # Steps represent a sequence of tasks that will be executed as part of the job
       steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -72,11 +70,13 @@
       runs-on: "ubuntu-latest"
   
       steps:
-        - env:
-            OUTPUT1: ${{needs.build.outputs.output1}}
-          run: echo "Artifact ID from previous job is $OUTPUT1"
+        - name: get artifacts
+          uses: actions/download-artifact@master
+          with:
+            name: flowcat-linux-amd64
+            path: ${{ github.workspace }}/bin/flowcat-linux-amd64/flowcat
         - name: "Determine tag"
-          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && echo Artifact is $OUTPUT1"
+          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls ${{ github.workspace }}/bin/flowcat-linux-amd64/"
   
         - name: "Create release"
           uses: "actions/github-script@v6"
