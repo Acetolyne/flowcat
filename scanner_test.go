@@ -27,11 +27,11 @@ var scantests = []struct {
 	{[]byte("print(\"#@todo some comment\")"), "test3.py", true, "output.txt", "@todo", ""},
 	{[]byte("#some multiline \n#@todo comment\n#with 3 lines"), "test4.py", true, "output.txt", "@todo", "test4.py\n 1)#some multiline \n#@todo comment\n#with 3 lines\n"},
 	//HTML tests
-	{[]byte("<!-- @todo some comment -->"), "test.html", true, "output.txt", "@todo", "test.html\n 1)<!-- @todo some comment -->\n"}, //can get single line comment
-	{[]byte("<!-- @todo some comment -->"), "test2.html", true, "output.txt", "todo", ""},                                            //can get comment at end of line
-	// {[]byte("//@todo some comment"), "test.go", true, "output.txt", "todo", ""},                                                                                          //ignores comments when a different match is used
-	// {[]byte("fmt.Println(\"//@todo some comment\")"), "test.go", true, "output.txt", "@todo", ""},                                                                        //ignores comments inside a print statement or string
-	// {[]byte("/* Some multiline \n@todo comment \ncomment2 */"), "test.go", true, "output.txt", "@todo", "test.go\n 1)/* Some multiline \n@todo comment \ncomment2 */\n"}, //can get multi-line comments
+	{[]byte("<!-- @todo some comment -->"), "test.html", true, "output.txt", "@todo", "test.html\n 1)<!-- @todo some comment -->\n"},                                                       //can get single line comment
+	{[]byte("<!-- stuff @todo some comment -->"), "test2.html", true, "output.txt", "@todo", "test2.html\n 1)<!-- stuff @todo some comment -->\n"},                                         //can get comment at end of line
+	{[]byte("<!-- @todo some comment -->"), "test3.html", true, "output.txt", "note", ""},                                                                                                  //ignores comments when a different match is used
+	{[]byte("fmt.Println(\"<!-- @todo some comment\")"), "test4.html", true, "output.txt", "@todo", ""},                                                                                    //ignores comments inside a print statement or string
+	{[]byte("<!--  Some multiline \n@todo comment \ncomment2 \n-->"), "test5.html", true, "output.txt", "@todo", "test5.html\n 1)<!--  Some multiline \n@todo comment \ncomment2 \n-->\n"}, //can get multi-line comments
 }
 
 func TestScan(t *testing.T) {
