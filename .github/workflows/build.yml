@@ -20,6 +20,8 @@
     build:
     # The type of runner that the job will run on
       runs-on: ubuntu-latest
+      outputs:
+        darwin-arm64-key: ${{ steps.darwin-arm64-cache.outputs.cache-primary-key }}
     # Steps represent a sequence of tasks that will be executed as part of the job
       steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -75,7 +77,7 @@
           uses: actions/cache/restore@v3
           with:
             path: bin/flowcat-darwin-arm64/flowcat
-            key: ${{ steps.darwin-arm64-cache.outputs.cache-primary-key }}
+            key: ${{ needs.build.outputs.darwin-arm64-key }}
         
         - name: "Determine tag"
           run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls bin/flowcat-linux-amd64/"
