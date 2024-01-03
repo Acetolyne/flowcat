@@ -44,6 +44,12 @@ var scantests = []struct {
 	{[]byte("#@todo some comment"), "test3.rb", true, "output.txt", "note", ""},                                                                                                                //ignores comments when a different match is used
 	{[]byte("fmt.Println(\"#@todo some comment\")"), "test4.rb", true, "output.txt", "@todo", ""},                                                                                              //ignores comments inside a print statement or string
 	{[]byte("=begin\n Some multiline \n@todo comment \ncomment2 \n=end"), "test5.rb", true, "output.txt", "@todo", "test5.rb\n 1)=begin\n Some multiline \n@todo comment \ncomment2 \n=end\n"}, //can get multi-line comments
+	//tmpl file tests
+	{[]byte("{{/* @todo some comment */}}"), "test.tmpl", true, "output.txt", "@todo", "test.tmpl\n 1){{/* @todo some comment */}}\n"},                                                     //can get single line comment
+	{[]byte("some words {{/* @todo some comment */}}"), "test2.tmpl", true, "output.txt", "@todo", "test2.tmpl\n 1){{/* @todo some comment */}}\n"},                                        //can get comment at end of line
+	{[]byte("{{/* @todo some comment */}}"), "test3.tmpl", true, "output.txt", "note", ""},                                                                                                 //ignores comments when a different match is used
+	{[]byte("fmt.Println(\"{{/*@todo some comment*/}}\")"), "test4.tmpl", true, "output.txt", "@todo", ""},                                                                                 //ignores comments inside a print statement or string
+	{[]byte("{{/* Some multiline \n@todo comment \ncomment2 \n*/}}"), "test5.tmpl", true, "output.txt", "@todo", "test5.tmpl\n 1){{/* Some multiline \n@todo comment \ncomment2 \n*/}}\n"}, //can get multi-line comments
 }
 
 func TestScan(t *testing.T) {

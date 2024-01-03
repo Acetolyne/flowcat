@@ -139,11 +139,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	}
 	var lexer = lexmachine.NewLexer()
 	//NEGATIVE LOOKAHEADS NOT SUPPORTED use START([^E]|E[^N]|EN[^D])*MATCH([^E]|E[^N]|EN[^D])*END to generate a long POSIX compatible regex
-	//@todo create tests for:
-	//partial ending token in middle of comment does not cut comment off
-	//comment in double quotes
-	//comment in single quotes
-	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
+
 	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
 	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
 	lexer.Add(lexReg([]byte(`(#(@todo)*.*#`), match, []byte(`([^\n]|\n[#])*)`)), getToken(tokmap["ML-COMMENT-COMMON-B"]))
@@ -156,8 +152,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	lexer.Add(lexReg([]byte(`\-\-\[\[([^\n])*`), match, []byte(`[^\n]+\-\-\]\]`)), getToken(tokmap["SL-LUA-STYLE"]))                                                //SL-LUA-STYLE
 	lexer.Add(lexReg([]byte(`--\[\[([^-]|-[^-]|--[^\]|\-\-\][^\]])*`), match, []byte(`([^-]|-[^-]|--[^\]]|\-\-\][^\]])*--\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
 	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*=end`)), getToken(tokmap["ML-RUBY-STYLE"]))
-	//@todo regex below has a bug so does not return the last token when doing the match on all chars except */}} when we add the last } it makes the asterisk not match in ending of token.
-	lexer.Add(lexReg([]byte(`\{\{\/\*([^\*]|\*[^\/]|\*\/[^\}]|\*\/\}[^\}])*`), match, []byte(`([^\*]|\*[^\/]|\*\/[^\}]|\*\/}[^}])*`)), getToken(tokmap["TEMPLATE-STYLE"]))
+	lexer.Add(lexReg([]byte(`\{\{\/\*([^\*]|\*[^\/]|\*\/[^\}]|\*\/\}[^\}])*`), match, []byte(`([^\*]|\*[^\/]|\*\/[^\}]|\*\/}[^}])*\*\/\}\}`)), getToken(tokmap["TEMPLATE-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
