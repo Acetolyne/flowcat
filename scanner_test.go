@@ -32,6 +32,12 @@ var scantests = []struct {
 	{[]byte("<!-- @todo some comment -->"), "test3.html", true, "output.txt", "note", ""},                                                                                                  //ignores comments when a different match is used
 	{[]byte("fmt.Println(\"<!-- @todo some comment\")"), "test4.html", true, "output.txt", "@todo", ""},                                                                                    //ignores comments inside a print statement or string
 	{[]byte("<!--  Some multiline \n@todo comment \ncomment2 \n-->"), "test5.html", true, "output.txt", "@todo", "test5.html\n 1)<!--  Some multiline \n@todo comment \ncomment2 \n-->\n"}, //can get multi-line comments
+	//LUA tests
+	{[]byte("--[[@todo some comment--]]"), "test.lua", true, "output.txt", "@todo", "test.lua\n 1)--[[@todo some comment--]]\n"},                                                     //can get single line comment
+	{[]byte("some words --[[@todo some comment--]]"), "test2.lua", true, "output.txt", "@todo", "test2.lua\n 1)--[[@todo some comment--]]\n"},                                        //can get comment at end of line
+	{[]byte("--[[@todo some comment--]]"), "test3.lua", true, "output.txt", "note", ""},                                                                                              //ignores comments when a different match is used
+	{[]byte("fmt.Println(\"//@todo some comment\")"), "test4.lua", true, "output.txt", "@todo", ""},                                                                                  //ignores comments inside a print statement or string
+	{[]byte("--[[ Some multiline \n@todo comment \ncomment2 --]]"), "test5.lua", true, "output.txt", "@todo", "test5.lua\n 1)--[[ Some multiline \n@todo comment \ncomment2 --]]\n"}, //can get multi-line comments
 }
 
 func TestScan(t *testing.T) {
