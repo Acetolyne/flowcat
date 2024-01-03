@@ -69,6 +69,11 @@
         steps:
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
           - uses: actions/checkout@v2
+          - uses: actions/upload-artifact@v3
+            with:
+              name: upload-linux_amd64
+              path: |
+                bin/flowcat-linux-386/flowcat
           - uses: actions/setup-go@v2
             with:
               go-version: '^1.20.0'
