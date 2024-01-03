@@ -1,12 +1,6 @@
 package main
 
-//@todo use the map like if map[FILE TYPE] == tok.Type then add token to a slice of token structs
-//@todo return a slice of structs {Line, Token}
-//@todo add current todo regex into middle of comment regex when adding to lexer
-//@todo pass in the users regex to call to GetComments from main file
 //@todo create more types of comments
-//@todo make a go test file
-//@todo make the test.txt file be one file to test all types of comments
 import (
 	"encoding/json"
 	"fmt"

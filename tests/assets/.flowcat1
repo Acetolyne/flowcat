@@ -1,6 +1,0 @@
-# Settings
-match: "Comment"
-
-# File patterns to ignore
-ignore:
-  - "^\\..*"
