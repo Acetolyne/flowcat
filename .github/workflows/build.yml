@@ -21,7 +21,7 @@
     # The type of runner that the job will run on
       runs-on: ubuntu-latest
       outputs:
-        darwin-arm64-key: ${{ steps.darwin-arm64-cache.outputs.cache-primary-key }}
+        darwin-arm64-key: ${{ steps.darwin-arm64-cache.outputs.key }}
     # Steps represent a sequence of tasks that will be executed as part of the job
       steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -49,7 +49,8 @@
           with:
             path: |
               bin/flowcat-darwin-arm64/flowcat
-            key: ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
+            #key: ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
+            key: test
 
         # - name: upload-linux-386-artifact
         #   uses: actions/upload-artifact@v3
@@ -77,7 +78,8 @@
           uses: actions/cache/restore@v3
           with:
             path: bin/flowcat-darwin-arm64/flowcat
-            key: ${{ needs.build.outputs.darwin-arm64-key }}
+            # key: ${{ needs.build.outputs.darwin-arm64-key }}
+            key: test
         
         - name: "Determine tag"
           run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls bin/flowcat-linux-amd64/"
