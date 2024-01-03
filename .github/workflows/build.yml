@@ -72,8 +72,11 @@
       runs-on: "ubuntu-latest"
   
       steps:
+        - env:
+            OUTPUT1: ${{needs.build.outputs.output1}}
+          run: echo "Artifact ID from previous job is $OUTPUT1"
         - name: "Determine tag"
-          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && echo 'Artifact is ${{ steps.upload-linux-amd64-artifact.outputs.artifact-id }}'"
+          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && echo Artifact is $OUTPUT1"
   
         - name: "Create release"
           uses: "actions/github-script@v6"
