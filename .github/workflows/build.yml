@@ -46,22 +46,22 @@
           uses: actions/cache/save@v3
           with:
             path: |
-              ${{ github.workspace }}/bin/flowcat-darwin-arm64/flowcat
+              bin/flowcat-darwin-arm64/flowcat
             key: ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
 
-        - name: upload-linux-386-artifact
-          uses: actions/upload-artifact@v3
-          with:
-            name: flowcat-linux-386
-            path: |
-              ${{ github.workspace }}/bin/flowcat-linux-386/flowcat
+        # - name: upload-linux-386-artifact
+        #   uses: actions/upload-artifact@v3
+        #   with:
+        #     name: flowcat-linux-386
+        #     path: |
+        #       ${{ github.workspace }}/bin/flowcat-linux-386/flowcat
 
-        - name: upload-linux-amd64-artifact
-          uses: actions/upload-artifact@v3
-          with:
-            name: flowcat-linux-amd64
-            path: |
-              ${{ github.workspace }}/bin/flowcat-linux-amd64/flowcat
+        # - name: upload-linux-amd64-artifact
+        #   uses: actions/upload-artifact@v3
+        #   with:
+        #     name: flowcat-linux-amd64
+        #     path: |
+        #       ${{ github.workspace }}/bin/flowcat-linux-amd64/flowcat
 
 
     release:
@@ -74,7 +74,7 @@
         - name: get-cache
           uses: actions/cache/restore@v3
           with:
-            path: bin/flowcat-linux-amd64/flowcat
+            path: bin/flowcat-darwin-arm64/flowcat
             key: ${{ steps.darwin-arm64-cache.outputs.cache-primary-key }}
         
         - name: "Determine tag"
