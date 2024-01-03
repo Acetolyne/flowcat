@@ -151,8 +151,8 @@ func newLexer(match string) *lexmachine.Lexer {
 	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                                                           //SL-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`\/\*([^\*]|\*[^\/])*`), match, []byte(`([^\*]|\*[^\/])*\*\/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                               //ML-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                                                                 //SL-SHELL-STYLE
-	lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["SL-HTML-STYLE"]))                                                            //SL-HTML-STYLE
-	lexer.Add(lexReg([]byte(`<!--([^-]|-[^-]|--[^>])*`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                              //ML-HTML-STYLE
+	lexer.Add(lexReg([]byte(`(<!--[ ]+`), match, []byte(`[^\n]*-->)`)), getToken(tokmap["SL-HTML-STYLE"]))                                                          //SL-HTML-STYLE
+	lexer.Add(lexReg([]byte(`(<!--([^-]|-[^-]|--[^>])*\n([^\n])*)`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                  //ML-HTML-STYLE
 	lexer.Add(lexReg([]byte(`\-\-[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-LUA-STYLE"]))                                                                //SL-LUA-STYLE
 	lexer.Add(lexReg([]byte(`--\[\[([^-]|-[^-]|--[^\]|\-\-\][^\]])*`), match, []byte(`([^-]|-[^-]|--[^\]]|\-\-\][^\]])*--\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
 	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*`)), getToken(tokmap["ML-RUBY-STYLE"]))
