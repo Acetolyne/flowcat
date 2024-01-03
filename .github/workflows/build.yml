@@ -21,7 +21,7 @@
     # The type of runner that the job will run on
       runs-on: ubuntu-latest
       outputs:
-        output1: ${{ steps.flowcat-linux-amd64.outputs.artifact-id }}
+        output1: ${{ steps.upload-linux-amd64-artifact.outputs.artifact-id }}
     # Steps represent a sequence of tasks that will be executed as part of the job
       steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
