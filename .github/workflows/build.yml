@@ -42,12 +42,27 @@
             ls bin
             ls bin/flowcat-linux-amd64/
 
-        - name: upload-artifacts
+        - name: upload-darwin-arm64-artifact
           uses: actions/upload-artifact@v3
           with:
-            name: upload-linux_amd64
+            name: flowcat-darwin-arm64
+            path: |
+              ${{ github.workspace }}/bin/flowcat-darwin-arm64/flowcat
+
+        - name: upload-linux-386-artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: flowcat-linux-386
+            path: |
+              ${{ github.workspace }}/bin/flowcat-linux-386/flowcat
+
+        - name: upload-linux-amd64-artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: flowcat-linux-amd64
             path: |
               ${{ github.workspace }}/bin/flowcat-linux-amd64/flowcat
+
 
     release:
       name: "Release"
@@ -57,7 +72,7 @@
   
       steps:
         - name: "Determine tag"
-          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
+          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls ${{ github.workspace }}/bin/flowcat-linux-amd64/"
   
         - name: "Create release"
           uses: "actions/github-script@v6"
