@@ -41,12 +41,13 @@
             ls bin
             ls bin/flowcat-linux-amd64/
 
-        - name: upload-darwin-arm64-artifact
-          uses: actions/upload-artifact@v3
+        - name: upload-darwin-arm64-cache
+          id: darwin-arm64-cache
+          uses: actions/cache/save@v3
           with:
-            name: flowcat-darwin-arm64
             path: |
               ${{ github.workspace }}/bin/flowcat-darwin-arm64/flowcat
+            key: ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
 
         - name: upload-linux-386-artifact
           uses: actions/upload-artifact@v3
@@ -70,13 +71,14 @@
       runs-on: "ubuntu-latest"
   
       steps:
-        - name: get artifacts
-          uses: actions/download-artifact@master
+        - name: get-cache
+          uses: actions/cache/restore@v3
           with:
-            name: flowcat-linux-amd64
-            path: ${{ github.workspace }}/bin/flowcat-linux-amd64/flowcat
+            path: bin/flowcat-linux-amd64/flowcat
+            key: ${{ steps.darwin-arm64-cache.outputs.cache-primary-key }}
+        
         - name: "Determine tag"
-          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls ${{ github.workspace }}/bin/flowcat-linux-amd64/"
+          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls bin/flowcat-linux-amd64/"
   
         - name: "Create release"
           uses: "actions/github-script@v6"
