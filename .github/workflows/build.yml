@@ -44,6 +44,8 @@
             mkdir bin/flowcat-linux-amd64
             go test release_test.go
             if [ `echo $?` -ne 0 ]; then exit 1; fi
+            ls bin
+            ls bin/flowcat-linux-amd64/
 
     release:
       name: "Release"
