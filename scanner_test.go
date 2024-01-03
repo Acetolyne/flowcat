@@ -22,10 +22,10 @@ var scantests = []struct {
 	{[]byte("/* Some multiline \n@todo comment \ncomment2 */"), "test.go", true, "output.txt", "@todo", "test.go\n 1)/* Some multiline \n@todo comment \ncomment2 */\n"}, //can get multi-line comments
 	//Python tests
 	{[]byte("#@todo some comment"), "test.py", true, "output.txt", "@todo", "test.py\n 1)#@todo some comment\n"},
-	{[]byte("some words first #@todo some comment"), "test.py", true, "output.txt", "@todo", "test.py\n 1)#@todo some comment\n"},
-	{[]byte("#@todo some comment"), "test.py", true, "output.txt", "todo", ""},
-	{[]byte("print(\"#@todo some comment\")"), "test.py", true, "output.txt", "@todo", ""},
-	{[]byte("#some multiline \n#@todo comment\n#with 3 lines"), "test1.py", true, "output.txt", "@todo", "test1.py\n 1)#some multiline \n#@todo comment\n#with 3 lines\n"},
+	{[]byte("some words first #@todo some comment"), "test1.py", true, "output.txt", "@todo", "test1.py\n 1)#@todo some comment\n"},
+	{[]byte("#@todo some comment"), "test2.py", true, "output.txt", "todo", ""},
+	{[]byte("print(\"#@todo some comment\")"), "test3.py", true, "output.txt", "@todo", ""},
+	{[]byte("#some multiline \n#@todo comment\n#with 3 lines"), "test4.py", true, "output.txt", "@todo", "test4.py\n 1)#some multiline \n#@todo comment\n#with 3 lines\n"},
 }
 
 func TestScan(t *testing.T) {

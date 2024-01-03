@@ -146,7 +146,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
 	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
 	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
-	lexer.Add(lexReg([]byte(`(#([^\n]|\n[#])*)`), match, []byte(`([^\n]|\n[#])*`)), getToken(tokmap["ML-COMMENT-COMMON-B"]))
+	lexer.Add(lexReg([]byte(`(#(@todo)*.*#`), match, []byte(`([^\n]|\n[#])*)`)), getToken(tokmap["ML-COMMENT-COMMON-B"]))
 	//lexer.Add(lexReg([]byte(`//.*(\n[\/][\/].*)*`), match, []byte(`.*(\n[\/][\/].*)*`)), getToken(tokmap["ML-SINGLE-STYLE"]))
 	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                                                           //SL-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`\/\*([^\*]|\*[^\/])*`), match, []byte(`([^\*]|\*[^\/])*\*\/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                               //ML-COMMENT-COMMON-A
