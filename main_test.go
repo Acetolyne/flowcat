@@ -210,7 +210,7 @@ func TestReadme(t *testing.T) {
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		t.Errorf("[ERROR]Readme was autoupdated commit the changes and run the test again", err.Error())
+		t.Errorf("[ERROR]Readme was autoupdated commit the changes and run the test again %s", err.Error())
 	}
 	//Remove COPY
 	err = os.Remove("README_COPY.md")
