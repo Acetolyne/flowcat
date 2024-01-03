@@ -155,7 +155,7 @@ func newLexer(match string) *lexmachine.Lexer {
 	lexer.Add(lexReg([]byte(`(<!--([^-]|-[^-]|--[^>])*\n([^\n])*)`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                  //ML-HTML-STYLE
 	lexer.Add(lexReg([]byte(`\-\-\[\[([^\n])*`), match, []byte(`[^\n]+\-\-\]\]`)), getToken(tokmap["SL-LUA-STYLE"]))                                                //SL-LUA-STYLE
 	lexer.Add(lexReg([]byte(`--\[\[([^-]|-[^-]|--[^\]|\-\-\][^\]])*`), match, []byte(`([^-]|-[^-]|--[^\]]|\-\-\][^\]])*--\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
-	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*`)), getToken(tokmap["ML-RUBY-STYLE"]))
+	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*=end`)), getToken(tokmap["ML-RUBY-STYLE"]))
 	//@todo regex below has a bug so does not return the last token when doing the match on all chars except */}} when we add the last } it makes the asterisk not match in ending of token.
 	lexer.Add(lexReg([]byte(`\{\{\/\*([^\*]|\*[^\/]|\*\/[^\}]|\*\/\}[^\}])*`), match, []byte(`([^\*]|\*[^\/]|\*\/[^\}]|\*\/}[^}])*`)), getToken(tokmap["TEMPLATE-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
