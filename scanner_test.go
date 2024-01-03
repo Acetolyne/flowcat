@@ -23,15 +23,16 @@ var scantests = []struct {
 	//Python tests
 	{[]byte("#@todo some comment"), "test.py", true, "output.txt", "@todo", "test.py\n 1)#@todo some comment\n"},
 	{[]byte("some words first #@todo some comment"), "test.py", true, "output.txt", "@todo", "test.py\n 1)#@todo some comment\n"},
-	{[]byte("#@todo some comment"), "test1.py", true, "output.txt", "todo", ""},
+	{[]byte("#@todo some comment"), "test.py", true, "output.txt", "todo", ""},
 	{[]byte("print(\"#@todo some comment\")"), "test.py", true, "output.txt", "@todo", ""},
-	//{[]byte("#some multiline \n#@todo comment\n#with 3 lines"), "test.py", true, "output.txt", "@todo", "test.py\n 1)#some multiline \n#@todo comment\n#with 3 lines\n"},
+	{[]byte("#some multiline \n#@todo comment\n#with 3 lines"), "test1.py", true, "output.txt", "@todo", "test1.py\n 1)#some multiline \n#@todo comment\n#with 3 lines\n"},
 }
 
 func TestScan(t *testing.T) {
 	var Cfg Config
 	Cfg.Linenum = "false"
 	for _, e := range scantests {
+		//fmt.Println("TESTING", e)
 		lexer = newLexer(e.match)                              //sets the matching string
 		err := Scan(e.text, e.path, e.showlines, e.outputFile) //e.text, e.path, e.showlines, e.outputFile
 		if err != nil {
