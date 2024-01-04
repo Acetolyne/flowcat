@@ -91,7 +91,7 @@
               bin
               bin/*
               bin/flowcat-darwin-arm64/flowcat
-            key: "$OUTPUT"
+            key: ${{ env.OUTPUT }}
             #key: test
         
         - name: "Determine tag"
