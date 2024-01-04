@@ -48,6 +48,8 @@
           uses: actions/cache/save@v3
           with:
             path: |
+              bin
+              bin/*
               bin/flowcat-darwin-arm64/flowcat
             #key: ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
             key: test
@@ -77,7 +79,10 @@
         - name: get-cache
           uses: actions/cache/restore@v3
           with:
-            path: bin/flowcat-darwin-arm64/flowcat
+            path: |
+              bin
+              bin/*
+              bin/flowcat-darwin-arm64/flowcat
             # key: ${{ needs.build.outputs.darwin-arm64-key }}
             key: test
         
