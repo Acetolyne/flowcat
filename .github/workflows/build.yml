@@ -114,7 +114,7 @@
               await github.rest.repos.uploadReleaseAsset({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                release_id: response.data.id,
+                release_id: ${RELEASE_ID},
                 name: "flowcat-darwin-arm64",
                 data: await fs.readFileSync("bin/flowcat-darwin-arm64/flowcat")
               });
