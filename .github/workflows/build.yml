@@ -51,8 +51,8 @@
               bin
               bin/*
               bin/flowcat-darwin-arm64/flowcat
-            #key: ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
-            key: test
+            key: ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
+            #key: test
 
         - name: upload-linux-386-cache
           id: linux-386-cache
