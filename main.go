@@ -146,7 +146,7 @@ func main() {
 
 	//Helpflag implemented because the default help flag from the flag package returns status code 2
 	if *helpFlag {
-		fmt.Println("Flowcat version 3.1.1")
+		fmt.Println("Flowcat version 4.0.0")
 		fmt.Println("")
 		fmt.Println("Options for Flowcat:")
 		fmt.Println("init")
