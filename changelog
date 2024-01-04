@@ -1,5 +1,8 @@
-VERSION 3.0.0
+VERSION 4.0.0
 
-Moved to using a custom lexer to parse files.
-Adds ability to parse files with multiple comment styles such as html files that may have html comments as well as javascript comments in a single filetype.
-Moves settings file to user home folder instead of per directory as this didn't work well when scanning specific folders within a project.
+Moved to a new lexer that significantly improves speed of finding matching comments
+Added better testing files
+Started using releases on Github
+Added logging
+moved config file to user directory only
+Fixed issue where comments inside of print statements were returned
