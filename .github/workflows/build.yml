@@ -81,8 +81,8 @@
     #   needs: [build]
   
     #   runs-on: "ubuntu-latest"
-    #   # env:
-    #   #   OUTPUT: ${{ needs.build.outputs.cache-key }}
+    #   env:
+    #     CACHE_KEY: ${{ env.CACHE_KEY }}
   
     #   steps:
         - name: get-cache
@@ -92,11 +92,11 @@
               bin
               bin/*
               bin/flowcat-darwin-arm64/flowcat
-            key: ${{ env.CACHE_KEY }}
+            key: ${{ github.env.GITHUB_ENV.CACHE_KEY }}
             #key: test
         
         - name: "Determine tag"
-          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && echo \"${{ env.CACHE_KEY }}\""
+          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV\""
   
         - name: "Create release"
           uses: "actions/github-script@v6"
