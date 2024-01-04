@@ -89,8 +89,8 @@
               bin
               bin/*
               bin/flowcat-darwin-arm64/flowcat
-            # key: ${{ needs.build.outputs.darwin-arm64-key }}
-            key: test
+            key: ${{ needs.build.outputs.darwin-arm64-key }}
+            #key: test
         
         - name: "Determine tag"
           run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls bin/flowcat-linux-amd64/"
