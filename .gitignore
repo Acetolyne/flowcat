@@ -2,3 +2,5 @@
 go.work
 flowcat
 todo
+bin/*
+tests/*

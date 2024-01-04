@@ -1,7 +1,7 @@
-# flowcat 3.0.0
+# flowcat v4.0.0
 
 
-## Flowcat helps developers bring their todo tasks forward to the user so you don't need to waste time looking for them. It provides a clear overview of your tasks and allows you to stay focused on your work. You can also output to a file for planning purposes or to separate tasks into different categories.
+## Flowcat helps developers bring their todo tasks forward to the user so you don't need to waste time looking for them. It provides a clear overview of your tasks and allows you to stay focused on your work. You can also output to a file for planning purposes or to separate tasks into different categories
 
 <a href="https://goreportcard.com/report/github.com/Acetolyne/flowcat" target="_blank"><img src="https://goreportcard.com/badge/github.com/Acetolyne/flowcat?style=flat&logo=none" alt="go report" /></a>
 
@@ -57,14 +57,11 @@ Options for Flowcat:
 ### SETUP
 
 #### Installation
-Download the appropriate version for your system below then put the flowcat binary for your OS in one of your userpaths such as /usr/local/bin/, /bin/, /sbin/ or another path
+Download the appropriate version for your system from the releases on Github, unzip the file then put the flowcat binary for your OS in one of your userpaths such as /usr/local/bin/, /bin/, /sbin/ or another path
 
-[![linux-amd64 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-amd64%20build%20and%20functionality.yml) https://github.com/Acetolyne/flowcat/raw/master/bin/flowcat-linux-amd64/flowcat
+[![functionality](https://github.com/Acetolyne/flowcat/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/test.yml)
 
-[![linux-386 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/linux-386%20build%20and%20functionality.yml) https://github.com/Acetolyne/flowcat/raw/master/bin/flowcat-linux-386/flowcat
-
-[![darwin-arm64 build and functionality](https://github.com/Acetolyne/flowcat/actions/workflows/darwin-arm64%20build%20and%20functionality.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/darwin-arm64%20build%20and%20functionality.yml) https://github.com/Acetolyne/flowcat/raw/master/bin/flowcat-darwin-arm64/flowcat
-
+[![build](https://github.com/Acetolyne/flowcat/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Acetolyne/flowcat/actions/workflows/build.yml)
 
 
 Flowcat is currently only tested on Linux systems, now that flowcat is written in GoLang I am looking at porting it to Windows systems as well. While not tested yet it should currently work with MacOS as well but feedback is required.
@@ -74,10 +71,15 @@ Flowcat is currently only tested on Linux systems, now that flowcat is written i
 To install from source clone the repository with the command ```git clone https://github.com/Acetolyne/flowcat```
 build the binary for your system with ```go build *.go -o flowcat```
 Now move the binary to a system path such as /usr/bin/
-alternatively if you don't want to setup a go environment to build from source you may use one of the pre-compiled binaries in the bin directory.
+if you are cross compiling for another system you will need to export the appropriate variables as per the golang documentation.
+
+#### download binary
+alternatively if you don't want to setup a go environment to build from source you may use one of the pre-compiled binaries that are available as releases on the github page https://github.com/Acetolyne/flowcat.
 
 #### Settings initialization
 running ```flowcat init``` will allow you to make a settings file for your user so that you can set the default -m argument as well as a list of regex for files to ignore. Once running flowcat init flowcat will confirm the file was written to ~/.flowcat/config, it is suggested to edit the settings file to include the files or regex you would like to ignore when flowcat runs.
+
+If you use the -o option to output to a file that file will automatically be ignored so you are not reading your output, this makes it safe to output to the same directory that you are reading.
 
 #### Regex
 The regex used for matching against ignore files and to match lines via the -m argument is described in the documentation at https://github.com/google/re2/wiki/Syntax and uses the MatchString method.
@@ -85,7 +87,6 @@ The regex used for matching against ignore files and to match lines via the -m a
 Certain characters will need to be escaped with a backslash ```\``` including the backslash character itself ```\``` becomes ```\\```
 
 The syntax of the regular expressions accepted is the same general syntax used by Perl, Python, and other languages. More precisely, it is the syntax accepted by RE2 and described at https://golang.org/s/re2syntax, except for \C. For an overview of the syntax, run ```go doc regexp/syntax```
-
 
 
 
@@ -114,29 +115,28 @@ A useful workflow is to have flowcat regenerate your todo list when you save a f
 ```
 ### Supported filetypes
 flowcat currently supports the following filetypes additionally files with no extensions use the basic // comment style and /*  */ comment style for multiline comments.
-To have additional filetypes added to flowcat please open an issue on GitHub for the lexer that is used by flowcat at github.com/Acetolyne/commentlex
+To have additional filetypes added to flowcat please open an issue on GitHub at github.com/Acetolyne/flowcat
 
-##### Supported Filetypes <!--Everything below this line is autogenerated do not edit -->
+#### Supported Filetypes <!--Everything below this line is autogenerated do not edit -->
 
-.go
-.py
-.js
-.rs
-.html
-.gohtml
-.php
+```text
 .c
-.cpp
-.h
 .class
+.cpp
+.go
+.gohtml
+.h
+.html
 .jar
 .java
+.js
 .jsp
-.sh
-.php
-.html
-.gohtml
-.md
 .lua
-.rb
+.md
+.php
 .py
+.rb
+.rs
+.sh
+.tmpl
+```

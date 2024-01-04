@@ -1,12 +1,6 @@
 package main
 
-//@todo use the map like if map[FILE TYPE] == tok.Type then add token to a slice of token structs
-//@todo return a slice of structs {Line, Token}
-//@todo add current todo regex into middle of comment regex when adding to lexer
-//@todo pass in the users regex to call to GetComments from main file
 //@todo create more types of comments
-//@todo make a go test file
-//@todo make the test.txt file be one file to test all types of comments
 import (
 	"encoding/json"
 	"fmt"
@@ -37,71 +31,76 @@ type CommentValues struct {
 }
 
 var tokens = []string{
-	"IGNORE", "ML-SINGLE-STYLE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE", "TEMPLATE-STYLE",
+	"IGNORE", "ML-COMMENT-COMMON-B", "ML-SINGLE-STYLE", "SL-COMMENT-COMMON-A", "ML-COMMENT-COMMON-A", "SL-SHELL-STYLE", "SL-HTML-STYLE", "ML-HTML-STYLE", "SL-LUA-STYLE", "ML-LUA-STYLE", "ML-RUBY-STYLE", "TEMPLATE-STYLE",
 }
 var tokmap map[string]int
 var lexer *lexmachine.Lexer
 
 var Extensions = []CommentValues{
 	{
+		Ext: []string{"py"},
+		// Multiline each starting with #
+		Type: 1,
+	},
+	{
 		Ext: []string{"rs"},
 		// Multiline each starting with //
-		Type: 1,
+		Type: 2,
 	},
 	{
 		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp", "php"},
 		// startSingle: "//",
-		Type: 2,
+		Type: 3,
 	},
 	{
 		Ext: []string{"", "go", "py", "js", "rs", "html", "gohtml", "php", "c", "cpp", "h", "class", "jar", "java", "jsp", "php"},
 		// startMulti:  "/*",
 		// endMulti:    "*/",
-		Type: 3,
+		Type: 4,
 	},
 	{
 		Ext: []string{"sh", "php", "rb", "py"},
 		// startSingle: "#",
-		Type: 4,
+		Type: 5,
 	},
 	{
 		Ext: []string{"html", "gohtml", "md"},
 		// Singleline HTML STYLE:  "<!--" COMMENT "-->",
-		Type: 5,
+		Type: 6,
 	},
 	{
 		Ext: []string{"html", "gohtml", "md"},
 		// startMulti:  "<!--",
 		// endMulti:    "-->",
-		Type: 6,
+		Type: 7,
 	},
 	{
 		Ext: []string{"lua"},
 		// startSingle: "--",
-		Type: 7,
+		Type: 8,
 	},
 	{
 		Ext: []string{"lua"},
 		// startMulti:  "--[[",
 		// endMulti:    "--]]",
-		Type: 8,
+		Type: 9,
 	},
 	{
 		Ext: []string{"rb"},
 		// startMulti:  "=begin",
 		// endMulti:    "=end",
-		Type: 9,
+		Type: 10,
 	},
 	{
 		Ext: []string{"tmpl"},
 		// startMulti: "{{/*",
 		// endMulti:   "*/}}",
-		Type: 10,
+		Type: 11,
 	},
 	{
 		Ext: []string{"rs"},
 		// Multiline each starting with //
-		Type: 11,
+		Type: 12,
 	},
 }
 
@@ -134,24 +133,20 @@ func newLexer(match string) *lexmachine.Lexer {
 	}
 	var lexer = lexmachine.NewLexer()
 	//NEGATIVE LOOKAHEADS NOT SUPPORTED use START([^E]|E[^N]|EN[^D])*MATCH([^E]|E[^N]|EN[^D])*END to generate a long POSIX compatible regex
-	//@todo create tests for:
-	//partial ending token in middle of comment does not cut comment off
-	//comment in double quotes
-	//comment in single quotes
-	//lexer.Add([]byte(`#[^\n]*`), getToken(tokmap["COMMENT"]))
+
 	lexer.Add(lexReg([]byte(`[\"]//[ ]*`), match, []byte(`[^\n]*[\"][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN DOUBLE QUOTES
 	lexer.Add(lexReg([]byte(`[\']//[ ]*`), match, []byte(`[^\n]*[\'][^\n]*`)), getToken(tokmap["IGNORE"])) //IGNORE THE MATCH WHEN IT IS BETWEEN SINGLE QUOTES
+	lexer.Add(lexReg([]byte(`(#(@todo)*.*#`), match, []byte(`([^\n]|\n[#])*)`)), getToken(tokmap["ML-COMMENT-COMMON-B"]))
 	//lexer.Add(lexReg([]byte(`//.*(\n[\/][\/].*)*`), match, []byte(`.*(\n[\/][\/].*)*`)), getToken(tokmap["ML-SINGLE-STYLE"]))
 	lexer.Add(lexReg([]byte(`//[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-COMMENT-COMMON-A"]))                                                           //SL-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`\/\*([^\*]|\*[^\/])*`), match, []byte(`([^\*]|\*[^\/])*\*\/`)), getToken(tokmap["ML-COMMENT-COMMON-A"]))                               //ML-COMMENT-COMMON-A
 	lexer.Add(lexReg([]byte(`#[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-SHELL-STYLE"]))                                                                 //SL-SHELL-STYLE
-	lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["SL-HTML-STYLE"]))                                                            //SL-HTML-STYLE
-	lexer.Add(lexReg([]byte(`<!--([^-]|-[^-]|--[^>])*`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                              //ML-HTML-STYLE
-	lexer.Add(lexReg([]byte(`\-\-[ ]*`), match, []byte(`[^\n]*`)), getToken(tokmap["SL-LUA-STYLE"]))                                                                //SL-LUA-STYLE
+	lexer.Add(lexReg([]byte(`(<!--[^\n]+`), match, []byte(`[^\n]*-->)`)), getToken(tokmap["SL-HTML-STYLE"]))                                                        //SL-HTML-STYLE
+	lexer.Add(lexReg([]byte(`(<!--([^-]|-[^-]|--[^>])*\n([^\n])*)`), match, []byte(`([^-]|-[^-]|--[^>])*-->`)), getToken(tokmap["ML-HTML-STYLE"]))                  //ML-HTML-STYLE
+	lexer.Add(lexReg([]byte(`\-\-\[\[([^\n])*`), match, []byte(`[^\n]+\-\-\]\]`)), getToken(tokmap["SL-LUA-STYLE"]))                                                //SL-LUA-STYLE
 	lexer.Add(lexReg([]byte(`--\[\[([^-]|-[^-]|--[^\]|\-\-\][^\]])*`), match, []byte(`([^-]|-[^-]|--[^\]]|\-\-\][^\]])*--\]\]`)), getToken(tokmap["ML-LUA-STYLE"])) //ML-LUA-STYLE
-	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*`)), getToken(tokmap["ML-RUBY-STYLE"]))
-	//@todo regex below has a bug so does not return the last token when doing the match on all chars except */}} when we add the last } it makes the asterisk not match in ending of token.
-	lexer.Add(lexReg([]byte(`\{\{\/\*([^\*]|\*[^\/]|\*\/[^\}]|\*\/\}[^\}])*`), match, []byte(`([^\*]|\*[^\/]|\*\/[^\}]|\*\/}[^}])*`)), getToken(tokmap["TEMPLATE-STYLE"]))
+	lexer.Add(lexReg([]byte(`\=begin([^=]|=[^e]|=e[^n]|=en[^d])*`), match, []byte(`([^=]|=[^e]|=e[^n]|=en[^d])*=end`)), getToken(tokmap["ML-RUBY-STYLE"]))
+	lexer.Add(lexReg([]byte(`\{\{\/\*([^\*]|\*[^\/]|\*\/[^\}]|\*\/\}[^\}])*`), match, []byte(`([^\*]|\*[^\/]|\*\/[^\}]|\*\/}[^}])*\*\/\}\}`)), getToken(tokmap["TEMPLATE-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
 	// lexer.Add(lexReg([]byte(`<!--[ ]*`), match, []byte(`[^\n]*-->`)), getToken(tokmap["WHAT-STYLE"]))
@@ -178,13 +173,17 @@ func newLexer(match string) *lexmachine.Lexer {
 	return lexer
 }
 
-func scan(text []byte, path string, showlines bool, outputFile string) error {
+func Scan(text []byte, path string, showlines bool, outputFile string) error {
 	logger.Info.Println("Scanning file:", path)
 	var f *os.File
 	var err error
-
 	//open output file in preparation
 	if outputFile != "" {
+		dir, _ := filepath.Split(outputFile)
+		if dir == "" {
+			folder, _ := filepath.Split(path)
+			outputFile = folder + outputFile
+		}
 		logger.Info.Println("Output will be sent to", outputFile)
 		f, err = os.OpenFile(outputFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0755)
 		if err != nil {
@@ -201,6 +200,7 @@ func scan(text []byte, path string, showlines bool, outputFile string) error {
 	}
 	scanner, err := lexer.Scanner(text)
 	if err != nil {
+		logger.Err.Println("Error while scanning text", string(text), err.Error())
 		return err
 	}
 	for tk, err, eof := scanner.Next(); !eof; tk, err, eof = scanner.Next() {
@@ -219,9 +219,11 @@ func scan(text []byte, path string, showlines bool, outputFile string) error {
 						if CommentValue.Type == curtok.Type {
 							if printfile {
 								fmt.Println(path)
-								_, err = f.WriteString(path + "\n")
-								if err != nil {
-									logger.Err.Println("Could not write output file", err.Error())
+								if outputFile != "" {
+									_, err = f.WriteString(path + "\n")
+									if err != nil {
+										logger.Err.Println("Could not write output file", err.Error())
+									}
 								}
 								printfile = false
 							}
@@ -258,7 +260,7 @@ func scan(text []byte, path string, showlines bool, outputFile string) error {
 func GetComments(text []byte, match string, path string, showlines bool, outputFile string) {
 	logger.Info.Println("matching on", match)
 	lexer = newLexer(match)
-	err := scan(text, path, showlines, outputFile)
+	err := Scan(text, path, showlines, outputFile)
 	if err != nil {
 		logger.Err.Println("Error scanning text", err.Error())
 	}

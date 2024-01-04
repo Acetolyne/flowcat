@@ -14,8 +14,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// @todo add logger
-// @todo add debug option in config file
 // Config structure of configuration from a yaml settings file.
 type Config struct {
 	Linenum      string   `yaml:"linenum"`
@@ -31,12 +29,11 @@ var Cfg Config
 var Debug int
 
 // @todo excluded regex not working when -f is specified because -f value is part of the path
-func checkExclude(path string, outfile string, folderFlag string) (string, bool) {
+func CheckExclude(path string, outfile string, folderFlag string) (string, bool) {
 	regpath := strings.TrimPrefix(path, folderFlag)
 	m := Cfg.IgnoredItems
 	reg := []bool{}
 	//If we are outputting to a file ignore the output file by default if it is in the project path
-	//@todo fix this logic see if path ends with the outfile
 	if outfile != "" {
 		if strings.Contains(outfile, folderFlag) {
 			m = append(m, outfile)
@@ -139,6 +136,7 @@ func main() {
 	var matchexp string
 	var outputFile string
 
+	//@todo add --dfa flag and pass to lexer file to change lexer compiling to dfa if wanted
 	folderFlag := flag.String("f", "./", "The project top level directory, where flowcat should start recursing from.")
 	outputFlag := flag.String("o", "", "Optional output file to dump results to, note output will still be shown on terminal.")
 	matchFlag := flag.String("m", "", "The string to match to do items on.")
@@ -183,7 +181,6 @@ func main() {
 	//@todo check if the folder .flowcat exists in the user dir
 	//@todo if it does not exist create it
 	//@todo if there is no .flowcat/settings file then create it with defaults
-	//@todo logs should go in the .flowcat folder as debug.log and error.log each should be overwritten every time.
 	settings, err := os.OpenFile(dirname+"/.flowcat/config", os.O_RDONLY, 0600)
 	if err != nil {
 		logger.Warn.Println("Could not open user configuration file", dirname+"/.flowcat/config", err.Error())
@@ -218,7 +215,14 @@ func main() {
 
 	if *outputFlag != "" {
 		if *folderFlag != "" {
-			outputFile = *folderFlag + *outputFlag
+			//If the user only supplied a filename without a path then use the filepath supplied at -f
+			dir, _ := filepath.Split(*outputFlag)
+			if dir == "" {
+				dir, _ := filepath.Split(*folderFlag)
+				outputFile = dir + *outputFlag
+			} else {
+				outputFile = *outputFlag
+			}
 		} else {
 			outputFile = *outputFlag
 		}
@@ -228,6 +232,7 @@ func main() {
 			logger.Err.Println("Could not trucate output file", outputFile, err.Error())
 		}
 	}
+	//Todo make this its own function and pass in relative information
 	parseFiles := func(path string, info os.FileInfo, _ error) (err error) {
 
 		if outputFile != "" {
@@ -242,8 +247,7 @@ func main() {
 			}
 		}
 		if info.Mode().IsRegular() {
-			file, exc := checkExclude(path, outputFile, *folderFlag)
-
+			file, exc := CheckExclude(path, outputFile, *folderFlag)
 			//If the file does not match our exclusion regex then use it.
 			if !exc {
 				logger.Info.Println("Checking file", path)
