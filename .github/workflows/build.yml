@@ -105,17 +105,17 @@
                   repo: context.repo.repo,
                   tag_name: process.env.RELEASE_TAG,
                 });
-  
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: response.data.id,
+                  name: "flowcat-darwin-arm64",
+                  data: await fs.readFileSync("bin/flowcat-darwin-arm64/flowcat")
+                });
                 core.exportVariable('RELEASE_ID', response.data.id);
                 core.exportVariable('RELEASE_UPLOAD_URL', response.data.upload_url);
               } catch (error) {
                 core.setFailed(error.message);
               }
-              await github.rest.repos.uploadReleaseAsset({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id: ${RELEASE_ID},
-                name: "flowcat-darwin-arm64",
-                data: await fs.readFileSync("bin/flowcat-darwin-arm64/flowcat")
-              });
+              
 
