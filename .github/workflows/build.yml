@@ -20,8 +20,8 @@
     build:
     # The type of runner that the job will run on
       runs-on: ubuntu-latest
-      outputs:
-        cache-key: ${{ steps.build-script.outputs.cache_key }}
+      # outputs:
+      #   cache-key: ${{ steps.build-script.outputs.cache_key }}
     # Steps represent a sequence of tasks that will be executed as part of the job
       steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -42,8 +42,8 @@
             go test release_test.go
             if [ `echo $?` -ne 0 ]; then exit 1; fi
             ls bin/flowcat-darwin-arm64/
-            echo "${{ hashFiles('bin/flowcat-darwin-arm64/**') }}"
-            echo "cache_key=${{ hashFiles('bin/flowcat-darwin-arm64/**') }}" >> $GITHUB_OUTPUT
+            # echo "${{ hashFiles('bin/flowcat-darwin-arm64/**') }}"
+            # echo "cache_key=${{ hashFiles('bin/flowcat-darwin-arm64/**') }}" >> $GITHUB_OUTPUT
 
         - name: upload-darwin-arm64-cache
           id: darwin-arm64-cache
@@ -53,7 +53,7 @@
               bin
               bin/*
               bin/flowcat-darwin-arm64/flowcat
-            key: ${{ steps.build-script.outputs.cache_key }}
+            key: ${{ github.sha }}
 
         # - name: upload-linux-386-cache
         #   id: linux-386-cache
@@ -95,7 +95,7 @@
               bin
               bin/*
               bin/flowcat-darwin-arm64/flowcat
-            key: ${{ env.cache_key }}
+            key: ${{ github.sha }}
             #key: test
         
         - name: "Determine tag"
