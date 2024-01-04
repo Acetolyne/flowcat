@@ -76,15 +76,15 @@
         #     key: test
 
 
-    release:
-      name: "Release"
-      needs: [build]
+    # release:
+    #   name: "Release"
+    #   needs: [build]
   
-      runs-on: "ubuntu-latest"
-      # env:
-      #   OUTPUT: ${{ needs.build.outputs.cache-key }}
+    #   runs-on: "ubuntu-latest"
+    #   # env:
+    #   #   OUTPUT: ${{ needs.build.outputs.cache-key }}
   
-      steps:
+    #   steps:
         - name: get-cache
           uses: actions/cache/restore@v3
           with:
