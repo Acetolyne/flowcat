@@ -55,6 +55,12 @@ func TestPre(t *testing.T) {
 	if err != nil {
 		t.Fatal("[PRE-TEST][BIN FOLDER] creating the folder bin/flowcat-linux-amd64 failed", err.Error())
 	}
+
+	//Create tmp file folder
+	err = os.MkdirAll("tests/files", 0775)
+	if err != nil {
+		t.Fatal("Could not perform pre-test actions, creating the tmp file folder failed", err.Error())
+	}
 }
 
 // func TestCfg(t *testing.T) {

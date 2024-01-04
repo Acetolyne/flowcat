@@ -1,4 +1,4 @@
-# flowcat 4.0.0
+# flowcat v4.0.0
 
 
 ## Flowcat helps developers bring their todo tasks forward to the user so you don't need to waste time looking for them. It provides a clear overview of your tasks and allows you to stay focused on your work. You can also output to a file for planning purposes or to separate tasks into different categories
