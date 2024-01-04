@@ -40,8 +40,7 @@
             mkdir bin/flowcat-linux-amd64
             go test release_test.go
             if [ `echo $?` -ne 0 ]; then exit 1; fi
-            ls bin
-            ls bin/flowcat-linux-amd64/
+            echo "KEY ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}"
 
         - name: upload-darwin-arm64-cache
           id: darwin-arm64-cache
@@ -54,19 +53,25 @@
             #key: ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
             key: test
 
-        # - name: upload-linux-386-artifact
-        #   uses: actions/upload-artifact@v3
-        #   with:
-        #     name: flowcat-linux-386
-        #     path: |
-        #       ${{ github.workspace }}/bin/flowcat-linux-386/flowcat
+        - name: upload-linux-386-cache
+          id: linux-386-cache
+          uses: actions/cache/save@v3
+          with:
+            path: |
+              bin
+              bin/*
+              bin/flowcat-linux-386/flowcat
+            key: test
 
-        # - name: upload-linux-amd64-artifact
-        #   uses: actions/upload-artifact@v3
-        #   with:
-        #     name: flowcat-linux-amd64
-        #     path: |
-        #       ${{ github.workspace }}/bin/flowcat-linux-amd64/flowcat
+        - name: upload-linux-amd64-cache
+          id: linux-amd64-cache
+          uses: actions/cache/save@v3
+          with:
+            path: |
+              bin
+              bin/*
+              bin/flowcat-linux-amd64/flowcat
+            key: test
 
 
     release:
@@ -111,6 +116,20 @@
                   release_id: response.data.id,
                   name: "flowcat-darwin-arm64",
                   data: await fs.readFileSync("bin/flowcat-darwin-arm64/flowcat")
+                });
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: response.data.id,
+                  name: "flowcat-linux-386",
+                  data: await fs.readFileSync("bin/flowcat-linux-386/flowcat")
+                });
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: response.data.id,
+                  name: "flowcat-linux-amd64",
+                  data: await fs.readFileSync("bin/flowcat-linux-amd64/flowcat")
                 });
                 core.exportVariable('RELEASE_ID', response.data.id);
                 core.exportVariable('RELEASE_UPLOAD_URL', response.data.upload_url);
