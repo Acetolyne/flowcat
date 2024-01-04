@@ -40,6 +40,7 @@
             mkdir bin/flowcat-linux-amd64
             go test release_test.go
             if [ `echo $?` -ne 0 ]; then exit 1; fi
+            ls bin/flowcat-darwin-arm64/
             echo "KEY ${{ runner.os }}-${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}"
 
         - name: upload-darwin-arm64-cache
