@@ -42,7 +42,8 @@
             go test release_test.go
             if [ `echo $?` -ne 0 ]; then exit 1; fi
             ls bin/flowcat-darwin-arm64/
-            echo "CACHE_KEY=${{ hashFiles('bin/flowcat-darwin-arm64/**') }}" >> $GITHUB_OUTPUT
+            echo "${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}"
+            echo "CACHE_KEY=${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}" >> $GITHUB_OUTPUT
 
         - name: upload-darwin-arm64-cache
           id: darwin-arm64-cache
@@ -54,25 +55,25 @@
               bin/flowcat-darwin-arm64/flowcat
             key: ${{ hashFiles('bin/flowcat-darwin-arm64/flowcat') }}
 
-        - name: upload-linux-386-cache
-          id: linux-386-cache
-          uses: actions/cache/save@v3
-          with:
-            path: |
-              bin
-              bin/*
-              bin/flowcat-linux-386/flowcat
-            key: test
+        # - name: upload-linux-386-cache
+        #   id: linux-386-cache
+        #   uses: actions/cache/save@v3
+        #   with:
+        #     path: |
+        #       bin
+        #       bin/*
+        #       bin/flowcat-linux-386/flowcat
+        #     key: test
 
-        - name: upload-linux-amd64-cache
-          id: linux-amd64-cache
-          uses: actions/cache/save@v3
-          with:
-            path: |
-              bin
-              bin/*
-              bin/flowcat-linux-amd64/flowcat
-            key: test
+        # - name: upload-linux-amd64-cache
+        #   id: linux-amd64-cache
+        #   uses: actions/cache/save@v3
+        #   with:
+        #     path: |
+        #       bin
+        #       bin/*
+        #       bin/flowcat-linux-amd64/flowcat
+        #     key: test
 
 
     release:
@@ -95,7 +96,7 @@
             #key: test
         
         - name: "Determine tag"
-          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && ls bin/flowcat-linux-amd64/"
+          run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV && echo \"${{ env.OUTPUT }}\""
   
         - name: "Create release"
           uses: "actions/github-script@v6"
