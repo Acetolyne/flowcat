@@ -6,3 +6,4 @@ Started using releases on Github
 Added logging
 moved config file to user directory only
 Fixed issue where comments inside of print statements were returned
+updated default to match on TODO instead of @todo
