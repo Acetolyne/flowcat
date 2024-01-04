@@ -80,13 +80,11 @@
       needs: [build]
   
       runs-on: "ubuntu-latest"
-      env:
-        cache_key: ${{ needs.build.outputs.cache-key }}
   
       steps:
         - name: get-cache-key
           env:
-            cache_key: ${{ needs.build.outputs.cache-key }}
+            cache_key: test
           run: echo "$cache_key"
 
         - name: get-cache
