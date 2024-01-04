@@ -111,11 +111,11 @@
               } catch (error) {
                 core.setFailed(error.message);
               }
-              await github.repos.uploadReleaseAsset({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: response.data.id,
-              name: "flowcat-darwin-arm64",
-              data: await fs.readFileSync("bin/flowcat-darwin-arm64/flowcat")
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: response.data.id,
+                name: "flowcat-darwin-arm64",
+                data: await fs.readFileSync("bin/flowcat-darwin-arm64/flowcat")
               });
 
