@@ -42,7 +42,7 @@
             go test release_test.go
             if [ `echo $?` -ne 0 ]; then exit 1; fi
             ls bin/flowcat-darwin-arm64/
-            echo "::set-output name=CACHE_KEY::${{ hashFiles('bin/flowcat-darwin-arm64/**') }}"
+            echo "CACHE_KEY=${{ hashFiles('bin/flowcat-darwin-arm64/**') }}" >> $GITHUB_OUTPUT
 
         - name: upload-darwin-arm64-cache
           id: darwin-arm64-cache
@@ -80,6 +80,8 @@
       needs: [build]
   
       runs-on: "ubuntu-latest"
+      env:
+        OUTPUT: ${{ needs.build.outputs.cache-key }}
   
       steps:
         - name: get-cache
@@ -89,7 +91,7 @@
               bin
               bin/*
               bin/flowcat-darwin-arm64/flowcat
-            key: ${{ needs.build.outputs.cache-key }}
+            key: "$OUTPUT"
             #key: test
         
         - name: "Determine tag"
