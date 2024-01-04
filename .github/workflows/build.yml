@@ -55,25 +55,25 @@
               bin/flowcat-darwin-arm64/flowcat
             key: ${{ github.sha }}
 
-        # - name: upload-linux-386-cache
-        #   id: linux-386-cache
-        #   uses: actions/cache/save@v3
-        #   with:
-        #     path: |
-        #       bin
-        #       bin/*
-        #       bin/flowcat-linux-386/flowcat
-        #     key: test
+        - name: upload-linux-386-cache
+          id: linux-386-cache
+          uses: actions/cache/save@v3
+          with:
+            path: |
+              bin
+              bin/*
+              bin/flowcat-linux-386/flowcat
+            key: ${{ github.sha }}
 
-        # - name: upload-linux-amd64-cache
-        #   id: linux-amd64-cache
-        #   uses: actions/cache/save@v3
-        #   with:
-        #     path: |
-        #       bin
-        #       bin/*
-        #       bin/flowcat-linux-amd64/flowcat
-        #     key: test
+        - name: upload-linux-amd64-cache
+          id: linux-amd64-cache
+          uses: actions/cache/save@v3
+          with:
+            path: |
+              bin
+              bin/*
+              bin/flowcat-linux-amd64/flowcat
+            key: ${{ github.sha }}
 
 
     release:
